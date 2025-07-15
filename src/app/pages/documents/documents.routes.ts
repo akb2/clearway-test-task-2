@@ -1,4 +1,4 @@
 export const DocumentsRoutes = {
   path: "documents",
-  loadChildren: () => import("./documents.component").then(m => m.DocumentsComponent)
+  loadComponent: () => import("./documents.component").then(m => m.DocumentsComponent)
 };
