@@ -10,10 +10,8 @@ import { BehaviorSubject } from "rxjs";
   styleUrl: './documents.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DocumentsComponent implements OnInit, OnDestroy {
+export class DocumentsComponent implements OnInit {
   readonly documents$ = this.store$.select(documentsListSelector);
-
-  readonly loading$ = new BehaviorSubject(true);
 
   constructor(
     private readonly store$: Store
@@ -21,9 +19,5 @@ export class DocumentsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.store$.dispatch(initialLoadDocumentsAction());
-  }
-
-  ngOnDestroy(): void {
-    this.loading$.complete();
   }
 }
