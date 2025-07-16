@@ -34,7 +34,7 @@ $animationTime: 0.3s;
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
-  background-color: map.get(colors.$matPrimary, 30);
+  background-color: map.get(colors.$matPrimary, 25);
   visibility: hidden;
   opacity: 0;
   pointer-events: none;

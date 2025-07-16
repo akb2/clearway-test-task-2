@@ -3,8 +3,11 @@
 @use "mixins";
 @use "vars";
 
+$fontSize: 20px;
+$lineHeight: 1.2;
+
 .section {
-  background-color: map.get(colors.$matPrimary, 30);
+  background-color: map.get(colors.$matPrimary, 25);
 }
 
 .container {
@@ -18,14 +21,14 @@
   height: vars.$headerHeight;
 
   &__title {
-    @include mixins.lineClamp(1, 1.2, 24px, 0, true);
+    @include mixins.lineClamp(1, $lineHeight, $fontSize, 0, true);
 
-    font-weight: 500;
+    font-weight: 300;
     color: map.get(colors.$matPrimary, 100);
   }
 
   &__breadcrumbs {
-    height: 24px * 1.2;
+    height: $fontSize * $lineHeight;
     flex-grow: 1;
     overflow: hidden;
     font-size: 0;
