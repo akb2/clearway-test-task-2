@@ -1,0 +1,30 @@
+@use "screens";
+
+$gaps: (
+  default: 24px,
+  small: 16px,
+  xsmall: 16px,
+  xxsmall: 16px
+);
+
+$columns: (
+  default: 1,
+  middle: 2,
+  large: 3,
+  xlarge: 4
+);
+
+.container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: stretch;
+
+  @include screens.adaptiveFor($gaps, $columns) using($gap, $column) {
+    gap: $gap;
+
+    &__item {
+      width: calc((100% - #{$gap * ($column - 1)}) / #{$column});
+    }
+  }
+}
