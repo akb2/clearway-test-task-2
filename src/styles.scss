@@ -1,3 +1,5 @@
+@use "containers";
+
 html,
 body,
 div,
@@ -83,4 +85,8 @@ body {
   letter-spacing: 0;
   overflow-x: hidden;
   overflow-y: hidden;
+}
+
+.container {
+  @include containers.container;
 }

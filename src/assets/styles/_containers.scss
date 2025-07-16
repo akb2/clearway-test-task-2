@@ -1,0 +1,71 @@
+@use "sass:map";
+@use "./screens";
+@use "./colors";
+
+$widths: (
+  xxsmall: 400px,
+  xsmall: 600px,
+  small: 600px,
+  middle: 900px,
+  large: 1200px,
+  xlarge: 1600px
+);
+
+$paddingsY: (
+  default: 15px,
+  small: 30px,
+  middle: 45px,
+  large: 60px,
+  xlarge: 90px
+);
+
+$paddingsX: (
+  default: 30px,
+  xxsmall: 15px,
+  xsmall: 15px,
+  small: 15px
+);
+
+$avatarSize: 48px;
+
+$cardBoxShadow: 1px 1px 10px 1px #{colors.$shadow};
+$cardBorderRadius: 5px;
+$cardPaddingY: 15px;
+$cardPaddingX: 22px;
+$cardPaddings: (
+  xxsmall: (
+    x: 15px,
+    y: 15px
+  ),
+  xsmall: (
+    x: 15px,
+    y: 15px
+  ),
+  small: (
+    x: 20px,
+    y: 20px
+  ),
+  default: (
+    x: 25px,
+    y: 25px
+  )
+);
+
+$mobileMenuWidth: 280px;
+$mobileMenuHeight: 240px;
+
+// Миксин
+@mixin container {
+  margin: 0 auto;
+  max-width: 100%;
+  background-color: inherit;
+  // Цикл по размерам
+  @include screens.adaptiveFor($widths, $paddingsY, $paddingsX) using ($width, $paddingY, $paddingX) {
+    width: $width;
+    padding: #{$paddingY} #{$paddingX};
+  }
+  // Последующие блоки
+  & + & {
+    padding-top: 0;
+  }
+}

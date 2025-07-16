@@ -1,0 +1,37 @@
+@use "sass:math";
+
+// Огранисение на количество линий
+@mixin lineClamp($lines: 1, $height: 1.2, $fontSize: 14px, $padding: 0, $heightImportant: false) {
+  $important: "";
+  // Обязательные поля
+  @if ($heightImportant == 1 or $heightImportant == true) {
+    $important: "!important";
+  }
+  // Не указана единица измерения для высоты
+  @if (math.is-unitless($height)) {
+    $height: $height * $fontSize;
+  }
+  // Свойства
+  overflow: hidden;
+  padding-top: $padding;
+  padding-bottom: $padding;
+  font-size: $fontSize;
+  // Установка высоты
+  @if ($height > 0) {
+    line-height: #{$height} #{$important};
+    min-height: #{$height + ($padding * 2)} #{$important};
+    max-height: #{($height * $lines) + ($padding * 2)} #{$important};
+  }
+  // Две и более линий
+  @if ($lines > 1) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $lines;
+    white-space: normal;
+  }
+  // Для одной линии
+  @else {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
