@@ -22,7 +22,7 @@ export class DocumentService {
 
         return [];
       }),
-      map((responce: any) => AnyToArray(responce?.pages).map(this.dtoToDocumentItem)),
+      map((responce: any) => AnyToArray(responce?.pages).map(this.dtoToDocumentItem.bind(this))),
     );
   }
 
