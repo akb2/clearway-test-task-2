@@ -8,22 +8,22 @@
     },
     {
       "number": 2,
-      "name": "Второй параграф",
+      "name": "Черный текст",
       "imageUrl": "pages/2.png"
     },
     {
       "number": 3,
-      "name": "Третий параграф",
+      "name": "Зеленый текст",
       "imageUrl": "pages/3.png"
     },
     {
       "number": 4,
-      "name": "Четвёртый параграф",
+      "name": "Красный текст",
       "imageUrl": "pages/4.png"
     },
     {
       "number": 5,
-      "name": "Пятый параграф",
+      "name": "Синий текст",
       "imageUrl": "pages/5.png"
     }
   ]
