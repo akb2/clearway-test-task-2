@@ -36,6 +36,9 @@
       ],
       "@pages/*": [
         "src/app/pages/*"
+      ],
+      "@helpers/*": [
+        "src/app/helpers/*"
       ]
     }
   },

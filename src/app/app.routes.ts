@@ -10,6 +10,9 @@ export const routes: Routes = [
   // Список документов
   {
     path: "documents",
+    data: {
+      title: "Документы",
+    },
     loadChildren: () => import("@pages/documents/documents.module").then(m => m.DocumentsModule)
   },
 ];

@@ -4,7 +4,9 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { BrowserModule } from "@angular/platform-browser";
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { RouterModule } from "@angular/router";
+import { RouterSerializer } from "@helpers/router-serializer";
 import { EffectsModule } from "@ngrx/effects";
+import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreModule } from "@ngrx/store";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { AppComponent } from "./app.component";
@@ -26,6 +28,7 @@ import { appReducer } from "./store/app.reducer";
     StoreDevtoolsModule.instrument({ maxAge: 25 }),
     MatProgressSpinnerModule,
     HeaderModule,
+    StoreRouterConnectingModule.forRoot({ serializer: RouterSerializer }),
   ],
   bootstrap: [
     AppComponent
@@ -35,6 +38,7 @@ import { appReducer } from "./store/app.reducer";
     provideHttpClient(withInterceptorsFromDi()),
     { provide: AssetsImagesPath, useValue: "/assets/images/" },
     { provide: AssetsMockPath, useValue: "/assets/mock/" },
+    { provide: RouterStateSerializer, useClass: RouterSerializer },
   ]
 })
 export class AppModule { }

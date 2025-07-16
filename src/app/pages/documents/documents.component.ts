@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { initialLoadDocumentsAction } from "@app/store/document/document.actions";
 import { documentsListSelector } from "@app/store/document/document.selectors";
 import { Store } from "@ngrx/store";
-import { BehaviorSubject } from "rxjs";
 
 @Component({
   selector: 'app-documents',

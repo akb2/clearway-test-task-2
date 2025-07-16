@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { pageLoaderDisableAction, pageLoaderEnableAction } from "./layout.actions";
+import { pageLoaderDisableAction, pageLoaderEnableAction, setPageTitleAction } from "./layout.actions";
 import { layoutInitialState } from "./layout.state";
 
 export const layoutReducer = createReducer(
@@ -13,5 +13,10 @@ export const layoutReducer = createReducer(
   on(pageLoaderDisableAction, (state) => ({
     ...state,
     pageLoading: false
+  })),
+  // Установка названия страницы
+  on(setPageTitleAction, (state, { pageTitle }) => ({
+    ...state,
+    pageTitle
   })),
 );
