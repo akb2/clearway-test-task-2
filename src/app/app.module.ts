@@ -1,5 +1,5 @@
 import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
-import { APP_ID, NgModule } from "@angular/core";
+import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { RouterModule } from "@angular/router";
@@ -8,6 +8,7 @@ import { StoreModule } from "@ngrx/store";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { AppComponent } from "./app.component";
 import { routes } from "./app.routes";
+import { AssetsImagesPath, AssetsMockPath } from "./data/app";
 import { appEffects } from "./store/app.effects";
 import { appReducer } from "./store/app.reducer";
 
@@ -27,7 +28,9 @@ import { appReducer } from "./store/app.reducer";
   ],
   providers: [
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptorsFromDi())
+    provideHttpClient(withInterceptorsFromDi()),
+    { provide: AssetsImagesPath, useValue: "/assets/images/" },
+    { provide: AssetsMockPath, useValue: "/assets/mock/" },
   ]
 })
 export class AppModule { }

@@ -1,17 +1,22 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Inject, Injectable } from "@angular/core";
+import { AssetsImagesPath, AssetsMockPath } from "@app/data/app";
 import { AnyToArray, AnyToInt, AnyToString } from "@app/helpers/converters";
 import { DocumentItem } from "@app/models/document";
-import { catchError, map, Observable, tap } from "rxjs";
+import { catchError, map } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
   constructor(
-    private readonly httpClient: HttpClient
+    private readonly httpClient: HttpClient,
+    @Inject(AssetsImagesPath)
+    private readonly imagesPath: string,
+    @Inject(AssetsMockPath)
+    private readonly mockPath: string
   ) { }
 
   getList() {
-    return this.httpClient.get("/assets/mock/documents.json").pipe(
+    return this.httpClient.get(this.mockPath + "documents.json").pipe(
       catchError(e => {
         console.error("Error while a documents loading", e);
 
@@ -28,7 +33,7 @@ export class DocumentService {
   private dtoToDocumentItem(dto: any): DocumentItem {
     const id = AnyToInt(dto?.number);
     const name = AnyToString(dto?.name);
-    const imageUrl = "/assets/images/" + AnyToString(dto?.imageUrl);
+    const imageUrl = this.imagesPath + AnyToString(dto?.imageUrl);
 
     return { id, name, imageUrl };
   }
