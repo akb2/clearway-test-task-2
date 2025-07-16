@@ -1,5 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { NgModule } from "@angular/core";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { BrowserModule } from "@angular/platform-browser";
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { RouterModule } from "@angular/router";
@@ -22,6 +23,7 @@ import { appReducer } from "./store/app.reducer";
     EffectsModule.forRoot(appEffects),
     RouterModule.forRoot(routes),
     StoreDevtoolsModule.instrument({ maxAge: 25 }),
+    MatProgressSpinnerModule,
   ],
   bootstrap: [
     AppComponent

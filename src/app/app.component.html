@@ -1,1 +1,15 @@
-<router-outlet />
+@let loading = loading$ | async;
+
+<div class="layout">
+  <div class="header"></div>
+  <!-- Содержимое -->
+  <div class="content"
+       [class.visible]="!loading">
+    <router-outlet />
+  </div>
+  <!-- Загрузчик -->
+  <div class="loader"
+       *ngIf="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+</div>
