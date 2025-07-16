@@ -1,7 +1,7 @@
 @let loading = loading$ | async;
 
 <div class="layout">
-  <div class="header"></div>
+  <app-header />
   <!-- Содержимое -->
   <div class="content"
        [class.visible]="!loading">
@@ -10,6 +10,9 @@
   <!-- Загрузчик -->
   <div class="loader"
        *ngIf="loading">
-    <mat-spinner></mat-spinner>
+    <mat-spinner mode="indeterminate"
+                 color="accent"
+                 [diameter]="128"
+                 [strokeWidth]="12" />
   </div>
 </div>

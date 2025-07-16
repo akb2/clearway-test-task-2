@@ -1,0 +1,67 @@
+@use "sass:map";
+@use "colors";
+@use "mixins";
+
+.section {
+  background-color: map.get(colors.$matPrimary, 30);
+}
+
+.container {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: 80px;
+
+  &__title {
+    @include mixins.lineClamp(1, 1.2, 24px, 0, true);
+
+    font-weight: 500;
+    color: map.get(colors.$matPrimary, 100);
+  }
+
+  &__breadcrumbs {
+    height: 24px * 1.2;
+    flex-grow: 1;
+    overflow: hidden;
+    font-size: 0;
+    line-height: 1;
+
+    > mat-icon,
+    &-item,
+    &-link {
+      vertical-align: middle;
+    }
+
+    > mat-icon,
+    &-link {
+      color: map.get(colors.$matPrimary, 100);
+    }
+
+    &-item,
+    &-link {
+      @include mixins.lineClamp(1, 1.2, 24px, 0, true);
+
+      display: inline-block;
+      max-width: max(230px, calc(100% / 3));
+    }
+
+    &-item {
+      color: #eee;
+      font-weight: 300;
+    }
+
+    &-link {
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

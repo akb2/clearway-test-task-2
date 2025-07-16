@@ -1,0 +1,30 @@
+<div class="section">
+  <div class="container header">
+    <div class="header__breadcrumbs"
+         *ngIf="!!breadCrumbs?.length; else simpleTitle">
+      <ng-container *ngFor="let breadCrumb of breadCrumbs; let key = index">
+        <ng-container [ngTemplateOutlet]="breadCrumbLink"
+                      [ngTemplateOutletContext]="{ breadCrumb, key }"></ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #simpleTitle>
+  <div class="header__title">{{title}}</div>
+</ng-template>
+
+<ng-template #breadCrumbLink
+             let-breadCrumb="breadCrumb"
+             let-key="key">
+  <mat-icon class="header__breadcrumbs-delimiter"
+            *ngIf="key > 0">chevron_right</mat-icon>
+  <!-- Ссылка -->
+  <a [routerLink]="breadCrumb.link"
+     class="header__breadcrumbs-link"
+     *ngIf="!!breadCrumb?.link?.length; else breadCrumbLinkText">{{breadCrumb.title}}</a>
+  <!-- Только текст -->
+  <ng-template #breadCrumbLinkText>
+    <span class="header__breadcrumbs-item">{{breadCrumb.title}}</span>
+  </ng-template>
+</ng-template>
