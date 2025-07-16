@@ -1,9 +1,8 @@
-import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { initialLoadDocumentsAction } from "@app/store/document/document.actions";
 import { documentsListSelector } from "@app/store/document/document.selectors";
 import { Store } from "@ngrx/store";
-import { BehaviorSubject, filter, map, pairwise, startWith, tap } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 
 @Component({
   selector: 'app-documents',

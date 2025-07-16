@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { DocumentsComponent } from './documents.component';
 
 describe('DocumentsComponent', () => {
@@ -10,7 +9,7 @@ describe('DocumentsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DocumentsComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DocumentsComponent);
     component = fixture.componentInstance;
