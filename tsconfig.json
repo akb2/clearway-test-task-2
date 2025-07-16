@@ -31,6 +31,9 @@
       "@models/*": [
         "src/app/models/*"
       ],
+      "@store/*": [
+        "src/app/store/*"
+      ],
       "@pages/*": [
         "src/app/pages/*"
       ]

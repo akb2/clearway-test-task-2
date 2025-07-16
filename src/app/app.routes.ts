@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { DocumentsRoutes } from "@pages/documents/documents.routes";
 
 export const routes: Routes = [
   // Основное
@@ -9,5 +8,8 @@ export const routes: Routes = [
     pathMatch: "full"
   },
   // Список документов
-  DocumentsRoutes,
+  {
+    path: "documents",
+    loadChildren: () => import("@pages/documents/documents.module").then(m => m.DocumentsModule)
+  },
 ];
