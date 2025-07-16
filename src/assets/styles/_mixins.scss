@@ -35,3 +35,15 @@
     text-overflow: ellipsis;
   }
 }
+
+// Отступы
+@mixin inset($top: 0, $right: null, $bottom: null, $left: null) {
+  $right: if($right != null, $right, $top);
+  $bottom: if($bottom != null, $bottom, $top);
+  $left: if($left != null, $left, $right);
+
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}

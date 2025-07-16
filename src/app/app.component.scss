@@ -1,3 +1,10 @@
+@use "sass:map";
+@use "colors";
+@use "mixins";
+@use "vars";
+
+$animationTime: 0.3s;
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -6,11 +13,40 @@
   width: 100%;
 }
 
+.header {
+  display: block;
+  overflow: hidden;
+  max-height: 0;
+  transition-property: max-height, overflow;
+  transition-duration: $animationTime;
+  transition-timing-function: ease;
+
+  &.visible {
+    max-height: vars.$headerHeight;
+  }
+}
+
 .loader {
+  @include mixins.inset;
+
+  position: fixed;
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
+  background-color: map.get(colors.$matPrimary, 30);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition-property: opacity, visibility, pointer-events;
+  transition-duration: $animationTime;
+  transition-timing-function: ease;
+
+  &.visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .content {
