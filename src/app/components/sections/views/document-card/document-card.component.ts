@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { DocumentItem } from "@app/models/document";
 
 @Component({
-  selector: "app-document-card",
+  selector: "app-document-card[document]",
   templateUrl: "./document-card.component.html",
   styleUrls: ["./document-card.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class DocumentCardComponent {
-  @Input() document?: DocumentItem;
+  @Input() document!: DocumentItem;
 }

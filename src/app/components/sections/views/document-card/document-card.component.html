@@ -1,20 +1,26 @@
-<mat-card *ngIf="document">
+<mat-card>
   <mat-card-header>
-    <mat-card-title>{{document.name}}</mat-card-title>
-    <mat-card-subtitle>Номер: {{document.id}}</mat-card-subtitle>
+    <mat-card-title>{{ document.name }}</mat-card-title>
+    <mat-card-subtitle>Номер: {{ document.id }}</mat-card-subtitle>
   </mat-card-header>
   <!-- Превью -->
-  <a class="image"
-     routerLink="/documents/view/{{document.id}}">
-    <img mat-card-image
-         [src]="document.imageUrl"
-         [alt]="document.name">
+  <a
+    class="image"
+    routerLink="/documents/view/{{ document.id }}"
+  >
+    <img
+      mat-card-image
+      [src]="document.imageUrl"
+      [alt]="document.name"
+    />
   </a>
   <!-- Действия -->
   <mat-card-actions align="end">
-    <a mat-button
-       color="accent"
-       routerLink="/documents/view/{{document.id}}">
+    <a
+      mat-button
+      color="accent"
+      routerLink="/documents/view/{{ document.id }}"
+    >
       Открыть
       <mat-icon iconPositionEnd>chevron_right</mat-icon>
     </a>
