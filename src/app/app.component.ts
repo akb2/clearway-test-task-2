@@ -6,7 +6,8 @@ import { pageLoadingStateSelector } from "./store/layout/layout.selectors";
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AppComponent {
   readonly loading$ = this.store$.select(pageLoadingStateSelector);

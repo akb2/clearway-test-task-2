@@ -5,7 +5,8 @@ import { DocumentItem } from "@app/models/document";
   selector: "app-document-card",
   templateUrl: "./document-card.component.html",
   styleUrls: ["./document-card.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DocumentCardComponent {
   @Input() document?: DocumentItem;

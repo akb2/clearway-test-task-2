@@ -7,7 +7,8 @@ import { Store } from "@ngrx/store";
   selector: 'app-documents',
   templateUrl: './documents.component.html',
   styleUrl: './documents.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DocumentsComponent implements OnInit {
   readonly documents$ = this.store$.select(documentsListSelector);
