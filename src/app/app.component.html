@@ -1,20 +1,28 @@
-@let loading = loading$ | async;
+@let loadingState = loading();
 
 <div class="layout">
-  <app-header class="header"
-              [class.visible]="!loading" />
+  <app-header
+    class="header"
+    [class.visible]="!loadingState"
+  />
   <!-- Содержимое -->
-  <div class="content"
-       [class.visible]="!loading">
+  <div
+    class="content"
+    [class.visible]="!loadingState"
+  >
     <router-outlet />
   </div>
 </div>
 
 <!-- Загрузчик -->
-<div class="loader"
-     [class.visible]="loading">
-  <mat-spinner mode="indeterminate"
-               color="primary"
-               [diameter]="128"
-               [strokeWidth]="12" />
+<div
+  class="loader"
+  [class.visible]="loadingState"
+>
+  <mat-spinner
+    mode="indeterminate"
+    color="primary"
+    [diameter]="128"
+    [strokeWidth]="12"
+  />
 </div>

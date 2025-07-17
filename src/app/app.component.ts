@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Store } from "@ngrx/store";
-import { pageLoadingStateSelector } from "./store/layout-old/layout.selectors";
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { LayoutStore } from "./store/layout/layout.store";
 
 @Component({
   selector: 'app-root',
@@ -10,9 +9,7 @@ import { pageLoadingStateSelector } from "./store/layout-old/layout.selectors";
   standalone: false,
 })
 export class AppComponent {
-  readonly loading$ = this.store$.select(pageLoadingStateSelector);
+  private readonly layoutStore = inject(LayoutStore);
 
-  constructor(
-    private readonly store$: Store
-  ) { }
+  readonly loading = this.layoutStore.pageLoading;
 }

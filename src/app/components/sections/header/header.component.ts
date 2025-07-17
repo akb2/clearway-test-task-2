@@ -1,7 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
-import { pageTitleSelector } from "@app/store/layout-old/layout.selectors";
-import { Store } from "@ngrx/store";
-import { map } from "rxjs";
+import { ChangeDetectionStrategy, Component, inject, Input } from "@angular/core";
+import { LayoutStore } from "@app/store/layout/layout.store";
 
 @Component({
   selector: "app-header",
@@ -13,14 +11,7 @@ import { map } from "rxjs";
 export class HeaderComponent {
   @Input() breadCrumbs: any[] = [];
 
-  readonly title$ = this.store$.select(pageTitleSelector).pipe(
-    map(pageTitle => !!pageTitle?.length
-      ? pageTitle
-      : "Тестовое задание"
-    )
-  );
+  private readonly layoutStore = inject(LayoutStore);
 
-  constructor(
-    private readonly store$: Store,
-  ) { }
+  readonly title = this.layoutStore.pageTitle;
 }
