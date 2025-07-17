@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Store } from "@ngrx/store";
-import { pageLoadingStateSelector } from "./store/layout/layout.selectors";
+import { pageLoadingStateSelector } from "./store/layout-old/layout.selectors";
 
 @Component({
   selector: 'app-root',

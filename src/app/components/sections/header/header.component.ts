@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
-import { pageTitleSelector } from "@app/store/layout/layout.selectors";
+import { pageTitleSelector } from "@app/store/layout-old/layout.selectors";
 import { Store } from "@ngrx/store";
 import { map } from "rxjs";
 
