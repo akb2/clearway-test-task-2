@@ -12,6 +12,7 @@ import { AppComponent } from "./app.component";
 import { routes } from "./app.routes";
 import { HeaderModule } from "./components/sections/header/header.module";
 import { AssetsImagesPath, AssetsMockPath } from "./data/app";
+import { DocumentStore } from "./store/document/document.store";
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { AssetsImagesPath, AssetsMockPath } from "./data/app";
     { provide: AssetsImagesPath, useValue: "/assets/images/" },
     { provide: AssetsMockPath, useValue: "/assets/mock/" },
     { provide: RouterStateSerializer, useClass: RouterSerializer },
+    DocumentStore,
   ]
 })
 export class AppModule { }

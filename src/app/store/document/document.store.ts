@@ -8,7 +8,7 @@ import { PageLoaderDisableAction, PageLoaderEnableAction } from "../layout/layou
 import { InitialLoadDocumentsAction, UpdateDocumentsAction } from "./document.actions";
 import { DocumentInitialState } from "./document.state";
 
-@Injectable({ providedIn: "root" })
+@Injectable()
 export class DocumentStore extends signalStore(
   withState(DocumentInitialState),
 
