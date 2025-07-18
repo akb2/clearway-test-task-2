@@ -45,6 +45,12 @@
       ],
       "@services/*": [
         "src/app/services/*"
+      ],
+      "@directives/*": [
+        "src/app/directives/*"
+      ],
+      "@modules/*": [
+        "src/app/modules/*"
       ]
     }
   },
