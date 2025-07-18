@@ -40,3 +40,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# SSL files
+/ssl/localhost.crt
+/ssl/localhost.key
+/ssl/openssl.cnf
