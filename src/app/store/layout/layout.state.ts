@@ -1,4 +1,4 @@
-import { BreadCrumbs } from '@app/models/ui';
+import { BreadCrumbs } from '@models/ui';
 
 export interface LayoutState {
   pageLoading: boolean;

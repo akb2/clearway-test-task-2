@@ -1,4 +1,4 @@
-import { DocumentItem } from "@app/models/document";
+import { DocumentItem } from "@models/document";
 import { type } from "@ngrx/signals";
 import { event } from "@ngrx/signals/events";
 

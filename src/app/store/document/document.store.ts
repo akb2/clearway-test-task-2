@@ -1,8 +1,8 @@
 import { inject, Injectable } from "@angular/core";
-import { DeepClone } from "@app/helpers/app";
-import { DocumentService } from "@app/services/document.service";
+import { DeepClone } from "@helpers/app";
 import { signalStore, withState } from "@ngrx/signals";
 import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
+import { DocumentService } from "@services/document.service";
 import { map, switchMap } from 'rxjs';
 import { PageLoaderDisableAction, PageLoaderEnableAction } from "../layout/layout.actions";
 import { InitialLoadDocumentsAction, UpdateDocumentsAction } from "./document.actions";

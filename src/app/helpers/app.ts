@@ -1,6 +1,6 @@
 import { Type } from "@angular/core";
 import { Route } from "@angular/router";
-import { BaseTypes, TypeOrArray } from "@app/models/app";
+import { BaseTypes, TypeOrArray } from "@models/app";
 
 /**
  * Проверка переменной на инициализацию

@@ -1,6 +1,6 @@
 import { effect, inject, Injectable } from "@angular/core";
 import { Title } from "@angular/platform-browser";
-import { RouterStateUrl } from "@app/models/app";
+import { RouterStateUrl } from "@models/app";
 import { Actions, ofType } from "@ngrx/effects";
 import { routerNavigatedAction } from "@ngrx/router-store";
 import { signalStore, withHooks, withState } from '@ngrx/signals';

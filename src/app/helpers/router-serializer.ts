@@ -1,5 +1,5 @@
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
-import { RouterStateUrl } from "@app/models/app";
+import { RouterStateUrl } from "@models/app";
 import { RouterStateSerializer } from "@ngrx/router-store";
 import { AnyToString } from "./converters";
 

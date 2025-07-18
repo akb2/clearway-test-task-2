@@ -25,9 +25,6 @@
     ],
     "baseUrl": "./",
     "paths": {
-      "@app/*": [
-        "src/app/*"
-      ],
       "@models/*": [
         "src/app/models/*"
       ],
@@ -39,6 +36,15 @@
       ],
       "@helpers/*": [
         "src/app/helpers/*"
+      ],
+      "@components/*": [
+        "src/app/components/*"
+      ],
+      "@data/*": [
+        "src/app/data/*"
+      ],
+      "@services/*": [
+        "src/app/services/*"
       ]
     }
   },

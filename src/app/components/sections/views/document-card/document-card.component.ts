@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
-import { DocumentItem } from "@app/models/document";
+import { DocumentItem } from "@models/document";
 
 @Component({
   selector: "app-document-card[document]",

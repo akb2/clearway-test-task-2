@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { InitialLoadDocumentsAction } from "@app/store/document/document.actions";
-import { DocumentStore } from "@app/store/document/document.store";
 import { Dispatcher } from "@ngrx/signals/events";
+import { InitialLoadDocumentsAction } from "@store/document/document.actions";
+import { DocumentStore } from "@store/document/document.store";
 
 @Component({
   selector: 'app-documents',

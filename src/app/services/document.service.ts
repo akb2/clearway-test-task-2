@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { AssetsImagesPath, AssetsMockPath } from "@app/data/app";
-import { AnyToArray, AnyToInt, AnyToString } from "@app/helpers/converters";
-import { DocumentItem } from "@app/models/document";
+import { AssetsImagesPath, AssetsMockPath } from "@data/app";
+import { AnyToArray, AnyToInt, AnyToString } from "@helpers/converters";
+import { DocumentItem } from "@models/document";
 import { catchError, map } from "rxjs";
 
 @Injectable({ providedIn: 'root' })

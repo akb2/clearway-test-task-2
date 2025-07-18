@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, Input } from "@angular/core";
-import { LayoutStore } from "@app/store/layout/layout.store";
+import { LayoutStore } from "@store/layout/layout.store";
 
 @Component({
   selector: "app-header",
