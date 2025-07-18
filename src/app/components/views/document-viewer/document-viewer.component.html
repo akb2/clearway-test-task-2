@@ -1,0 +1,20 @@
+@let doc = document();
+
+@if (doc) {
+  <div
+    class="image"
+    resizeObserver
+  >
+    <div class="image__border">
+      <div
+        #imageOverlay
+        class="image__overlay"
+      >
+        <img
+          [src]="doc.imageUrl"
+          [alt]="doc.name"
+        />
+      </div>
+    </div>
+  </div>
+}
