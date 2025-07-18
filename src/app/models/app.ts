@@ -6,3 +6,8 @@ export interface RouterStateUrl {
   queryParams: Params;
   title: string;
 }
+
+export type SimpleTypes = string | number | boolean | null | undefined;
+export type ObjectTypes = {} | object;
+export type BaseTypes = SimpleTypes | ObjectTypes;
+export type TypeOrArray<T> = T | T[];
