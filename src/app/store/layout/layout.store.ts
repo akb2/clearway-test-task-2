@@ -8,7 +8,7 @@ import { map } from "rxjs";
 import { PageLoaderDisableAction, PageLoaderEnableAction, SetPageTitleAction } from "./layout.actions";
 import { LayoutInitialState, LayoutTitleSeparator } from "./layout.state";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class LayoutStore extends signalStore(
   withState(LayoutInitialState),
 

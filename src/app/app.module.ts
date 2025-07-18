@@ -15,7 +15,6 @@ import { HeaderModule } from "./components/sections/header/header.module";
 import { AssetsImagesPath, AssetsMockPath } from "./data/app";
 import { appEffects } from "./store/app.effects";
 import { appReducer } from "./store/app.reducer";
-import { LayoutStore } from "./store/layout/layout.store";
 
 @NgModule({
   declarations: [
@@ -40,7 +39,6 @@ import { LayoutStore } from "./store/layout/layout.store";
     { provide: AssetsImagesPath, useValue: "/assets/images/" },
     { provide: AssetsMockPath, useValue: "/assets/mock/" },
     { provide: RouterStateSerializer, useClass: RouterSerializer },
-    LayoutStore,
   ]
 })
 export class AppModule { }
