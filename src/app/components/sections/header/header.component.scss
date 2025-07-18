@@ -8,6 +8,7 @@ $lineHeight: 1.2;
 
 .section {
   background-color: map.get(colors.$matPrimary, 25);
+  height: 100%;
 }
 
 .container {
@@ -18,7 +19,7 @@ $lineHeight: 1.2;
 .header {
   display: flex;
   align-items: center;
-  height: vars.$headerHeight;
+  height: 100%;
 
   &__title {
     @include mixins.lineClamp(1, $lineHeight, $fontSize, 0, true);

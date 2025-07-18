@@ -16,13 +16,13 @@ $animationTime: 0.3s;
 .header {
   display: block;
   overflow: hidden;
-  max-height: 0;
-  transition-property: max-height, overflow;
+  height: vars.$headerHeight * 2;
+  transition-property: height, overflow;
   transition-duration: $animationTime;
   transition-timing-function: ease;
 
   &.visible {
-    max-height: vars.$headerHeight;
+    height: vars.$headerHeight;
   }
 }
 
