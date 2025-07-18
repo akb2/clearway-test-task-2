@@ -7,7 +7,7 @@ import { signalStore, withHooks, withState } from '@ngrx/signals';
 import { on, withEffects, withReducer } from '@ngrx/signals/events';
 import { debugActions } from "@store/debug.actions";
 import { map } from "rxjs";
-import { PageLoaderDisableAction, PageLoaderEnableAction, SetPageTitleAction } from "./layout.actions";
+import { PageLoaderDisableAction, PageLoaderEnableAction, SetBreadCrumbsAction, SetPageTitleAction } from "./layout.actions";
 import { LayoutInitialState, LayoutTitleSeparator } from "./layout.state";
 
 @Injectable({ providedIn: "root" })
@@ -20,6 +20,7 @@ export class LayoutStore extends signalStore(
     on(PageLoaderEnableAction, () => ({ pageLoading: true })),
     on(PageLoaderDisableAction, () => ({ pageLoading: false })),
     on(SetPageTitleAction, ({ payload: pageTitle }) => ({ pageTitle })),
+    on(SetBreadCrumbsAction, ({ payload: breadCrumbs }) => ({ breadCrumbs })),
   ),
 
   withEffects((_, actions = inject(Actions)) => ({

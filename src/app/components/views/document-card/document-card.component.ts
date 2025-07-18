@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, input } from "@angular/core";
 import { DocumentItem } from "@models/document";
+import { DocumentViewUrl } from "@models/route";
 
 @Component({
   selector: "app-document-card[document]",
@@ -9,5 +10,13 @@ import { DocumentItem } from "@models/document";
   standalone: false,
 })
 export class DocumentCardComponent {
-  @Input() document!: DocumentItem;
+  readonly document = input<DocumentItem>();
+
+  readonly documentViewUrl = computed(() => {
+    const document = this.document();
+
+    return document
+      ? DocumentViewUrl + document.id
+      : "";
+  });
 }

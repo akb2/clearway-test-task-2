@@ -1,6 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { Dispatcher } from "@ngrx/signals/events";
-import { InitialLoadDocumentsAction } from "@store/document/document.actions";
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DocumentStore } from "@store/document/document.store";
 
 @Component({
@@ -10,13 +8,8 @@ import { DocumentStore } from "@store/document/document.store";
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
-export class DocumentsComponent implements OnInit {
+export class DocumentsComponent {
   private readonly documentStore = inject(DocumentStore);
-  private readonly dispatcher = inject(Dispatcher);
 
   readonly documents = this.documentStore.documents;
-
-  ngOnInit() {
-    this.dispatcher.dispatch(InitialLoadDocumentsAction());
-  }
 }

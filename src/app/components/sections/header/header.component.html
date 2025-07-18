@@ -1,9 +1,15 @@
+@let breadCrumbsState = breadCrumbs();
+
 <div class="section">
   <div class="container header">
     <!-- Название и хлебные крошки -->
-    @if (!!breadCrumbs.length) {
+    @if (!!breadCrumbsState.length) {
       <div class="header__breadcrumbs">
-        @for (breadCrumb of breadCrumbs; track breadCrumbs; let key = $index) {
+        @for (
+          breadCrumb of breadCrumbsState;
+          track breadCrumb;
+          let key = $index
+        ) {
           <mat-icon
             class="header__breadcrumbs-delimiter"
             *ngIf="key > 0"

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { LayoutStore } from "@store/layout/layout.store";
 
 @Component({
@@ -12,6 +12,5 @@ export class HeaderComponent {
   private readonly layoutStore = inject(LayoutStore);
 
   readonly title = this.layoutStore.pageTitle;
-
-  @Input() breadCrumbs: any[] = [];
+  readonly breadCrumbs = this.layoutStore.breadCrumbs;
 }

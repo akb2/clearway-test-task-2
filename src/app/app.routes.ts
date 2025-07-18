@@ -1,15 +1,16 @@
 import { Routes } from '@angular/router';
+import { DocumentsListRoute, DocumentsListUrl, DocumentViewRoute } from "@models/route";
 
 export const routes: Routes = [
   // Основное
   {
     path: "",
-    redirectTo: "/documents",
+    redirectTo: DocumentsListUrl,
     pathMatch: "full"
   },
   // Список документов
   {
-    path: "documents",
+    path: DocumentsListRoute,
     data: {
       title: "Документы",
     },
@@ -17,7 +18,7 @@ export const routes: Routes = [
   },
   // Просмотр документа
   {
-    path: "documents/view/:id",
+    path: DocumentViewRoute,
     data: {
       title: "Просмотр документа",
     },

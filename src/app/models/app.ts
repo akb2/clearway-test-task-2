@@ -1,9 +1,9 @@
 import { Params } from "@angular/router";
 
-export interface RouterStateUrl {
+export interface RouterStateUrl<P = Params, Q = Params> {
   url: string;
-  params: Params;
-  queryParams: Params;
+  params: P;
+  queryParams: Q;
   title: string;
 }
 
