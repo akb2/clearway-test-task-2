@@ -1,4 +1,4 @@
-import { DOCUMENT_KEY, DocumentState } from "./document/document.state";
+import { DOCUMENT_KEY, DocumentState } from "./document-old/document.state";
 
 export interface AppState {
   [DOCUMENT_KEY]: DocumentState;

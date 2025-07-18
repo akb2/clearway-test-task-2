@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { initialLoadDocumentsAction } from "@app/store/document/document.actions";
-import { documentsListSelector } from "@app/store/document/document.selectors";
+import { initialLoadDocumentsAction } from "@app/store/document-old/document.actions";
+import { documentsListSelector } from "@app/store/document-old/document.selectors";
 import { Store } from "@ngrx/store";
 
 @Component({
