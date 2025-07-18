@@ -1,0 +1,18 @@
+<!-- Увеличить -->
+<button
+  mat-icon-button
+  aria-label="Увеличить"
+  [disabled]="zoom() >= zoomMax"
+  (click)="onZoomIn()"
+>
+  <mat-icon>add</mat-icon>
+</button>
+<!-- Уменьшить -->
+<button
+  mat-icon-button
+  aria-label="Уменьшить"
+  [disabled]="zoom() <= zoomMin"
+  (click)="onZoomOut()"
+>
+  <mat-icon>remove</mat-icon>
+</button>

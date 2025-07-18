@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
 import { DirectivesModule } from "@modules/directives.module";
+import { DocumentViewerActionsModule } from "../document-viewer-actions/document-viewer-actions.module";
 import { DocumentViewerComponent } from './document-viewer.component';
 
 @NgModule({
@@ -11,9 +10,8 @@ import { DocumentViewerComponent } from './document-viewer.component';
   ],
   imports: [
     CommonModule,
-    MatButtonModule,
-    MatIconModule,
     DirectivesModule,
+    DocumentViewerActionsModule,
   ],
   exports: [
     DocumentViewerComponent

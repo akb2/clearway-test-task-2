@@ -1,20 +1,31 @@
 @let doc = document();
 
 @if (doc) {
-  <div
-    class="image"
-    resizeObserver
-  >
-    <div class="image__border">
+  <div class="image">
+    <div
+      class="image__border"
+      resizeObserver
+      (resized)="onResize($event)"
+    >
       <div
         #imageOverlay
         class="image__overlay"
+        [ngStyle]="styles()"
+        [ngClass]="classes"
       >
         <img
           [src]="doc.imageUrl"
           [alt]="doc.name"
+          (load)="onImageLoad($event)"
+          (dragging)="onImageDrag($event)"
         />
       </div>
+      <!-- Управление -->
+      <app-document-viewer-actions
+        [(zoom)]="zoom"
+        [(tool)]="currentTool"
+        class="image__actions"
+      />
     </div>
   </div>
 }

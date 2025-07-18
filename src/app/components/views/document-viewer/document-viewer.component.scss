@@ -37,10 +37,6 @@
     right: 0;
     display: flex;
     flex-flow: column nowrap;
-
-    > * {
-      pointer-events: auto;
-    }
   }
 
   &__snippets {
