@@ -1,3 +1,4 @@
+import { BreadCrumbs } from "@models/ui";
 import { type } from "@ngrx/signals";
 import { event } from "@ngrx/signals/events";
 
@@ -12,4 +13,9 @@ export const PageLoaderDisableAction = event(
 export const SetPageTitleAction = event(
   "[ШАБЛОН] Установка заголовка страницы",
   type<string>()
+);
+
+export const SetBreadCrumbsAction = event(
+  "[ШАБЛОН] Установка хлебных крошек",
+  type<BreadCrumbs[]>()
 );
