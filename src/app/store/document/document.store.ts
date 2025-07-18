@@ -3,6 +3,7 @@ import { DeepClone } from "@helpers/app";
 import { signalStore, withState } from "@ngrx/signals";
 import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { DocumentService } from "@services/document.service";
+import { debugActions } from "@store/debug.actions";
 import { map, switchMap } from 'rxjs';
 import { PageLoaderDisableAction, PageLoaderEnableAction } from "../layout/layout.actions";
 import { InitialLoadDocumentsAction, UpdateDocumentsAction } from "./document.actions";
@@ -10,6 +11,8 @@ import { DocumentInitialState } from "./document.state";
 
 @Injectable()
 export class DocumentStore extends signalStore(
+  debugActions,
+
   withState(DocumentInitialState),
 
   withReducer(

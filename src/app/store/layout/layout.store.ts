@@ -5,12 +5,15 @@ import { Actions, ofType } from "@ngrx/effects";
 import { routerNavigatedAction } from "@ngrx/router-store";
 import { signalStore, withHooks, withState } from '@ngrx/signals';
 import { on, withEffects, withReducer } from '@ngrx/signals/events';
+import { debugActions } from "@store/debug.actions";
 import { map } from "rxjs";
 import { PageLoaderDisableAction, PageLoaderEnableAction, SetPageTitleAction } from "./layout.actions";
 import { LayoutInitialState, LayoutTitleSeparator } from "./layout.state";
 
 @Injectable({ providedIn: "root" })
 export class LayoutStore extends signalStore(
+  debugActions,
+
   withState(LayoutInitialState),
 
   withReducer(

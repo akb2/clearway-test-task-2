@@ -1,0 +1,46 @@
+import { inject } from "@angular/core";
+import { getState, signalStoreFeature, withHooks } from "@ngrx/signals";
+import { Events } from "@ngrx/signals/events";
+import { Subject, takeUntil } from "rxjs";
+
+export const debugActions = signalStoreFeature(withHooks((store, events = inject(Events)) => {
+  const destroyed$ = new Subject<void>();
+
+  const tagColor = "color: lightgreen; font-weight: bold;";
+  const tagErrorColor = "color: red; font-weight: bold;";
+  const titleColor = "color: lightgray; font-weight: normal;";
+  const varColor = "color: orange; font-weight: bold;";
+  const defaultColor = "color: lightgray; font-weight: normal;";
+
+  const onInit = () => events.on()
+    .pipe(takeUntil(destroyed$))
+    .subscribe({
+      next: ({ type, payload }) => console.log(
+        "\n%c[СТОР]%s\n\n%cЗначение: %c%o\n%cСостояние: %c%o\n",
+        tagColor,
+        type.replace(/^\[(.+)\](.*)/i, "%c[$1]%c$2"),
+        tagColor,
+        defaultColor,
+        titleColor,
+        varColor,
+        payload,
+        titleColor,
+        varColor,
+        getState(store)
+      ),
+      error: error => console.error(
+        "%c[СТОР] %cОшибка\n%c%o",
+        tagErrorColor,
+        defaultColor,
+        varColor,
+        error
+      )
+    });
+
+  const onDestroy = () => {
+    destroyed$.next();
+    destroyed$.complete();
+  };
+
+  return { onInit, onDestroy };
+}));
