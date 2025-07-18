@@ -5,7 +5,6 @@ import { BrowserModule } from "@angular/platform-browser";
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { RouterModule } from "@angular/router";
 import { RouterSerializer } from "@helpers/router-serializer";
-import { EffectsModule } from "@ngrx/effects";
 import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreModule } from "@ngrx/store";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
@@ -13,8 +12,6 @@ import { AppComponent } from "./app.component";
 import { routes } from "./app.routes";
 import { HeaderModule } from "./components/sections/header/header.module";
 import { AssetsImagesPath, AssetsMockPath } from "./data/app";
-import { appEffects } from "./store/app.effects";
-import { appReducer } from "./store/app.reducer";
 
 @NgModule({
   declarations: [
@@ -22,8 +19,7 @@ import { appReducer } from "./store/app.reducer";
   ],
   imports: [
     BrowserModule,
-    StoreModule.forRoot(appReducer),
-    EffectsModule.forRoot(appEffects),
+    StoreModule.forRoot(),
     RouterModule.forRoot(routes),
     StoreDevtoolsModule.instrument({ maxAge: 25 }),
     MatProgressSpinnerModule,

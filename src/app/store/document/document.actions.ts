@@ -1,11 +1,12 @@
 import { DocumentItem } from "@app/models/document";
-import { createAction, props } from "@ngrx/store";
+import { type } from "@ngrx/signals";
+import { event } from "@ngrx/signals/events";
 
-export const initialLoadDocumentsAction = createAction(
+export const InitialLoadDocumentsAction = event(
   "[ДОКУМЕНТЫ] Начальная загрузка списка документов"
 );
 
-export const updateDocumentsAction = createAction(
+export const UpdateDocumentsAction = event(
   "[ДОКУМЕНТЫ] Сохранение списка документов",
-  props<{ documents: DocumentItem[] }>()
+  type<DocumentItem[]>()
 );

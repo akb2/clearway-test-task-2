@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { initialLoadDocumentsAction } from "@app/store/document-old/document.actions";
-import { documentsListSelector } from "@app/store/document-old/document.selectors";
-import { Store } from "@ngrx/store";
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { InitialLoadDocumentsAction } from "@app/store/document/document.actions";
+import { DocumentStore } from "@app/store/document/document.store";
+import { Dispatcher } from "@ngrx/signals/events";
 
 @Component({
   selector: 'app-documents',
@@ -11,13 +11,12 @@ import { Store } from "@ngrx/store";
   standalone: false,
 })
 export class DocumentsComponent implements OnInit {
-  readonly documents$ = this.store$.select(documentsListSelector);
+  private readonly documentStore = inject(DocumentStore);
+  private readonly dispatcher = inject(Dispatcher);
 
-  constructor(
-    private readonly store$: Store
-  ) { }
+  readonly documents = this.documentStore.documents;
 
   ngOnInit() {
-    this.store$.dispatch(initialLoadDocumentsAction());
+    this.dispatcher.dispatch(InitialLoadDocumentsAction());
   }
 }

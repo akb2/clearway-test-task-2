@@ -1,9 +1,10 @@
 import { effect, inject, Injectable } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import { RouterStateUrl } from "@app/models/app";
+import { Actions, ofType } from "@ngrx/effects";
 import { routerNavigatedAction } from "@ngrx/router-store";
 import { signalStore, withHooks, withState } from '@ngrx/signals';
-import { Events, on, withEffects, withReducer } from '@ngrx/signals/events';
+import { on, withEffects, withReducer } from '@ngrx/signals/events';
 import { map } from "rxjs";
 import { PageLoaderDisableAction, PageLoaderEnableAction, SetPageTitleAction } from "./layout.actions";
 import { LayoutInitialState, LayoutTitleSeparator } from "./layout.state";
@@ -18,9 +19,10 @@ export class LayoutStore extends signalStore(
     on(SetPageTitleAction, ({ payload: pageTitle }) => ({ pageTitle })),
   ),
 
-  withEffects((_, events = inject(Events)) => ({
+  withEffects((_, actions = inject(Actions)) => ({
     // Обновление заголовка из роута
-    routerChangeListener$: events.on(routerNavigatedAction).pipe(
+    routerChangeListener$: actions.pipe(
+      ofType(routerNavigatedAction),
       map(({ payload: { routerState } }) => routerState as unknown as RouterStateUrl),
       map(({ title }) => SetPageTitleAction(title))
     ),

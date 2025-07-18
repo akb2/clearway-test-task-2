@@ -9,9 +9,9 @@ import { LayoutStore } from "@app/store/layout/layout.store";
   standalone: false,
 })
 export class HeaderComponent {
-  @Input() breadCrumbs: any[] = [];
-
   private readonly layoutStore = inject(LayoutStore);
 
   readonly title = this.layoutStore.pageTitle;
+
+  @Input() breadCrumbs: any[] = [];
 }
