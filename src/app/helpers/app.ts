@@ -1,3 +1,5 @@
+import { Type } from "@angular/core";
+import { Route } from "@angular/router";
 import { BaseTypes, TypeOrArray } from "@app/models/app";
 
 /**
@@ -32,3 +34,12 @@ export const DeepClone = <U extends TypeOrArray<BaseTypes>>(value?: U): U => {
 
   return value as U;
 };
+
+/**
+ * Возвращает массив маршрутов без подмаршрутов.
+ *
+ * @param component Компонент, который будет отображаться для данного маршрута.
+ * @returns Массив маршрутов без подмаршрутов.
+ * @template C Тип компонента.
+ */
+export const NoSubRoutes = <C>(component: Type<C>): Route[] => ([{ path: "", component }]);
