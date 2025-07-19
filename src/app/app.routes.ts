@@ -14,7 +14,7 @@ export const routes: Routes = [
     data: {
       title: "Документы",
     },
-    loadChildren: () => import("@pages/documents/documents.module").then(m => m.DocumentsModule)
+    loadChildren: () => import("@pages/document-pages/document-pages.module").then(m => m.DocumentPagesModule)
   },
   // Просмотр документа
   {
