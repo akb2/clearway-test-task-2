@@ -11,11 +11,12 @@
         #imageOverlay
         class="image__overlay"
         [ngStyle]="styles()"
-        [ngClass]="classes"
       >
         <img
           [src]="doc.imageUrl"
           [alt]="doc.name"
+          [class.dragging]="isDragging()"
+          [(isDragging)]="isDragging"
           (load)="onImageLoad($event)"
           (dragging)="onImageDrag($event)"
         />

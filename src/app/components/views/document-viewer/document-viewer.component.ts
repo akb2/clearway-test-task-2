@@ -24,6 +24,7 @@ export class DocumentViewerComponent {
   private readonly imageShiftY = signal(0);
 
   readonly zoom = signal<number>(3);
+  readonly isDragging = signal(false);
 
   currentTool = DocumentEditTool.view;
 
@@ -76,15 +77,6 @@ export class DocumentViewerComponent {
 
     return {} as Record<string, string>;
   });
-
-  get classes(): Record<string, boolean> {
-    const isViewTool = this.currentTool === DocumentEditTool.view;
-
-    return {
-      grab: isViewTool,
-      grabbing: isViewTool
-    };
-  }
 
   private setImageShifts(x: number, y: number) {
     const zoomKoeff = this.zoomKoeff();

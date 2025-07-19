@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, OnDestroy, output } from "@angular/core";
+import { AfterViewInit, Directive, ElementRef, model, OnDestroy, output } from "@angular/core";
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { fromEvent, merge, Observable, Subject, takeUntil, tap } from "rxjs";
 
@@ -7,11 +7,11 @@ import { fromEvent, merge, Observable, Subject, takeUntil, tap } from "rxjs";
   standalone: false,
 })
 export class DragDirective implements AfterViewInit, OnDestroy {
+  readonly isDragging = model(false);
   readonly dragStart = output<DragStartEvent>();
   readonly dragging = output<DraggingEvent>();
   readonly dragEnd = output<void>();
 
-  private isDragging = false;
   private lastX = 0;
   private lastY = 0;
 
@@ -47,10 +47,10 @@ export class DragDirective implements AfterViewInit, OnDestroy {
   }
 
   private onDragStart(event: MouseEvent) {
-    this.isDragging = true;
     this.lastX = event.clientX;
     this.lastY = event.clientY;
 
+    this.isDragging.set(true);
     this.dragStart.emit({
       startX: this.lastX,
       startY: this.lastY,
@@ -58,7 +58,7 @@ export class DragDirective implements AfterViewInit, OnDestroy {
   }
 
   private onDragging(event: MouseEvent) {
-    if (this.isDragging) {
+    if (this.isDragging()) {
       const deltaX = event.clientX - this.lastX;
       const deltaY = event.clientY - this.lastY;
 
@@ -70,8 +70,7 @@ export class DragDirective implements AfterViewInit, OnDestroy {
   }
 
   private onDragEnd(event: MouseEvent) {
-    this.isDragging = false;
-
+    this.isDragging.set(false);
     this.dragEnd.emit();
   }
 }
