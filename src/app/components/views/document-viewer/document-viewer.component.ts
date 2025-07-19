@@ -13,7 +13,7 @@ import { DocumentEditTool, DocumentItem } from "@models/document";
 export class DocumentViewerComponent {
   readonly document = input<DocumentItem>();
 
-  readonly imageOverlay = viewChild("imageOverlay", { read: ElementRef });
+  private readonly imageOverlay = viewChild("imageOverlay", { read: ElementRef });
 
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -27,7 +27,6 @@ export class DocumentViewerComponent {
 
   readonly zoom = signal<number>(3);
 
-  isDragging = false;
   currentTool = DocumentEditTool.view;
 
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
@@ -58,10 +57,10 @@ export class DocumentViewerComponent {
     : 0
   );
 
-  readonly minImageShiftX = computed(() => this.imageInitialPositionX() - this.imageShiftDistanceX());
-  readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
-  readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
-  readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
+  private readonly minImageShiftX = computed(() => this.imageInitialPositionX() - this.imageShiftDistanceX());
+  private readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
+  private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
+  private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
 
   readonly styles = computed<Record<string, string>>(() => {
     if (this.containerWidth() > 0 && this.containerHeight() > 0 && this.imageOriginalWidth() > 0 && this.imageOriginalHeight() > 0) {
@@ -85,7 +84,7 @@ export class DocumentViewerComponent {
 
     return {
       grab: isViewTool,
-      grabbing: this.isDragging && isViewTool
+      grabbing: isViewTool
     };
   }
 
