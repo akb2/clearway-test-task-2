@@ -7,11 +7,11 @@ import { BreadCrumbs } from "@models/ui";
 import { Actions, ofType } from "@ngrx/effects";
 import { routerNavigatedAction } from "@ngrx/router-store";
 import { signalStore, withComputed, withState } from "@ngrx/signals";
-import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
+import { EventInstance, Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { DocumentService } from "@services/document.service";
 import { debugActions } from "@store/debug.actions";
 import { map, mergeMap, switchMap } from 'rxjs';
-import { PageLoaderDisableAction, PageLoaderEnableAction, SetBreadCrumbsAction } from "../layout/layout.actions";
+import { PageLoaderDisableAction, PageLoaderEnableAction, SetBreadCrumbsAction, SetPageTitleAction } from "../layout/layout.actions";
 import { SetViewingDocumentIdAction, UpdateDocumentsAction } from "./document.actions";
 import { DocumentInitialState } from "./document.state";
 
@@ -41,14 +41,23 @@ export class DocumentStore extends signalStore(
     initialViewingId$: actions.pipe(
       ofType(routerNavigatedAction),
       map(({ payload: { routerState } }) => routerState as unknown as RouterStateUrl<{ documentViewId: number }>),
-      switchMap(routerState => documentService.getList().pipe(
-        map(documents => ({ routerState, documents })),
+      switchMap(({ params: { documentViewId } }) => documentService.getList().pipe(
+        map(documents => ({ documentViewId: AnyToInt(documentViewId), documents })),
       )),
-      mergeMap(({ routerState: { params: { documentViewId } }, documents }) => [
-        UpdateDocumentsAction(documents),
-        SetViewingDocumentIdAction(AnyToInt(documentViewId)),
-        PageLoaderDisableAction(),
-      ])
+      mergeMap(({ documentViewId, documents }) => {
+        const viewingDocument = documents.find(({ id }) => id === documentViewId);
+        const actions: EventInstance<string, any>[] = [
+          UpdateDocumentsAction(documents),
+          SetViewingDocumentIdAction(documentViewId),
+          PageLoaderDisableAction(),
+        ];
+
+        if (viewingDocument) {
+          actions.push(SetPageTitleAction(viewingDocument.name));
+        }
+
+        return actions;
+      })
     ),
     // Инициализация страницы при навигации
     initialDocuments$: actions.pipe(
