@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, ElementRef, inject, input, signal, viewChild } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, inject, input, signal } from "@angular/core";
 import { Clamp } from "@helpers/math";
 import { DraggingEvent } from "@models/app";
 import { DocumentEditTool, DocumentItem } from "@models/document";
@@ -12,8 +12,6 @@ import { DocumentEditTool, DocumentItem } from "@models/document";
 })
 export class DocumentViewerComponent {
   readonly document = input<DocumentItem>();
-
-  private readonly imageOverlay = viewChild("imageOverlay", { read: ElementRef });
 
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -127,19 +125,16 @@ export class DocumentViewerComponent {
   private onZoomChangeListener() {
     let prevZoomKoeff = this.zoomKoeff();
 
-    effect(
-      () => {
-        const zoomKoeff = this.zoomKoeff();
+    effect(() => {
+      const zoomKoeff = this.zoomKoeff();
 
-        if (zoomKoeff !== prevZoomKoeff) {
-          const scaleRatio = prevZoomKoeff * zoomKoeff / prevZoomKoeff;
+      if (zoomKoeff !== prevZoomKoeff) {
+        const scaleRatio = prevZoomKoeff * zoomKoeff / prevZoomKoeff;
 
-          this.setImageShifts(this.imageShiftX() * scaleRatio, this.imageShiftY() * scaleRatio);
+        this.setImageShifts(this.imageShiftX() * scaleRatio, this.imageShiftY() * scaleRatio);
 
-          prevZoomKoeff = zoomKoeff;
-        }
-      },
-      { allowSignalWrites: true }
-    );
+        prevZoomKoeff = zoomKoeff;
+      }
+    });
   }
 }
