@@ -1,17 +1,17 @@
 import { computed, inject, Injectable } from "@angular/core";
 import { DeepClone } from "@helpers/app";
 import { AnyToInt } from "@helpers/converters";
-import { DocumentsBreadCrumbs, LoadingBreadCrumbs } from "@helpers/ui";
+import { DocumentBreadCrumbs, DocumentPagesBreadCrumbs, DocumentViewBreadCrumbs } from "@helpers/ui";
 import { RouterStateUrl } from "@models/app";
 import { BreadCrumbs } from "@models/ui";
 import { Actions, ofType } from "@ngrx/effects";
 import { routerNavigatedAction } from "@ngrx/router-store";
 import { signalStore, withComputed, withState } from "@ngrx/signals";
-import { EventInstance, Events, on, withEffects, withReducer } from "@ngrx/signals/events";
+import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { DocumentService } from "@services/document.service";
 import { debugActions } from "@store/debug.actions";
 import { map, mergeMap, switchMap } from 'rxjs';
-import { PageLoaderDisableAction, PageLoaderEnableAction, SetBreadCrumbsAction, SetPageTitleAction } from "../layout/layout.actions";
+import { PageLoaderDisableAction, PageLoaderEnableAction, SetBreadCrumbsAction } from "../layout/layout.actions";
 import { SetViewingDocumentIdAction, UpdateDocumentsAction } from "./document.actions";
 import { DocumentInitialState } from "./document.state";
 
@@ -44,20 +44,11 @@ export class DocumentStore extends signalStore(
       switchMap(({ params: { documentViewId } }) => documentService.getList().pipe(
         map(documents => ({ documentViewId: AnyToInt(documentViewId), documents })),
       )),
-      mergeMap(({ documentViewId, documents }) => {
-        const viewingDocument = documents.find(({ id }) => id === documentViewId);
-        const actions: EventInstance<string, any>[] = [
-          UpdateDocumentsAction(documents),
-          SetViewingDocumentIdAction(documentViewId),
-          PageLoaderDisableAction(),
-        ];
-
-        if (viewingDocument) {
-          actions.push(SetPageTitleAction(viewingDocument.name));
-        }
-
-        return actions;
-      })
+      mergeMap(({ documentViewId, documents }) => [
+        UpdateDocumentsAction(documents),
+        SetViewingDocumentIdAction(documentViewId),
+        PageLoaderDisableAction(),
+      ])
     ),
     // Инициализация страницы при навигации
     initialDocuments$: actions.pipe(
@@ -67,16 +58,19 @@ export class DocumentStore extends signalStore(
     // Установка хлебных крошек при навигации
     setBreadCrumbs$: events.on(UpdateDocumentsAction, SetViewingDocumentIdAction).pipe(
       map(() => {
-        if (store.viewingDocumentId() > 0) {
-          const viewDocument = store.viewingDocument();
-          const breadCrumbs: BreadCrumbs = viewDocument
-            ? { title: viewDocument.name }
-            : LoadingBreadCrumbs;
+        const breadCrumbs: BreadCrumbs[] = [DocumentBreadCrumbs];
 
-          return SetBreadCrumbsAction([DocumentsBreadCrumbs, breadCrumbs]);
+        if (store.viewingDocumentId() > 0) {
+          breadCrumbs.push(DocumentPagesBreadCrumbs, DocumentViewBreadCrumbs);
         }
 
-        return SetBreadCrumbsAction([]);
+        else {
+          const { link, ...documentPagesBreadCrumbs } = DocumentPagesBreadCrumbs;
+
+          breadCrumbs.push(documentPagesBreadCrumbs);
+        }
+
+        return SetBreadCrumbsAction(breadCrumbs);
       })
     ),
   })),

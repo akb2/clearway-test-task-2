@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { DocumentPagesTitle, DocumentViewTitle } from "@helpers/ui";
 import { DocumentsListRoute, DocumentsListUrl, DocumentViewRoute } from "@models/route";
 
 export const routes: Routes = [
@@ -12,7 +13,7 @@ export const routes: Routes = [
   {
     path: DocumentsListRoute,
     data: {
-      title: "Документы",
+      title: DocumentPagesTitle,
     },
     loadChildren: () => import("@pages/document-pages/document-pages.module").then(m => m.DocumentPagesModule)
   },
@@ -20,7 +21,7 @@ export const routes: Routes = [
   {
     path: DocumentViewRoute,
     data: {
-      title: "Просмотр документа",
+      title: DocumentViewTitle,
     },
     loadChildren: () => import("@pages/document-view/document-view.module").then(m => m.DocumentViewModule)
   }
