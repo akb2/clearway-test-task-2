@@ -3,16 +3,16 @@ import { NgModule } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { DocumentViewerModule } from "@components/views/document-viewer/document-viewer.module";
 import { NoSubRoutes } from "@helpers/app";
-import { DocumentsViewComponent } from "./documents-view.component";
+import { DocumentViewComponent } from "./document-view.component";
 
 @NgModule({
   declarations: [
-    DocumentsViewComponent
+    DocumentViewComponent
   ],
   imports: [
-    RouterModule.forChild(NoSubRoutes(DocumentsViewComponent)),
+    RouterModule.forChild(NoSubRoutes(DocumentViewComponent)),
     CommonModule,
     DocumentViewerModule
   ]
 })
-export class DocumentsViewModule { }
+export class DocumentViewModule { }

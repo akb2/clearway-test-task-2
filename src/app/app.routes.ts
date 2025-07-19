@@ -22,6 +22,6 @@ export const routes: Routes = [
     data: {
       title: "Просмотр документа",
     },
-    loadChildren: () => import("@pages/documents-view/documents-view.module").then(m => m.DocumentsViewModule)
+    loadChildren: () => import("@pages/document-view/document-view.module").then(m => m.DocumentViewModule)
   }
 ];
