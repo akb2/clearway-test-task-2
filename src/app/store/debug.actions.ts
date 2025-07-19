@@ -15,19 +15,23 @@ export const debugActions = signalStoreFeature(withHooks((store, events = inject
   const onInit = () => events.on()
     .pipe(takeUntil(destroyed$))
     .subscribe({
-      next: ({ type, payload }) => console.log(
-        "\n%c[СТОР]%s\n\n%cЗначение: %c%o\n%cСостояние: %c%o\n",
-        tagColor,
-        type.replace(/^\[(.+)\](.*)/i, "%c[$1]%c$2"),
-        tagColor,
-        defaultColor,
-        titleColor,
-        varColor,
-        payload,
-        titleColor,
-        varColor,
-        getState(store)
-      ),
+      next: ({ type, payload }) => {
+        const regExp = new RegExp("^\\[(.+)\\](.*)$", "i");
+        const tag = type.replace(regExp, "[$1]");
+        const text = type.replace(regExp, "$2");
+
+        console.log(
+          "\n%c[СТОР]" + tag + "%c" + text + "\n\n%cЗначение: %c%o\n%cСостояние: %c%o\n\n",
+          tagColor,
+          defaultColor,
+          titleColor,
+          varColor,
+          payload,
+          titleColor,
+          varColor,
+          getState(store)
+        )
+      },
       error: error => console.error(
         "%c[СТОР] %cОшибка\n%c%o",
         tagErrorColor,
