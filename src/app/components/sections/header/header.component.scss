@@ -65,11 +65,15 @@ $lineHeight: 1.2;
     &-link {
       text-decoration: none;
       font-weight: 300;
-      cursor: pointer;
       opacity: 0.5;
+      cursor: pointer;
       transition: opacity 0.3s ease;
 
-      &:hover {
+      &.no-hover {
+        cursor: text;
+      }
+
+      &:not(.no-hover):hover {
         opacity: 1;
       }
     }

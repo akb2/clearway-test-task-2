@@ -5,8 +5,11 @@ export const DocumentTitle = "Название документа";
 export const DocumentPagesTitle = "Все страницы";
 export const DocumentViewTitle = "Просмотр документа";
 
+export const NoHoverLink = "#";
+
 export const DocumentBreadCrumbs: BreadCrumbs = {
   title: DocumentTitle,
+  link: NoHoverLink
 };
 
 export const DocumentPagesBreadCrumbs: BreadCrumbs = {

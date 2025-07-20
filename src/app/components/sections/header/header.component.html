@@ -21,6 +21,7 @@
             <a
               [routerLink]="breadCrumb.link"
               class="header__breadcrumbs-link"
+              [class.no-hover]="breadCrumb.link === noHoverLink"
             >
               {{ breadCrumb.title }}
             </a>

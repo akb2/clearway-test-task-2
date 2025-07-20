@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { NoHoverLink } from "@helpers/ui";
 import { LayoutStore } from "@store/layout/layout.store";
 
 @Component({
@@ -10,6 +11,8 @@ import { LayoutStore } from "@store/layout/layout.store";
 })
 export class HeaderComponent {
   private readonly layoutStore = inject(LayoutStore);
+
+  readonly noHoverLink = NoHoverLink;
 
   readonly title = this.layoutStore.pageTitle;
   readonly breadCrumbs = this.layoutStore.breadCrumbs;
