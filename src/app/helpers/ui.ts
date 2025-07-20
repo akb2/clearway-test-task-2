@@ -14,6 +14,6 @@ export const DocumentPagesBreadCrumbs: BreadCrumbs = {
   link: DocumentsListUrl,
 };
 
-export const DocumentViewBreadCrumbs: BreadCrumbs = {
-  title: DocumentViewTitle,
+export const LoadingBreadCrumbs: BreadCrumbs = {
+  title: ". . . Загрузка",
 };

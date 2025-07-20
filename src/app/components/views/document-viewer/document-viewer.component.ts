@@ -11,8 +11,7 @@ import { DocumentEditTool, DocumentItem } from "@models/document";
   standalone: false
 })
 export class DocumentViewerComponent {
-  readonly documents = input<DocumentItem[]>();
-  readonly viewingDocumentId = input<number>();
+  readonly document = input<DocumentItem>();
 
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -28,15 +27,6 @@ export class DocumentViewerComponent {
 
   currentTool = DocumentEditTool.view;
 
-  readonly document = computed(() => {
-    const documents = this.documents();
-    const viewingDocumentId = this.viewingDocumentId();
-
-    return documents && viewingDocumentId
-      ? documents.find(({ id }) => id === viewingDocumentId)
-      : undefined;
-  });
-
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
   private readonly isVertical = computed(() => this.containerWidth() / this.containerHeight() > this.aspectRatio());
   private readonly imageScaledWidth = computed(() => this.imageAspectedWidth() * this.zoomKoeff());
@@ -45,7 +35,7 @@ export class DocumentViewerComponent {
   private readonly imageInitialPositionY = computed(() => (this.containerHeight() - this.imageScaledHeight()) / 2);
 
   private readonly aspectRatio = computed(() => {
-    const viewingDocumentId = this.viewingDocumentId();
+    const viewingDocumentId = this.document()?.id;
     const imageData = viewingDocumentId
       ? this.imagesOriginalSize().find(({ id }) => viewingDocumentId === id)
       : undefined;
