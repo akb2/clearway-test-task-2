@@ -1,4 +1,4 @@
-import { computed, inject, Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { DeepClone } from "@helpers/app";
 import { AnyToInt } from "@helpers/converters";
 import { DocumentBreadCrumbs, DocumentPagesBreadCrumbs, DocumentViewBreadCrumbs } from "@helpers/ui";
@@ -6,7 +6,7 @@ import { RouterStateUrl } from "@models/app";
 import { BreadCrumbs } from "@models/ui";
 import { Actions, ofType } from "@ngrx/effects";
 import { routerNavigatedAction } from "@ngrx/router-store";
-import { signalStore, withComputed, withState } from "@ngrx/signals";
+import { signalStore, withState } from "@ngrx/signals";
 import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { DocumentService } from "@services/document.service";
 import { debugActions } from "@store/debug.actions";
@@ -20,16 +20,6 @@ export class DocumentStore extends signalStore(
   debugActions,
 
   withState(DocumentInitialState),
-
-  withComputed(store => ({
-    viewingDocument: computed(() => {
-      const id = store.viewingDocumentId();
-
-      return id
-        ? store.documents().find(doc => doc.id === id)
-        : undefined;
-    })
-  })),
 
   withReducer(
     on(UpdateDocumentsAction, ({ payload: documents }) => ({ documents: DeepClone(documents) })),

@@ -17,7 +17,7 @@
           [alt]="doc.name"
           [class.dragging]="isDragging()"
           [(isDragging)]="isDragging"
-          (load)="onImageLoad($event)"
+          (load)="onImageLoad($event, doc)"
           (dragging)="onImageDrag($event)"
         />
       </div>

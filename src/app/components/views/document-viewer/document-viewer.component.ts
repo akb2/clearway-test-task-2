@@ -11,30 +11,49 @@ import { DocumentEditTool, DocumentItem } from "@models/document";
   standalone: false
 })
 export class DocumentViewerComponent {
-  readonly document = input<DocumentItem>();
+  readonly documents = input<DocumentItem[]>();
+  readonly viewingDocumentId = input<number>();
 
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
   private readonly containerWidth = signal(0);
   private readonly containerHeight = signal(0);
 
-  private readonly imageOriginalWidth = signal(0);
-  private readonly imageOriginalHeight = signal(0);
+  private readonly imagesOriginalSize = signal<{ width: number; height: number; id: number }[]>([]);
   private readonly imageShiftX = signal(0);
   private readonly imageShiftY = signal(0);
 
-  readonly zoom = signal<number>(3);
+  readonly zoom = signal<number>(1);
   readonly isDragging = signal(false);
 
   currentTool = DocumentEditTool.view;
 
+  readonly document = computed(() => {
+    const documents = this.documents();
+    const viewingDocumentId = this.viewingDocumentId();
+
+    return documents && viewingDocumentId
+      ? documents.find(({ id }) => id === viewingDocumentId)
+      : undefined;
+  });
+
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
-  private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
   private readonly isVertical = computed(() => this.containerWidth() / this.containerHeight() > this.aspectRatio());
   private readonly imageScaledWidth = computed(() => this.imageAspectedWidth() * this.zoomKoeff());
   private readonly imageScaledHeight = computed(() => this.imageAspectedHeight() * this.zoomKoeff());
   private readonly imageInitialPositionX = computed(() => (this.containerWidth() - this.imageScaledWidth()) / 2);
   private readonly imageInitialPositionY = computed(() => (this.containerHeight() - this.imageScaledHeight()) / 2);
+
+  private readonly aspectRatio = computed(() => {
+    const viewingDocumentId = this.viewingDocumentId();
+    const imageData = viewingDocumentId
+      ? this.imagesOriginalSize().find(({ id }) => viewingDocumentId === id)
+      : undefined;
+
+    return imageData
+      ? imageData.width / imageData.height
+      : 0;
+  });
 
   private readonly imageAspectedWidth = computed(() => this.isVertical()
     ? this.containerHeight() * this.aspectRatio()
@@ -62,10 +81,18 @@ export class DocumentViewerComponent {
   private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
 
   readonly styles = computed<Record<string, string>>(() => {
-    if (this.containerWidth() > 0 && this.containerHeight() > 0 && this.imageOriginalWidth() > 0 && this.imageOriginalHeight() > 0) {
+    if (this.containerWidth() > 0 && this.containerHeight() > 0 && this.imagesOriginalSize().length > 0) {
       const zoomKoeff = this.zoomKoeff();
-      const left = Clamp(this.imageShiftX() * zoomKoeff + this.imageInitialPositionX(), this.minImageShiftX(), this.maxImageShiftX());
-      const top = Clamp(this.imageShiftY() * zoomKoeff + this.imageInitialPositionY(), this.minImageShiftY(), this.maxImageShiftY());
+      const left = Clamp(
+        this.imageShiftX() * zoomKoeff + this.imageInitialPositionX(),
+        this.minImageShiftX(),
+        this.maxImageShiftX()
+      );
+      const top = Clamp(
+        this.imageShiftY() * zoomKoeff + this.imageInitialPositionY(),
+        this.minImageShiftY(),
+        this.maxImageShiftY()
+      );
 
       return {
         width: this.imageScaledWidth() + "px",
@@ -98,11 +125,23 @@ export class DocumentViewerComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  onImageLoad(event: Event) {
+  onImageLoad(event: Event, { id }: DocumentItem) {
+    const list = [...this.imagesOriginalSize()];
+    const sizeIndex = list.findIndex(item => item.id === id);
     const imgElement = event.target as HTMLImageElement;
+    const width = imgElement.naturalWidth;
+    const height = imgElement.naturalHeight;
+    const size = { id, width, height };
 
-    this.imageOriginalWidth.set(imgElement.naturalWidth);
-    this.imageOriginalHeight.set(imgElement.naturalHeight);
+    if (sizeIndex >= 0) {
+      list[sizeIndex] = size;
+    }
+
+    else {
+      list.push(size);
+    }
+
+    this.imagesOriginalSize.set(list);
   }
 
   onImageDrag(event: DraggingEvent) {

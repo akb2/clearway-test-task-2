@@ -11,5 +11,6 @@ import { DocumentStore } from "@store/document/document.store";
 export class DocumentViewComponent {
   private readonly documentStore = inject(DocumentStore);
 
-  readonly document = this.documentStore.viewingDocument;
+  readonly documents = this.documentStore.documents;
+  readonly viewingDocumentId = this.documentStore.viewingDocumentId;
 }
