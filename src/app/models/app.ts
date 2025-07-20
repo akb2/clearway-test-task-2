@@ -21,3 +21,5 @@ export interface DraggingEvent {
   deltaX: number;
   deltaY: number;
 }
+
+export type Direction = -1 | 0 | 1;

@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect
 import { Router } from "@angular/router";
 import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
-import { DraggingEvent } from "@models/app";
+import { Direction, DraggingEvent } from "@models/app";
 import { DocumentEditTool, DocumentItem } from "@models/document";
 import { DocumentViewUrl } from "@models/route";
-import { defer, delay, from, Subject, takeUntil } from "rxjs";
+import { defer, from, Subject, takeUntil } from "rxjs";
 
 @Component({
   selector: "app-document-viewer",
@@ -29,11 +29,14 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly imageShiftX = signal(0);
   private readonly imageShiftY = signal(0);
 
-  readonly zoom = signal<number>(1);
+  readonly zoom = signal(1);
   readonly isDragging = signal(false);
+  readonly isPageScrolling = signal(false);
+  private readonly isPageLoading = signal(false);
 
   currentTool = DocumentEditTool.view;
-  pageToggling = false;
+
+  readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
 
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
   private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
@@ -42,6 +45,34 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly imageScaledHeight = computed(() => this.imageAspectedHeight() * this.zoomKoeff());
   private readonly imageInitialPositionX = computed(() => (this.containerWidth() - this.imageScaledWidth()) / 2);
   private readonly imageInitialPositionY = computed(() => (this.containerHeight() - this.imageScaledHeight()) / 2);
+  private readonly minImageShiftX = computed(() => this.imageInitialPositionX() - this.imageShiftDistanceX());
+  private readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
+  private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
+  private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
+
+  private readonly currentDocumentIndex = computed(() => {
+    const documents = this.documents();
+    const document = this.document();
+
+    return AnyToInt(documents?.findIndex(({ id }) => id === document?.id), -1);
+  });
+
+  readonly nextDocumentIndex = computed(() => {
+    const index = this.currentDocumentIndex();
+    const documents = this.documents();
+
+    return documents && index + 1 < documents.length
+      ? index + 1
+      : -1;
+  });
+
+  readonly prevDocumentIndex = computed(() => {
+    const index = this.currentDocumentIndex();
+
+    return index - 1 >= 0
+      ? index - 1
+      : -1;
+  });
 
   private readonly imageAspectedWidth = computed(() => this.isVertical()
     ? this.containerHeight() * this.aspectRatio()
@@ -62,11 +93,6 @@ export class DocumentViewerComponent implements OnDestroy {
     ? -this.imageInitialPositionY()
     : 0
   );
-
-  private readonly minImageShiftX = computed(() => this.imageInitialPositionX() - this.imageShiftDistanceX());
-  private readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
-  private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
-  private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
 
   private readonly destroyed$ = new Subject<void>();
 
@@ -136,29 +162,19 @@ export class DocumentViewerComponent implements OnDestroy {
     );
   }
 
-  onScroll(event: WheelEvent) {
-    if (!this.pageToggling) {
-      const documents = this.documents();
-      const document = this.document();
-      const documentIndex = AnyToInt(documents?.findIndex(({ id }) => id === document?.id), -1);
-      const nextIndex = documentIndex + (event.deltaY / Math.abs(event.deltaY));
-      const nextDocument = documents && nextIndex >= 0 && nextIndex < documents.length
-        ? documents[nextIndex]
-        : undefined;
+  onScrollStart(direction: Direction) {
+    if (!this.isPageLoading()) {
+      const newIndex = direction > 0
+        ? this.nextDocumentIndex()
+        : this.prevDocumentIndex();
+      const nextDocument = this.documents()?.[newIndex];
 
       if (nextDocument) {
-        console.log('akb2', event);
-        this.pageToggling = true;
+        this.isPageLoading.set(true);
 
         from(defer(() => this.router.navigateByUrl(DocumentViewUrl + nextDocument.id)))
-          .pipe(
-            delay(500),
-            takeUntil(this.destroyed$)
-          )
-          .subscribe(() => {
-            this.pageToggling = false;
-            this.changeDetectorRef.markForCheck();
-          });
+          .pipe(takeUntil(this.destroyed$))
+          .subscribe(() => this.isPageLoading.set(false));
       }
     }
   }

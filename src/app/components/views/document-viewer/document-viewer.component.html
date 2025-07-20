@@ -1,4 +1,5 @@
 @let doc = document();
+@let loading = pageLoading();
 
 @if (doc) {
   <div class="image">
@@ -9,8 +10,15 @@
     >
       <div
         #imageOverlay
+        scrollable
+        [inertion]="false"
         class="image__overlay"
         [ngStyle]="styles()"
+        [disabledScroll]="loading"
+        [disabledBottomScroll]="nextDocumentIndex() < 0"
+        [disabledTopScroll]="prevDocumentIndex() < 0"
+        [(isScrolling)]="isPageScrolling"
+        (scrollStart)="onScrollStart($event)"
       >
         <img
           [src]="doc.imageUrl"
@@ -19,20 +27,31 @@
           [(isDragging)]="isDragging"
           (load)="onImageLoad($event)"
           (dragging)="onImageDrag($event)"
-          (wheel)="onScroll($event)"
         />
       </div>
+      <!-- Загрузка -->
+      @if (loading) {
+        <div
+          class="image__loader"
+          (mousedown)="$event.stopPropagation()"
+          (mouseleave)="$event.stopPropagation()"
+          (click)="$event.stopPropagation()"
+        >
+          <mat-spinner
+            mode="indeterminate"
+            color="primary"
+            [diameter]="128"
+            [strokeWidth]="12"
+          />
+        </div>
+      }
       <!-- Управление -->
-      @if (!pageToggling) {
+      @else {
         <app-document-viewer-actions
           [(zoom)]="zoom"
           [(tool)]="currentTool"
           class="image__actions"
         />
-      }
-      <!-- Загрузка -->
-      @else {
-        <div class="image__loader"></div>
       }
     </div>
   </div>

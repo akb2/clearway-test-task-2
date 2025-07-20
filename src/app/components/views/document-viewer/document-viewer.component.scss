@@ -1,6 +1,7 @@
 @use "mixins";
 
 $spacing: 15px;
+$background: #ccc;
 
 .image {
   height: 100%;
@@ -41,6 +42,11 @@ $spacing: 15px;
     position: absolute;
     z-index: 1;
     pointer-events: auto;
+    background-color: rgba($background, 0.3);
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
   }
 
   &__actions {
