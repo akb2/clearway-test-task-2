@@ -6,19 +6,19 @@
     <div
       class="image__border"
       resizeObserver
+      scrollable
+      [inertion]="false"
+      [disabledScroll]="loading"
+      [disabledBottomScroll]="nextDocumentIndex() < 0"
+      [disabledTopScroll]="prevDocumentIndex() < 0"
+      [(isScrolling)]="isPageScrolling"
+      (scrollStart)="onScrollStart($event)"
       (resized)="onResize($event)"
     >
       <div
         #imageOverlay
-        scrollable
-        [inertion]="false"
         class="image__overlay"
         [ngStyle]="styles()"
-        [disabledScroll]="loading"
-        [disabledBottomScroll]="nextDocumentIndex() < 0"
-        [disabledTopScroll]="prevDocumentIndex() < 0"
-        [(isScrolling)]="isPageScrolling"
-        (scrollStart)="onScrollStart($event)"
       >
         <img
           [src]="doc.imageUrl"
