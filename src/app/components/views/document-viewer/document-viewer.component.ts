@@ -1,7 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, inject, input, signal } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, inject, input, OnDestroy, signal } from "@angular/core";
+import { Router } from "@angular/router";
+import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
 import { DraggingEvent } from "@models/app";
 import { DocumentEditTool, DocumentItem } from "@models/document";
+import { DocumentViewUrl } from "@models/route";
+import { defer, delay, from, Subject, takeUntil } from "rxjs";
 
 @Component({
   selector: "app-document-viewer",
@@ -10,15 +14,18 @@ import { DocumentEditTool, DocumentItem } from "@models/document";
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false
 })
-export class DocumentViewerComponent {
+export class DocumentViewerComponent implements OnDestroy {
+  readonly documents = input<DocumentItem[]>();
   readonly document = input<DocumentItem>();
 
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   private readonly containerWidth = signal(0);
   private readonly containerHeight = signal(0);
 
-  private readonly imagesOriginalSize = signal<{ width: number; height: number; id: number }[]>([]);
+  private readonly imageOriginalWidth = signal(0);
+  private readonly imageOriginalHeight = signal(0);
   private readonly imageShiftX = signal(0);
   private readonly imageShiftY = signal(0);
 
@@ -26,24 +33,15 @@ export class DocumentViewerComponent {
   readonly isDragging = signal(false);
 
   currentTool = DocumentEditTool.view;
+  pageToggling = false;
 
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
+  private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
   private readonly isVertical = computed(() => this.containerWidth() / this.containerHeight() > this.aspectRatio());
   private readonly imageScaledWidth = computed(() => this.imageAspectedWidth() * this.zoomKoeff());
   private readonly imageScaledHeight = computed(() => this.imageAspectedHeight() * this.zoomKoeff());
   private readonly imageInitialPositionX = computed(() => (this.containerWidth() - this.imageScaledWidth()) / 2);
   private readonly imageInitialPositionY = computed(() => (this.containerHeight() - this.imageScaledHeight()) / 2);
-
-  private readonly aspectRatio = computed(() => {
-    const viewingDocumentId = this.document()?.id;
-    const imageData = viewingDocumentId
-      ? this.imagesOriginalSize().find(({ id }) => viewingDocumentId === id)
-      : undefined;
-
-    return imageData
-      ? imageData.width / imageData.height
-      : 0;
-  });
 
   private readonly imageAspectedWidth = computed(() => this.isVertical()
     ? this.containerHeight() * this.aspectRatio()
@@ -70,8 +68,10 @@ export class DocumentViewerComponent {
   private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
   private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
 
+  private readonly destroyed$ = new Subject<void>();
+
   readonly styles = computed<Record<string, string>>(() => {
-    if (this.containerWidth() > 0 && this.containerHeight() > 0 && this.imagesOriginalSize().length > 0) {
+    if (this.containerWidth() > 0 && this.containerHeight() > 0 && this.imageOriginalWidth() > 0 && this.imageAspectedHeight() > 0) {
       const zoomKoeff = this.zoomKoeff();
       const left = Clamp(
         this.imageShiftX() * zoomKoeff + this.imageInitialPositionX(),
@@ -108,6 +108,11 @@ export class DocumentViewerComponent {
     this.onZoomChangeListener();
   }
 
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
+
   onResize(event: ResizeObserverEntry) {
     this.containerWidth.set(event.contentRect.width);
     this.containerHeight.set(event.contentRect.height);
@@ -115,23 +120,11 @@ export class DocumentViewerComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  onImageLoad(event: Event, { id }: DocumentItem) {
-    const list = [...this.imagesOriginalSize()];
-    const sizeIndex = list.findIndex(item => item.id === id);
+  onImageLoad(event: Event) {
     const imgElement = event.target as HTMLImageElement;
-    const width = imgElement.naturalWidth;
-    const height = imgElement.naturalHeight;
-    const size = { id, width, height };
 
-    if (sizeIndex >= 0) {
-      list[sizeIndex] = size;
-    }
-
-    else {
-      list.push(size);
-    }
-
-    this.imagesOriginalSize.set(list);
+    this.imageOriginalWidth.set(imgElement.naturalWidth);
+    this.imageOriginalHeight.set(imgElement.naturalHeight);
   }
 
   onImageDrag(event: DraggingEvent) {
@@ -141,6 +134,33 @@ export class DocumentViewerComponent {
       this.imageShiftX() * zoomKoeff + event.deltaX,
       this.imageShiftY() * zoomKoeff + event.deltaY
     );
+  }
+
+  onScroll(event: WheelEvent) {
+    if (!this.pageToggling) {
+      const documents = this.documents();
+      const document = this.document();
+      const documentIndex = AnyToInt(documents?.findIndex(({ id }) => id === document?.id), -1);
+      const nextIndex = documentIndex + (event.deltaY / Math.abs(event.deltaY));
+      const nextDocument = documents && nextIndex >= 0 && nextIndex < documents.length
+        ? documents[nextIndex]
+        : undefined;
+
+      if (nextDocument) {
+        console.log('akb2', event);
+        this.pageToggling = true;
+
+        from(defer(() => this.router.navigateByUrl(DocumentViewUrl + nextDocument.id)))
+          .pipe(
+            delay(500),
+            takeUntil(this.destroyed$)
+          )
+          .subscribe(() => {
+            this.pageToggling = false;
+            this.changeDetectorRef.markForCheck();
+          });
+      }
+    }
   }
 
   private onZoomChangeListener() {

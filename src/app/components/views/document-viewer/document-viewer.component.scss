@@ -1,3 +1,5 @@
+@use "mixins";
+
 $spacing: 15px;
 
 .image {
@@ -31,6 +33,14 @@ $spacing: 15px;
         cursor: grabbing;
       }
     }
+  }
+
+  &__loader {
+    @include mixins.inset(-$spacing);
+
+    position: absolute;
+    z-index: 1;
+    pointer-events: auto;
   }
 
   &__actions {

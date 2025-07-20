@@ -17,16 +17,23 @@
           [alt]="doc.name"
           [class.dragging]="isDragging()"
           [(isDragging)]="isDragging"
-          (load)="onImageLoad($event, doc)"
+          (load)="onImageLoad($event)"
           (dragging)="onImageDrag($event)"
+          (wheel)="onScroll($event)"
         />
       </div>
       <!-- Управление -->
-      <app-document-viewer-actions
-        [(zoom)]="zoom"
-        [(tool)]="currentTool"
-        class="image__actions"
-      />
+      @if (!pageToggling) {
+        <app-document-viewer-actions
+          [(zoom)]="zoom"
+          [(tool)]="currentTool"
+          class="image__actions"
+        />
+      }
+      <!-- Загрузка -->
+      @else {
+        <div class="image__loader"></div>
+      }
     </div>
   </div>
 }
