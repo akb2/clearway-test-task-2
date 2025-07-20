@@ -5,7 +5,7 @@ import { Clamp } from "@helpers/math";
 import { Direction, DraggingEvent } from "@models/app";
 import { DocumentEditTool, DocumentItem } from "@models/document";
 import { DocumentViewUrl } from "@models/route";
-import { defer, from, Subject, takeUntil } from "rxjs";
+import { defer, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
 @Component({
   selector: "app-document-viewer",
@@ -35,6 +35,8 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly isPageLoading = signal(false);
 
   currentTool = DocumentEditTool.view;
+
+  private readonly pageChangindDelayMs = 300;
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
 
@@ -172,7 +174,10 @@ export class DocumentViewerComponent implements OnDestroy {
       if (nextDocument) {
         this.isPageLoading.set(true);
 
-        from(defer(() => this.router.navigateByUrl(DocumentViewUrl + nextDocument.id)))
+        forkJoin([
+          from(defer(() => this.router.navigateByUrl(DocumentViewUrl + nextDocument.id))),
+          timer(this.pageChangindDelayMs)
+        ])
           .pipe(takeUntil(this.destroyed$))
           .subscribe(() => this.isPageLoading.set(false));
       }

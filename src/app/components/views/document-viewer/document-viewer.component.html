@@ -24,33 +24,34 @@
           [src]="doc.imageUrl"
           [alt]="doc.name"
           [class.dragging]="isDragging()"
+          [class.loading]="loading"
           [(isDragging)]="isDragging"
           (load)="onImageLoad($event)"
           (dragging)="onImageDrag($event)"
         />
       </div>
       <!-- Загрузка -->
-      @if (loading) {
-        <div
-          class="image__loader"
-          (mousedown)="$event.stopPropagation()"
-          (mouseleave)="$event.stopPropagation()"
-          (click)="$event.stopPropagation()"
-        >
-          <mat-spinner
-            mode="indeterminate"
-            color="primary"
-            [diameter]="128"
-            [strokeWidth]="12"
-          />
-        </div>
-      }
+      <div
+        class="image__loader"
+        [class.loading]="loading"
+        (mousedown)="$event.stopPropagation()"
+        (mouseleave)="$event.stopPropagation()"
+        (click)="$event.stopPropagation()"
+      >
+        <mat-spinner
+          mode="indeterminate"
+          color="primary"
+          [diameter]="128"
+          [strokeWidth]="12"
+        />
+      </div>
       <!-- Управление -->
-      @else {
+      @if (!loading) {
         <app-document-viewer-actions
+          class="image__actions"
           [(zoom)]="zoom"
           [(tool)]="currentTool"
-          class="image__actions"
+          (changePage)="onScrollStart($event)"
         />
       }
     </div>
