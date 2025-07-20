@@ -53,20 +53,27 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
   private keyboardZoomListener() {
     const zoomInKeys = ["Equal", "NumpadAdd"];
     const zoomOutKeys = ["Minus", "NumpadSubtract"];
+    const zoomClear = ["Digit0", "Numpad0"];
+    const allKeys = [...zoomInKeys, ...zoomOutKeys, ...zoomClear];
     const isMacOs = IsMacOs();
 
     fromEvent<KeyboardEvent>(document, "keydown")
       .pipe(
         filter(({ ctrlKey, metaKey, code }) => (
-          (zoomInKeys.includes(code) || zoomOutKeys.includes(code))
+          allKeys.includes(code)
           && ((ctrlKey && !isMacOs) || (metaKey && isMacOs))
         )),
         tap(event => event.preventDefault()),
         takeUntil(this.destroyed$)
       )
-      .subscribe(({ code }) => zoomInKeys.includes(code)
-        ? this.onZoomIn()
-        : this.onZoomOut()
-      );
+      .subscribe(({ code }) => {
+        if (zoomInKeys.includes(code)) {
+          this.onZoomIn();
+        } else if (zoomOutKeys.includes(code)) {
+          this.onZoomOut();
+        } else if (zoomClear.includes(code)) {
+          this.setZoom(1);
+        }
+      });
   }
 }
