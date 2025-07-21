@@ -1,7 +1,10 @@
+@use "sass:map";
 @use "mixins";
+@use "colors";
 
 $spacing: 15px;
 $background: #ccc;
+$animationTime: 0.3s;
 
 .image {
   height: 100%;
@@ -9,6 +12,15 @@ $background: #ccc;
   border-radius: 6px;
   padding: $spacing;
   user-select: none;
+
+  &:hover &__actions {
+    opacity: 0.5;
+    visibility: visible;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 
   &__border {
     width: 100%;
@@ -25,7 +37,7 @@ $background: #ccc;
       cursor: grab;
       width: 100%;
       height: 100%;
-      transition: opacity 0.3s ease;
+      transition: opacity #{$animationTime} ease;
 
       + img {
         margin-top: $spacing;
@@ -54,8 +66,8 @@ $background: #ccc;
     visibility: hidden;
     pointer-events: none;
     transition:
-      opacity 0.3s ease,
-      visibility 0.3s ease;
+      opacity #{$animationTime} ease,
+      visibility #{$animationTime} ease;
 
     &.loading {
       opacity: 1;
@@ -67,10 +79,19 @@ $background: #ccc;
   &__actions {
     position: absolute;
     pointer-events: none;
-    bottom: 0;
-    right: 0;
+    bottom: $spacing;
+    left: 50%;
     display: flex;
-    flex-flow: column nowrap;
+    flex-flow: row nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%);
+    background-color: map.get(colors.$matPrimary, 30);
+    padding: 10px;
+    border-radius: 60px;
+    transition:
+      opacity #{$animationTime} ease,
+      visibility #{$animationTime} ease;
   }
 
   &__snippets {
