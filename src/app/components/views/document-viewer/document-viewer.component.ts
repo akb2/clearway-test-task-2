@@ -36,6 +36,8 @@ export class DocumentViewerComponent implements OnDestroy {
 
   currentTool = DocumentEditTool.view;
 
+  private isCreatingSnippet = false;
+
   private readonly pageChangindDelayMs = 300;
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
@@ -155,13 +157,24 @@ export class DocumentViewerComponent implements OnDestroy {
     this.imageOriginalHeight.set(imgElement.naturalHeight);
   }
 
+  onImageDragStart() {
+    this.isCreatingSnippet = true;
+  }
+
   onImageDrag(event: DraggingEvent) {
     const zoomKoeff = this.zoomKoeff();
 
+    this.isCreatingSnippet = false;
     this.setImageShifts(
       this.imageShiftX() * zoomKoeff + event.deltaX,
       this.imageShiftY() * zoomKoeff + event.deltaY
     );
+  }
+
+  onImageDragEnd() {
+    if (this.isCreatingSnippet) {
+      // Todo: Здесь создается аннотация
+    }
   }
 
   onScrollStart(direction: Direction) {

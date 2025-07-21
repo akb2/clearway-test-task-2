@@ -27,7 +27,9 @@
           [class.loading]="loading"
           [(isDragging)]="isDragging"
           (load)="onImageLoad($event)"
+          (dragStart)="onImageDragStart()"
           (dragging)="onImageDrag($event)"
+          (dragEnd)="onImageDragEnd()"
         />
       </div>
       <!-- Загрузка -->
