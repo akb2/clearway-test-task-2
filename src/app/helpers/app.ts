@@ -19,11 +19,15 @@ export const DeepClone = <U extends TypeOrArray<BaseTypes>>(value?: U): U => {
     }
 
     else if (typeof value === "object") {
-      const obj = <Record<string, keyof U>>value;
+      if (value instanceof Set) {
+        return new Set(Array.from(value).map(item => DeepClone(item))) as U;
+      }
+
+      const obj = <Record<string, U[keyof U]>>value;
 
       return Object.entries(obj).reduce(
-        (acc, [key, item]: [string, keyof U]) => {
-          (acc as Record<string, keyof U>)[key] = DeepClone(item);
+        (acc, [key, item]: [string, U[keyof U]]) => {
+          (acc as Record<string, U[keyof U]>)[key] = DeepClone(item);
 
           return acc;
         },
