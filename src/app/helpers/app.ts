@@ -45,3 +45,5 @@ export const DeepClone = <U extends TypeOrArray<BaseTypes>>(value?: U): U => {
 export const NoSubRoutes = <C>(component: Type<C>): Route[] => ([{ path: "", component }]);
 
 export const IsMacOs = () => /mac\s?os/i.test(navigator.userAgent);
+
+export const IsSafari = () => /^Mozilla\/.*AppleWebKit\/.*\(KHTML, like Gecko\)(?!.*Chrome\/)(?!.*Chromium\/).*Version\/[\d.]+ Safari\/[\d.]+$/i.test(navigator.userAgent);

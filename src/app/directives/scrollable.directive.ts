@@ -1,6 +1,8 @@
 import { AfterViewInit, Directive, ElementRef, input, model, OnDestroy, output } from "@angular/core";
+import { IsMacOs, IsSafari } from "@helpers/app";
+import { AnyToInt } from "@helpers/converters";
 import { Direction } from "@models/app";
-import { filter, fromEvent, Subject, switchMap, takeUntil, tap, timer } from "rxjs";
+import { filter, fromEvent, pairwise, skipWhile, startWith, Subject, switchMap, takeUntil, tap, timer } from "rxjs";
 
 @Directive({
   selector: "[scrollable]",
@@ -16,9 +18,31 @@ export class ScrollableDirective implements AfterViewInit, OnDestroy {
   readonly scrolling = output<void>();
   readonly scrollEnd = output<void>();
 
-  private readonly endTime = 200;
+  private readonly endTime = 350;
+  private readonly inertionDetectTime = 90;
 
   private readonly destroyed$ = new Subject<void>();
+
+  private isInertionEvent(cancelable: boolean, timeStamp: number, lastTime: number): boolean {
+    return IsMacOs() && IsSafari()
+      ? timeStamp - lastTime <= this.inertionDetectTime
+      : !cancelable && timeStamp > 0;
+  }
+
+  private filterEvents([prev, next]: (WheelEvent | undefined)[]): boolean {
+    const cancelable = !!next!.cancelable;
+    const timeStamp = AnyToInt(next?.timeStamp);
+    const lastTime = AnyToInt(prev?.timeStamp);
+    const isInertion = this.isInertionEvent(cancelable, timeStamp, lastTime);
+
+    return !isInertion || (isInertion && this.inertion());
+  }
+
+  private getFilterOperator<T extends WheelEvent | undefined>() {
+    return IsMacOs() && IsSafari()
+      ? skipWhile((data: T[]) => this.filterEvents(data))
+      : filter((data: T[]) => this.filterEvents(data));
+  }
 
   constructor(
     private readonly elementRef: ElementRef<HTMLElement>
@@ -34,10 +58,12 @@ export class ScrollableDirective implements AfterViewInit, OnDestroy {
   }
 
   private wheelListener() {
-    fromEvent<WheelEvent>(this.elementRef.nativeElement, "wheel", { passive: this.inertion() })
+    fromEvent<WheelEvent>(this.elementRef.nativeElement, "wheel", { passive: false })
       .pipe(
-        filter(({ cancelable }) => cancelable || (!cancelable && this.inertion())),
-        tap(event => this.onScrollStart(Math.sign(event.deltaY) as Direction)),
+        startWith(undefined),
+        pairwise(),
+        this.getFilterOperator(),
+        tap(([, event]) => this.onScrollStart(event!)),
         switchMap(() => timer(this.endTime)),
         filter(() => this.isScrolling()),
         takeUntil(this.destroyed$)
@@ -45,16 +71,21 @@ export class ScrollableDirective implements AfterViewInit, OnDestroy {
       .subscribe(() => this.onScrollEnd());
   }
 
-  private onScrollStart(direction: Direction) {
+  private onScrollStart(event: WheelEvent) {
+    const direction = Math.sign(event.deltaY) as Direction;
     const disabledTop = this.disabledTopScroll() && direction < 0;
     const disabledBottom = this.disabledBottomScroll() && direction > 0;
 
-    if (!this.disabledScroll() && !disabledTop && !disabledBottom && !disabledBottom && !this.isScrolling()) {
-      this.isScrolling.set(true);
-      this.scrollStart.emit(direction);
+    if (!this.isScrolling()) {
+      if (!this.disabledScroll() && !disabledTop && !disabledBottom) {
+        this.isScrolling.set(true);
+        this.scrollStart.emit(direction);
+      }
     }
 
-    this.scrolling.emit();
+    if (this.isScrolling()) {
+      this.scrolling.emit();
+    }
   }
 
   private onScrollEnd() {
