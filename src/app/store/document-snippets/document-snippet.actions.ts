@@ -3,6 +3,6 @@ import { type } from "@ngrx/signals";
 import { event } from "@ngrx/signals/events";
 
 export const UpsertSnippetsAction = event(
-  "[СНИППЕТЫ] Сохранение сниппетов",
+  "[АННОТАЦИИ] Сохранение аннотаций",
   type<DocumentSnippet[]>()
 );
