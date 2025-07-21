@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, model, OnDestroy, OnInit, output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, model, OnDestroy, OnInit, output } from "@angular/core";
 import { IsMacOs } from "@helpers/app";
 import { Direction } from "@models/app";
 import { DocumentEditTool } from "@models/document";
@@ -19,8 +19,10 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
   readonly changePage = output<Direction>();
 
   readonly zoomMin = 1;
-  readonly zoomMax = 4.2;
+  readonly zoomMax = 4;
   private readonly zoomStep = 0.2;
+
+  readonly zoomPercentValue = computed(() => Math.round(this.zoom() / this.zoomMin * 100));
 
   private readonly destroyed$ = new Subject<void>();
 
@@ -34,19 +36,11 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
   }
 
   onZoomIn() {
-    const zoom = this.zoom();
-
-    if (zoom + this.zoomStep <= this.zoomMax) {
-      this.setZoom(zoom + this.zoomStep);
-    }
+    this.setZoom(this.zoom() + this.zoomStep);
   }
 
   onZoomOut() {
-    const zoom = this.zoom();
-
-    if (zoom - this.zoomStep >= this.zoomMin) {
-      this.setZoom(zoom - this.zoomStep);
-    }
+    this.setZoom(this.zoom() - this.zoomStep);
   }
 
   private setZoom(zoom: number) {

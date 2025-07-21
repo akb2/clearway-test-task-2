@@ -1,6 +1,31 @@
+@use "@angular/material";
+@use "sass:map";
+@use "mixins";
+@use "colors";
+
+$spacing: 10px;
+$iconSize: 40px;
+$panelHeight: $iconSize + ($spacing * 2);
+
 :host {
-  display: block;
-  padding: 7px;
+  background-color: map.get(colors.$matPrimary, 40);
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: $spacing;
+  border-radius: $panelHeight / 2;
+  gap: $spacing;
+
+  @include material.icon-button-overrides(
+    (
+      icon-color: white,
+      disabled-icon-color: #aaa
+    )
+  );
+}
+
+.zoom-label {
+  color: white;
 }
 
 button {

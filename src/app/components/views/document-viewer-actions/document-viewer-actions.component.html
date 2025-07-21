@@ -1,15 +1,19 @@
 <!-- Уменьшить -->
 <button
-  mat-icon-button
+  matIconButton
+  color="primary"
   aria-label="Уменьшить"
   [disabled]="zoom() <= zoomMin"
   (click)="onZoomOut()"
 >
   <mat-icon>remove</mat-icon>
 </button>
+<!-- Уровень зума -->
+<span class="zoom-label">{{ zoomPercentValue() }}%</span>
 <!-- Увеличить -->
 <button
-  mat-icon-button
+  matIconButton
+  color="primary"
   aria-label="Увеличить"
   [disabled]="zoom() >= zoomMax"
   (click)="onZoomIn()"
