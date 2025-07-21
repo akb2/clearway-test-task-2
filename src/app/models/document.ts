@@ -9,3 +9,13 @@ export enum DocumentEditTool {
   text,
   image
 }
+
+export interface DocumentSnippet {
+  id: number;
+  documentId: number;
+  text: string;
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+}
