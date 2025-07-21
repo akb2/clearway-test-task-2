@@ -51,8 +51,11 @@
       @if (!loading) {
         <app-document-viewer-actions
           class="image__actions"
+          [pagesCount]="documentsCount()"
+          [prevPageIndex]="prevDocumentIndex()"
+          [currentPageIndex]="currentDocumentIndex() + 1"
+          [nextPageIndex]="nextDocumentIndex()"
           [(zoom)]="zoom"
-          [(tool)]="currentTool"
           (changePage)="onScrollStart($event)"
         />
       }

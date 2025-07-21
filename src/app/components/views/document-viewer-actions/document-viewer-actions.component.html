@@ -1,22 +1,60 @@
-<!-- Уменьшить -->
-<button
-  matIconButton
-  color="primary"
-  aria-label="Уменьшить"
-  [disabled]="zoom() <= zoomMin"
-  (click)="onZoomOut()"
->
-  <mat-icon>remove</mat-icon>
-</button>
-<!-- Уровень зума -->
-<span class="zoom-label">{{ zoomPercentValue() }}%</span>
-<!-- Увеличить -->
-<button
-  matIconButton
-  color="primary"
-  aria-label="Увеличить"
-  [disabled]="zoom() >= zoomMax"
-  (click)="onZoomIn()"
->
-  <mat-icon>add</mat-icon>
-</button>
+@let count = pagesCount();
+
+<div class="action-group">
+  <!-- Уменьшить -->
+  <button
+    matIconButton
+    color="primary"
+    aria-label="Уменьшить"
+    [disabled]="zoom() <= zoomMin"
+    (click)="onZoomOut()"
+  >
+    <mat-icon>remove</mat-icon>
+  </button>
+  <!-- Уровень зума -->
+  <button
+    matButton
+    color="primary"
+    [disabled]="zoom() === zoomMin"
+    (click)="setZoom(zoomMin)"
+  >
+    {{ zoomPercentValue() }}%
+  </button>
+  <!-- Увеличить -->
+  <button
+    matIconButton
+    color="primary"
+    aria-label="Увеличить"
+    [disabled]="zoom() >= zoomMax"
+    (click)="onZoomIn()"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+
+@if (count > 0) {
+  <div class="action-group gap">
+    <!-- Предыдущая страница -->
+    <button
+      matIconButton
+      color="primary"
+      aria-label="Предыдущая страница"
+      [disabled]="prevPageIndex() < 0"
+      (click)="changePage.emit(-1)"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <!-- Информация о страницах -->
+    <span class="label">{{ currentPageIndex() }} / {{ count }}</span>
+    <!-- Следующая страница -->
+    <button
+      matIconButton
+      color="primary"
+      aria-label="Следующая страница"
+      [disabled]="nextPageIndex() < 0"
+      (click)="changePage.emit(1)"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+}

@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, model, OnDestroy, OnInit, output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, input, model, OnDestroy, OnInit, output } from "@angular/core";
 import { IsMacOs } from "@helpers/app";
 import { Direction } from "@models/app";
-import { DocumentEditTool } from "@models/document";
 import { filter, fromEvent, Subject, takeUntil, tap } from "rxjs";
 import { Clamp } from '../../../helpers/math';
 
@@ -13,8 +12,11 @@ import { Clamp } from '../../../helpers/math';
   standalone: false
 })
 export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
-  readonly zoom = model<number>(1);
-  readonly tool = model<DocumentEditTool>(DocumentEditTool.view);
+  readonly zoom = model(1);
+  readonly currentPageIndex = input(-1);
+  readonly prevPageIndex = input(-1);
+  readonly nextPageIndex = input(-1);
+  readonly pagesCount = input(0);
 
   readonly changePage = output<Direction>();
 
@@ -43,7 +45,7 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
     this.setZoom(this.zoom() - this.zoomStep);
   }
 
-  private setZoom(zoom: number) {
+  setZoom(zoom: number) {
     this.zoom.set(Clamp(zoom, this.zoomMin, this.zoomMax));
   }
 
@@ -51,8 +53,8 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
     const zoomInKeys = ["Equal", "NumpadAdd"];
     const zoomOutKeys = ["Minus", "NumpadSubtract"];
     const zoomClear = ["Digit0", "Numpad0"];
-    const nextPage = ["ArrowDown"];
-    const prevPage = ["ArrowUp"];
+    const nextPage = ["ArrowDown", "ArrowRight"];
+    const prevPage = ["ArrowUp", "ArrowLeft"];
     const ctrlKeys = [...zoomInKeys, ...zoomOutKeys, ...zoomClear];
     const simpleKeys = [...prevPage, ...nextPage];
     const isMacOs = IsMacOs();

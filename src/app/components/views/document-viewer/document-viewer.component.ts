@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
 import { Direction, DraggingEvent } from "@models/app";
-import { DocumentEditTool, DocumentItem } from "@models/document";
+import { DocumentItem } from "@models/document";
 import { DocumentViewUrl } from "@models/route";
 import { defer, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
@@ -34,13 +34,12 @@ export class DocumentViewerComponent implements OnDestroy {
   readonly isPageScrolling = signal(false);
   private readonly isPageLoading = signal(false);
 
-  currentTool = DocumentEditTool.view;
-
   private isCreatingSnippet = false;
 
   private readonly pageChangindDelayMs = 300;
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
+  readonly documentsCount = computed(() => AnyToInt(this.documents()?.length));
 
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
   private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
@@ -54,7 +53,8 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
   private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
 
-  private readonly currentDocumentIndex = computed(() => {
+
+  readonly currentDocumentIndex = computed(() => {
     const documents = this.documents();
     const document = this.document();
 
@@ -63,9 +63,9 @@ export class DocumentViewerComponent implements OnDestroy {
 
   readonly nextDocumentIndex = computed(() => {
     const index = this.currentDocumentIndex();
-    const documents = this.documents();
+    const count = this.documentsCount();
 
-    return documents && index + 1 < documents.length
+    return index + 1 < count
       ? index + 1
       : -1;
   });

@@ -9,13 +9,9 @@ $iconSize: 40px;
 $panelHeight: $iconSize + ($spacing * 2);
 
 :host {
-  background-color: map.get(colors.$matPrimary, 40);
   display: flex;
   flex-flow: row nowrap;
-  align-items: center;
-  padding: $spacing;
-  border-radius: math.div($panelHeight, 2);
-  gap: $spacing;
+  align-items: flex-end;
 
   @include material.icon-button-overrides(
     (
@@ -23,9 +19,34 @@ $panelHeight: $iconSize + ($spacing * 2);
       disabled-icon-color: #aaa
     )
   );
+
+  @include material.button-overrides(
+    (
+      text-label-text-color: white,
+      text-disabled-label-text-color: #aaa
+    )
+  );
 }
 
-.zoom-label {
+.action-group {
+  background-color: map.get(colors.$matPrimary, 40);
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: $spacing;
+  border-radius: math.div($panelHeight, 2);
+  pointer-events: auto;
+
+  &.gap {
+    gap: $spacing;
+  }
+
+  & + & {
+    margin-left: 15px;
+  }
+}
+
+.label {
   color: white;
 }
 

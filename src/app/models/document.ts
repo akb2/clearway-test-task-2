@@ -4,12 +4,6 @@ export interface DocumentItem {
   imageUrl: string;
 }
 
-export enum DocumentEditTool {
-  view,
-  text,
-  image
-}
-
 export interface DocumentSnippet {
   id: number;
   documentId: number;
