@@ -23,3 +23,8 @@ export interface DraggingEvent {
 }
 
 export type Direction = -1 | 0 | 1;
+
+export interface LocalStorageItemInterface<T = any> {
+  value: T;
+  expiry: number;
+}
