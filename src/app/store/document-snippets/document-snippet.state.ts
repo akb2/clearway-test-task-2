@@ -2,7 +2,6 @@ import { DocumentItem, DocumentSnippet } from "@models/document";
 import { type } from "@ngrx/signals";
 
 export const LocalStorageSnippetsKey = "document_snippets";
-export const LocalStorageSnippetsByDocumentIdsKey = "document_snippets_by_document_ids";
 
 export interface DocumentSnippetState extends Pick<DocumentItem, "id"> {
   snippetsIds: Set<number>;

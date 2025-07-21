@@ -1,10 +1,14 @@
-import { effect, Injectable } from "@angular/core";
+import { computed, effect, inject, Injectable } from "@angular/core";
 import { DeepClone } from "@helpers/app";
 import { LocalStorageGet, LocalStorageSet } from "@helpers/local-storage";
 import { DocumentSnippet } from "@models/document";
-import { patchState, signalStore, withHooks, withMethods } from "@ngrx/signals";
+import { Actions, ofType } from "@ngrx/effects";
+import { patchState, signalStore, withComputed, withHooks, withMethods } from "@ngrx/signals";
 import { setEntities, upsertEntities, withEntities } from "@ngrx/signals/entities";
-import { DocumentIdTableEntitiesConfig, DocumentSnippetState, EmptyDocumentSnippet, LocalStorageSnippetsByDocumentIdsKey, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
+import { withEffects } from "@ngrx/signals/events";
+import { map } from "rxjs";
+import { UpsertSnippetsAction } from "./document-snippet.actions";
+import { DocumentIdTableEntitiesConfig, DocumentSnippetState, EmptyDocumentSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
 export class DocumentSnippetsStore extends signalStore(
@@ -14,17 +18,15 @@ export class DocumentSnippetsStore extends signalStore(
   // Таблица связей аннотаций с документами
   withEntities(DocumentIdTableEntitiesConfig),
 
+  withComputed(({ documentIdTableEntityMap }) => ({
+    documentIdTable: computed(documentIdTableEntityMap)
+  })),
+
   // Методы для работы с аннотациями
   withMethods(state => ({
-    // Обновить таблицу сопоставлений
-    upsertDocumentIdTable: (items: DocumentSnippetState[]) => patchState(
-      state,
-      upsertEntities(DeepClone(items), DocumentIdTableEntitiesConfig)
-    ),
     // Обновить аннотации
     upsertSnippets(items: DocumentSnippet[]) {
-      const { documentIdTableEntityMap } = state;
-      const documentIdTable = documentIdTableEntityMap();
+      const documentIdTable = state.documentIdTable();
       const documentIds: DocumentSnippetState[] = [];
 
       items.forEach(({ id, documentId }) => {
@@ -44,17 +46,20 @@ export class DocumentSnippetsStore extends signalStore(
     }
   })),
 
+  withEffects((store, actions = inject(Actions)) => ({
+    upsertSnippetsAction$: actions.pipe(
+      ofType(UpsertSnippetsAction),
+      map(({ payload: snippets }) => store.upsertSnippets(snippets)),
+    )
+  })),
+
   // Работа с localStorage
-  withHooks(({ snippetsEntities, documentIdTableEntities }) => ({
+  withHooks(({ snippetsEntities }) => ({
     onInit: () => {
       // Загрузить аннотации из localStorage
-      const snippets = LocalStorageGet<DocumentSnippet[]>(LocalStorageSnippetsKey);
-      const documentIdTable = LocalStorageGet<DocumentSnippetState[]>(LocalStorageSnippetsByDocumentIdsKey);
+      UpsertSnippetsAction(LocalStorageGet<DocumentSnippet[]>(LocalStorageSnippetsKey));
       // Записать изменения в localStorage
-      effect(() => {
-        LocalStorageSet(LocalStorageSnippetsKey, snippetsEntities());
-        LocalStorageSet(LocalStorageSnippetsByDocumentIdsKey, documentIdTableEntities());
-      })
+      effect(() => LocalStorageSet(LocalStorageSnippetsKey, snippetsEntities()))
     }
   })),
 ) { }
