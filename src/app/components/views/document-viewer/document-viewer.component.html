@@ -1,5 +1,6 @@
 @let doc = document();
 @let loading = pageLoading();
+@let isSnippetDrawing = isCreatingSnippet();
 
 @if (doc) {
   <div class="image">
@@ -23,14 +24,26 @@
         <img
           [src]="doc.imageUrl"
           [alt]="doc.name"
-          [class.dragging]="isDragging()"
+          [class.dragging]="isImageDragging()"
           [class.loading]="loading"
-          [(isDragging)]="isDragging"
+          [disabledDrag]="isSnippetDrawing"
+          [(isDragging)]="isImageDragging"
           (load)="onImageLoad($event)"
           (dragStart)="onImageDragStart()"
           (dragging)="onImageDrag($event)"
           (dragEnd)="onImageDragEnd()"
         />
+        <!-- Создание аннотации -->
+        <div class="snippets">
+          <span
+            #snippetHelper
+            class="snippets__helper"
+            [class.dragging]="isSnippetDrawing"
+            [(isDragging)]="isCreatingSnippet"
+            (dragging)="onSnippetHelperDragging($event)"
+            (dragEnd)="onSnippetHelperDragEnd()"
+          ></span>
+        </div>
       </div>
       <!-- Загрузка -->
       <div

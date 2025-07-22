@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, model, OnDestroy, output } from "@angular/core";
+import { AfterViewInit, Directive, ElementRef, input, model, OnDestroy, output } from "@angular/core";
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { fromEvent, merge, Observable, Subject, takeUntil, tap } from "rxjs";
 
@@ -7,6 +7,7 @@ import { fromEvent, merge, Observable, Subject, takeUntil, tap } from "rxjs";
   standalone: false,
 })
 export class DragDirective implements AfterViewInit, OnDestroy {
+  readonly disabledDrag = input(false);
   readonly isDragging = model(false);
   readonly dragStart = output<DragStartEvent>();
   readonly dragging = output<DraggingEvent>();
@@ -47,30 +48,41 @@ export class DragDirective implements AfterViewInit, OnDestroy {
   }
 
   private onDragStart(event: MouseEvent) {
-    this.lastX = event.clientX;
-    this.lastY = event.clientY;
+    if (!this.disabledDrag()) {
+      this.lastX = event.clientX;
+      this.lastY = event.clientY;
 
-    this.isDragging.set(true);
-    this.dragStart.emit({
-      startX: this.lastX,
-      startY: this.lastY,
-    });
+      this.isDragging.set(true);
+      this.dragStart.emit({
+        startX: this.lastX,
+        startY: this.lastY,
+      });
+    }
   }
 
   private onDragging(event: MouseEvent) {
     if (this.isDragging()) {
-      const deltaX = event.clientX - this.lastX;
-      const deltaY = event.clientY - this.lastY;
+      if (!this.disabledDrag()) {
+        const deltaX = event.clientX - this.lastX;
+        const deltaY = event.clientY - this.lastY;
 
-      this.lastX = event.clientX;
-      this.lastY = event.clientY;
+        this.lastX = event.clientX;
+        this.lastY = event.clientY;
 
-      this.dragging.emit({ deltaX, deltaY });
+        this.dragging.emit({ deltaX, deltaY });
+      }
+
+      else {
+        this.isDragging.set(false);
+        this.dragEnd.emit();
+      }
     }
   }
 
   private onDragEnd(event: MouseEvent) {
-    this.isDragging.set(false);
-    this.dragEnd.emit();
+    if (!this.disabledDrag()) {
+      this.isDragging.set(false);
+      this.dragEnd.emit();
+    }
   }
 }

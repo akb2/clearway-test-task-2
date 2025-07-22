@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, inject, input, OnDestroy, signal } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, ElementRef, inject, input, OnDestroy, signal, viewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
 import { Direction, DraggingEvent } from "@models/app";
 import { DocumentItem } from "@models/document";
 import { DocumentViewUrl } from "@models/route";
-import { defer, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
+import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
 @Component({
   selector: "app-document-viewer",
@@ -17,6 +17,8 @@ import { defer, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 export class DocumentViewerComponent implements OnDestroy {
   readonly documents = input<DocumentItem[]>();
   readonly document = input<DocumentItem>();
+
+  readonly snippetHelper = viewChild("snippetHelper", { read: ElementRef });
 
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
@@ -30,13 +32,16 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly imageShiftY = signal(0);
 
   readonly zoom = signal(1);
-  readonly isDragging = signal(false);
+  readonly isImageDragging = signal(false);
   readonly isPageScrolling = signal(false);
+  readonly isCreatingSnippet = signal(false);
+
   private readonly isPageLoading = signal(false);
 
-  private isCreatingSnippet = false;
+  private isWaitingForCreateSnippet = false;
 
   private readonly pageChangindDelayMs = 300;
+  private readonly createSnippetTimeout = 1200;
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
   readonly documentsCount = computed(() => AnyToInt(this.documents()?.length));
@@ -52,7 +57,6 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
   private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
   private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
-
 
   readonly currentDocumentIndex = computed(() => {
     const documents = this.documents();
@@ -158,23 +162,42 @@ export class DocumentViewerComponent implements OnDestroy {
   }
 
   onImageDragStart() {
-    this.isCreatingSnippet = true;
+    this.isWaitingForCreateSnippet = true;
+
+    timer(this.createSnippetTimeout)
+      .pipe(
+        filter(() => this.isWaitingForCreateSnippet && this.isImageDragging()),
+        takeUntil(this.destroyed$)
+      )
+      .subscribe(() => this.snippetHelper()?.nativeElement.dispatchEvent(new MouseEvent("mousedown", {
+        bubbles: true,
+        cancelable: true,
+        button: 0
+      })));
   }
 
   onImageDrag(event: DraggingEvent) {
     const zoomKoeff = this.zoomKoeff();
 
-    this.isCreatingSnippet = false;
     this.setImageShifts(
       this.imageShiftX() * zoomKoeff + event.deltaX,
       this.imageShiftY() * zoomKoeff + event.deltaY
     );
+    this.isWaitingForCreateSnippet = false;
   }
 
   onImageDragEnd() {
-    if (this.isCreatingSnippet) {
-      // Todo: Здесь создается аннотация
-    }
+    this.isWaitingForCreateSnippet = false;
+  }
+
+  onSnippetHelperDragStart() {
+    this.isWaitingForCreateSnippet = false;
+  }
+
+  onSnippetHelperDragging(event: DraggingEvent) {
+  }
+
+  onSnippetHelperDragEnd() {
   }
 
   onScrollStart(direction: Direction) {
