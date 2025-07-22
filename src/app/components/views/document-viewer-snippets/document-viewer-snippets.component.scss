@@ -1,0 +1,9 @@
+@use "mixins";
+
+:host {
+  @include mixins.inset;
+
+  position: absolute;
+  pointer-events: none;
+  display: block;
+}

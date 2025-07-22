@@ -1,0 +1,11 @@
+@let dragging = isDragging();
+
+<span
+  #helperElm
+  class="helper"
+  [class.dragging]="dragging"
+  [(isDragging)]="isDragging"
+  (dragStart)="onDragStart($event)"
+  (dragging)="onDragging($event)"
+  (dragEnd)="onDragEnd()"
+></span>

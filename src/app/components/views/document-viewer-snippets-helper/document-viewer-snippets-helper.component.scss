@@ -1,0 +1,23 @@
+@use "sass:map";
+@use "colors";
+
+$animationTime: 0.3s;
+$color: map.get(colors.$matPrimary, 40);
+
+.helper {
+  position: absolute;
+  background-color: rgba($color, 0.3);
+  border: 1px solid #{$color};
+  min-width: 8px;
+  min-height: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity #{$animationTime} ease,
+    visibility #{$animationTime} ease;
+
+  &.dragging {
+    opacity: 1;
+    visibility: visible;
+  }
+}

@@ -1,11 +1,20 @@
+import { DragStartEvent } from "@models/app";
 import { DocumentItem, DocumentSnippet } from "@models/document";
 import { type } from "@ngrx/signals";
 
 export const LocalStorageSnippetsKey = "document_snippets";
 
-export interface DocumentSnippetState extends Pick<DocumentItem, "id"> {
+export interface DocumentSnippetState {
+  createEvent: DragStartEvent | undefined;
+}
+
+export interface DocumentForSnippet extends Pick<DocumentItem, "id"> {
   snippetsIds: Set<number>;
 }
+
+export const DocumentSnippetInitialState: DocumentSnippetState = {
+  createEvent: undefined,
+};
 
 export const SnippetEntitiesConfig = {
   entity: type<DocumentSnippet>(),
@@ -16,10 +25,10 @@ export const SnippetEntitiesConfig = {
 };
 
 export const DocumentIdTableEntitiesConfig = {
-  entity: type<DocumentSnippetState>(),
+  entity: type<DocumentForSnippet>(),
   collection: "documentIdTable",
-  selectId: ({ id }: DocumentSnippetState) => id,
-  trackBy: ([prev, next]: DocumentSnippetState[]) => (
+  selectId: ({ id }: DocumentForSnippet) => id,
+  trackBy: ([prev, next]: DocumentForSnippet[]) => (
     prev.id === next.id
     && prev.snippetsIds.size === next.snippetsIds.size
     && (
@@ -29,7 +38,7 @@ export const DocumentIdTableEntitiesConfig = {
   )
 };
 
-export const EmptyDocumentSnippet = (id: number): DocumentSnippetState => ({
+export const EmptyDocumentForSnippet = (id: number): DocumentForSnippet => ({
   id,
   snippetsIds: new Set(),
 });

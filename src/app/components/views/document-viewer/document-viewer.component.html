@@ -34,17 +34,9 @@
           (dragEnd)="onImageDragEnd()"
         />
         <!-- Создание аннотации -->
-        <div class="snippets">
-          <span
-            #snippetHelper
-            class="snippets__helper"
-            [class.dragging]="isSnippetDrawing"
-            [(isDragging)]="isCreatingSnippet"
-            (dragStart)="onSnippetHelperDragStart($event)"
-            (dragging)="onSnippetHelperDragging($event)"
-            (dragEnd)="onSnippetHelperDragEnd()"
-          ></span>
-        </div>
+        <app-document-viewer-snippets
+          [(isSnippetHelperDragging)]="isCreatingSnippet"
+        />
       </div>
       <!-- Загрузка -->
       <div

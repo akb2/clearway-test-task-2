@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, ElementRef, inject, input, OnDestroy, signal, viewChild } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, inject, input, OnDestroy, signal, } from "@angular/core";
 import { Router } from "@angular/router";
 import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
 import { Direction, DraggingEvent, DragStartEvent } from "@models/app";
 import { DocumentItem } from "@models/document";
 import { DocumentViewUrl } from "@models/route";
+import { Dispatcher } from "@ngrx/signals/events";
+import { CreateSnippetAction } from "@store/document-snippets/document-snippet.actions";
 import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
 @Component({
@@ -15,13 +17,12 @@ import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
   standalone: false
 })
 export class DocumentViewerComponent implements OnDestroy {
-  readonly documents = input<DocumentItem[]>();
-  readonly document = input<DocumentItem>();
-
-  readonly snippetHelper = viewChild("snippetHelper", { read: ElementRef });
-
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
+  private readonly dispatcher = inject(Dispatcher);
+
+  readonly documents = input<DocumentItem[]>();
+  readonly document = input<DocumentItem>();
 
   private readonly containerWidth = signal(0);
   private readonly containerHeight = signal(0);
@@ -41,7 +42,7 @@ export class DocumentViewerComponent implements OnDestroy {
   private isWaitingForCreateSnippet = false;
 
   private readonly pageChangindDelayMs = 300;
-  private readonly createSnippetTimeout = 1200;
+  private readonly createSnippetTimeout = 750;
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
   readonly documentsCount = computed(() => AnyToInt(this.documents()?.length));
@@ -161,7 +162,7 @@ export class DocumentViewerComponent implements OnDestroy {
     this.imageOriginalHeight.set(imgElement.naturalHeight);
   }
 
-  onImageDragStart({ startX, startY }: DragStartEvent) {
+  onImageDragStart(event: DragStartEvent) {
     this.isWaitingForCreateSnippet = true;
 
     timer(this.createSnippetTimeout)
@@ -169,13 +170,11 @@ export class DocumentViewerComponent implements OnDestroy {
         filter(() => this.isWaitingForCreateSnippet && this.isImageDragging()),
         takeUntil(this.destroyed$)
       )
-      .subscribe(() => this.snippetHelper()?.nativeElement.dispatchEvent(new MouseEvent("mousedown", {
-        bubbles: true,
-        cancelable: true,
-        button: 0,
-        clientX: startX,
-        clientY: startY
-      })));
+      .subscribe(() => {
+        this.isWaitingForCreateSnippet = false;
+
+        this.dispatcher.dispatch(CreateSnippetAction(event));
+      });
   }
 
   onImageDrag(event: DraggingEvent) {
@@ -190,16 +189,6 @@ export class DocumentViewerComponent implements OnDestroy {
 
   onImageDragEnd() {
     this.isWaitingForCreateSnippet = false;
-  }
-
-  onSnippetHelperDragStart(event: DragStartEvent) {
-    this.isWaitingForCreateSnippet = false;
-  }
-
-  onSnippetHelperDragging(event: DraggingEvent) {
-  }
-
-  onSnippetHelperDragEnd() {
   }
 
   onScrollStart(direction: Direction) {
