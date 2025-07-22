@@ -1,6 +1,6 @@
-import { AfterViewInit, Directive, ElementRef, input, model, OnDestroy, output } from "@angular/core";
+import { AfterViewInit, Directive, effect, ElementRef, input, model, OnDestroy, output } from "@angular/core";
 import { DraggingEvent, DragStartEvent } from "@models/app";
-import { fromEvent, merge, Observable, Subject, takeUntil, tap } from "rxjs";
+import { filter, fromEvent, merge, Observable, Subject, takeUntil, tap } from "rxjs";
 
 @Directive({
   selector: "[dragging]",
@@ -20,17 +20,23 @@ export class DragDirective implements AfterViewInit, OnDestroy {
 
   private getEvent(elm: Node, eventName: string, callback: (event: MouseEvent) => void): Observable<MouseEvent> {
     return fromEvent<MouseEvent>(elm, eventName).pipe(
-      takeUntil(this.destroyed$),
+      filter(event => (
+        (event.type !== "mousedown" && event.type !== "mouseup")
+        || event.button === 0
+      )),
       tap(event => {
         event.preventDefault();
         callback(event);
       }),
+      takeUntil(this.destroyed$),
     );
   }
 
   constructor(
     private readonly elementRef: ElementRef<HTMLElement>
-  ) { }
+  ) {
+    this.disabledDragStateListener();
+  }
 
   ngAfterViewInit() {
     merge(
@@ -61,8 +67,8 @@ export class DragDirective implements AfterViewInit, OnDestroy {
   }
 
   private onDragging(event: MouseEvent) {
-    if (this.isDragging()) {
-      if (!this.disabledDrag()) {
+    if (!this.disabledDrag()) {
+      if (this.isDragging()) {
         const deltaX = event.clientX - this.lastX;
         const deltaY = event.clientY - this.lastY;
 
@@ -71,18 +77,23 @@ export class DragDirective implements AfterViewInit, OnDestroy {
 
         this.dragging.emit({ deltaX, deltaY });
       }
+    }
 
-      else {
-        this.isDragging.set(false);
-        this.dragEnd.emit();
-      }
+    else {
+      this.onDragEnd();
     }
   }
 
-  private onDragEnd(event: MouseEvent) {
-    if (!this.disabledDrag()) {
-      this.isDragging.set(false);
-      this.dragEnd.emit();
-    }
+  private onDragEnd() {
+    this.isDragging.set(false);
+    this.dragEnd.emit();
+  }
+
+  private disabledDragStateListener() {
+    effect(() => {
+      if (this.disabledDrag() && this.isDragging()) {
+        this.onDragEnd();
+      }
+    });
   }
 }

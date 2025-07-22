@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect
 import { Router } from "@angular/router";
 import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
-import { Direction, DraggingEvent } from "@models/app";
+import { Direction, DraggingEvent, DragStartEvent } from "@models/app";
 import { DocumentItem } from "@models/document";
 import { DocumentViewUrl } from "@models/route";
 import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
@@ -161,7 +161,7 @@ export class DocumentViewerComponent implements OnDestroy {
     this.imageOriginalHeight.set(imgElement.naturalHeight);
   }
 
-  onImageDragStart() {
+  onImageDragStart({ startX, startY }: DragStartEvent) {
     this.isWaitingForCreateSnippet = true;
 
     timer(this.createSnippetTimeout)
@@ -172,7 +172,9 @@ export class DocumentViewerComponent implements OnDestroy {
       .subscribe(() => this.snippetHelper()?.nativeElement.dispatchEvent(new MouseEvent("mousedown", {
         bubbles: true,
         cancelable: true,
-        button: 0
+        button: 0,
+        clientX: startX,
+        clientY: startY
       })));
   }
 
@@ -190,7 +192,7 @@ export class DocumentViewerComponent implements OnDestroy {
     this.isWaitingForCreateSnippet = false;
   }
 
-  onSnippetHelperDragStart() {
+  onSnippetHelperDragStart(event: DragStartEvent) {
     this.isWaitingForCreateSnippet = false;
   }
 
