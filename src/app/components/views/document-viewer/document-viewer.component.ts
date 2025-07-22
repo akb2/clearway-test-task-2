@@ -5,6 +5,7 @@ import { Clamp } from "@helpers/math";
 import { Direction, DraggingEvent, DragStartEvent } from "@models/app";
 import { DocumentItem } from "@models/document";
 import { DocumentViewUrl } from "@models/route";
+import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { CreateSnippetAction } from "@store/document-snippets/document-snippet.actions";
 import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
@@ -148,9 +149,9 @@ export class DocumentViewerComponent implements OnDestroy {
     this.destroyed$.complete();
   }
 
-  onResize(event: ResizeObserverEntry) {
-    this.containerWidth.set(event.contentRect.width);
-    this.containerHeight.set(event.contentRect.height);
+  onResize({ width, height }: ResizeEvent) {
+    this.containerWidth.set(width);
+    this.containerHeight.set(height);
 
     this.changeDetectorRef.detectChanges();
   }
