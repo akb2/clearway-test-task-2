@@ -1,4 +1,4 @@
-import { Nullable } from "@models/app";
+import { DefaultRectData } from "@helpers/ui";
 import { DocumentItem, DocumentSnippet } from "@models/document";
 import { RectData } from "@models/ui";
 import { type } from "@ngrx/signals";
@@ -6,7 +6,7 @@ import { type } from "@ngrx/signals";
 export const LocalStorageSnippetsKey = "document_snippets";
 
 export interface DocumentSnippetState {
-  helperRect: Nullable<RectData>;
+  helperRect: RectData;
 }
 
 export interface DocumentForSnippet extends Pick<DocumentItem, "id"> {
@@ -14,12 +14,7 @@ export interface DocumentForSnippet extends Pick<DocumentItem, "id"> {
 }
 
 export const DocumentSnippetInitialState: DocumentSnippetState = {
-  helperRect: {
-    width: 0,
-    height: 0,
-    left: 0,
-    top: 0,
-  },
+  helperRect: DefaultRectData,
 };
 
 export const SnippetEntitiesConfig = {

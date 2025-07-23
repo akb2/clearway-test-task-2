@@ -26,12 +26,12 @@ export class DocumentSnippetsStore extends signalStore(
   })),
 
   withReducer(
-    on(CreateSnippetAction, ({ payload: { startX, startY } }, { helperRect }) => ({
+    on(CreateSnippetAction, ({ payload: { left, top } }, { helperRect }) => ({
       helperRect: {
         width: AnyToInt(helperRect?.width),
         height: AnyToInt(helperRect?.height),
-        left: startX,
-        top: startY,
+        left,
+        top,
       }
     })),
     on(ClearCreateSnippetEventAction, () => ({ helperRect: undefined })),

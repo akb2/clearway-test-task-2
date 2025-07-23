@@ -1,5 +1,5 @@
 import { DocumentsListUrl } from "@models/route";
-import { BreadCrumbs } from "@models/ui";
+import { BreadCrumbs, RectData } from "@models/ui";
 
 export const DocumentTitle = "Название документа";
 export const DocumentPagesTitle = "Все страницы";
@@ -19,4 +19,11 @@ export const DocumentPagesBreadCrumbs: BreadCrumbs = {
 
 export const LoadingBreadCrumbs: BreadCrumbs = {
   title: ". . . Загрузка",
+};
+
+export const DefaultRectData: RectData = {
+  left: 0,
+  top: 0,
+  width: 0,
+  height: 0
 };

@@ -1,5 +1,5 @@
-import { DragStartEvent } from "@models/app";
 import { DocumentSnippet } from "@models/document";
+import { RectData } from "@models/ui";
 import { type } from "@ngrx/signals";
 import { event } from "@ngrx/signals/events";
 
@@ -10,7 +10,7 @@ export const UpsertSnippetsAction = event(
 
 export const CreateSnippetAction = event(
   "[АННОТАЦИИ] Начало создания новой аннотации",
-  type<DragStartEvent>(),
+  type<Pick<RectData, "left" | "top">>(),
 );
 
 export const ClearCreateSnippetEventAction = event(

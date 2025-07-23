@@ -33,10 +33,9 @@ export class DocumentViewerSnippetsHelperComponent {
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
 
   readonly styles = computed(() => {
-    const hostRect = this.hostRect();
     const zoomKoeff = this.zoomKoeff();
-    const left = this.positionX() - hostRect.left - (this.imageShiftX() * zoomKoeff);
-    const top = this.positionY() - hostRect.top - (this.imageShiftY() * zoomKoeff);
+    const left = this.positionX() * zoomKoeff;
+    const top = this.positionY() * zoomKoeff;
 
     return {
       left: left + "px",
