@@ -4,6 +4,7 @@ import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { ClearCreateSnippetEventAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
+import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
 @Component({
   selector: "app-document-viewer-snippets-helper",
@@ -14,20 +15,28 @@ import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet
 })
 export class DocumentViewerSnippetsHelperComponent {
   private readonly documentSnippetsStore = inject(DocumentSnippetsStore);
+  private readonly documentViewerStore = inject(DocumentViewerStore);
   private readonly dispatcher = inject(Dispatcher);
 
   readonly isDragging = model(false);
 
   private readonly positionX = signal(0);
   private readonly positionY = signal(0);
-  readonly hostPositionX = signal(0);
-  private readonly hostPositionY = signal(0);
+  readonly hostRect = signal<ResizeEvent>({ width: 0, height: 0, left: 0, top: 0 });
+
+  private readonly zoom = this.documentViewerStore.zoom;
+  private readonly imageShiftX = this.documentViewerStore.positionX;
+  private readonly imageShiftY = this.documentViewerStore.positionY;
 
   readonly helperElm = viewChild("helperElm", { read: ElementRef });
 
+  private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
+
   readonly styles = computed(() => {
-    const left = this.positionX() - this.hostPositionX();
-    const top = this.positionY() - this.hostPositionY();
+    const hostRect = this.hostRect();
+    const zoomKoeff = this.zoomKoeff();
+    const left = this.positionX() - hostRect.left - (this.imageShiftX() * zoomKoeff);
+    const top = this.positionY() - hostRect.top - (this.imageShiftY() * zoomKoeff);
 
     return {
       left: left + "px",
@@ -49,9 +58,8 @@ export class DocumentViewerSnippetsHelperComponent {
 
   onDragEnd() { }
 
-  onHostResized({ left, top }: ResizeEvent) {
-    this.hostPositionX.set(left);
-    this.hostPositionY.set(top);
+  onHostResized(event: ResizeEvent) {
+    this.hostRect.set(event);
   }
 
   private createSnippetActionListener() {
