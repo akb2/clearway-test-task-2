@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, OnDestroy, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { Clamp } from "@helpers/math";
-import { DefaultRectData } from "@helpers/ui";
 import { Direction, DraggingEvent, DragStartEvent } from "@models/app";
 import { DocumentItem } from "@models/document";
 import { DocumentViewUrl } from "@models/route";
-import { RectData, ResizeEvent } from "@models/ui";
+import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { CreateSnippetAction } from "@store/document-snippets/document-snippet.actions";
-import { SetPositionAction } from "@store/document-viewer/document-viewer.actions";
+import { SetContainerRectAction, SetPositionAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
@@ -27,8 +26,6 @@ export class DocumentViewerComponent implements OnDestroy {
   readonly documents = input<DocumentItem[]>();
   readonly document = input<DocumentItem>();
 
-  private readonly containerRect = signal<RectData>(DefaultRectData);
-
   private readonly imageOriginalWidth = signal(0);
   private readonly imageOriginalHeight = signal(0);
 
@@ -44,6 +41,9 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly imageShiftX = this.documentViewerStore.positionX;
   private readonly imageShiftY = this.documentViewerStore.positionY;
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
+  private readonly containerWidth = this.documentViewerStore.containerWidth;
+  private readonly containerHeight = this.documentViewerStore.containerHeight;
+  private readonly containerRect = this.documentViewerStore.containerRect;
 
   private isWaitingForCreateSnippet = false;
 
@@ -52,8 +52,6 @@ export class DocumentViewerComponent implements OnDestroy {
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
 
-  private readonly containerWidth = computed(() => this.containerRect().width);
-  private readonly containerHeight = computed(() => this.containerRect().height);
   private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
   private readonly imageScaledWidth = computed(() => this.imageAspectedWidth() * this.zoomKoeff());
   private readonly imageScaledHeight = computed(() => this.imageAspectedHeight() * this.zoomKoeff());
@@ -63,12 +61,7 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
   private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
   private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
-
-  private readonly isVertical = computed(() => {
-    const { width, height } = this.containerRect();
-
-    return width / height > this.aspectRatio()
-  });
+  private readonly isVertical = computed(() => this.containerWidth() / this.containerHeight() > this.aspectRatio());
 
   private readonly imagePositionTop = computed(() => Clamp(
     this.imageShiftY() * this.zoomKoeff() + this.imageInitialPositionY(),
@@ -138,7 +131,7 @@ export class DocumentViewerComponent implements OnDestroy {
   }
 
   onResize(event: ResizeEvent) {
-    this.containerRect.set(event);
+    this.dispatcher.dispatch(SetContainerRectAction(event));
   }
 
   onImageLoad(event: Event) {

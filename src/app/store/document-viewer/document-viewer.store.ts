@@ -4,7 +4,7 @@ import { Clamp } from "@helpers/math";
 import { signalStore, withComputed, withState } from "@ngrx/signals";
 import { on, withReducer } from "@ngrx/signals/events";
 import { DocumentStore } from "@store/document/document.store";
-import { SetPositionAction, SetZoomAction } from "./document-viewer.actions";
+import { SetContainerRectAction, SetPositionAction, SetZoomAction } from "./document-viewer.actions";
 import { DocumentViewerInitialState } from "./document-viewer.state";
 
 @Injectable()
@@ -14,10 +14,13 @@ export class DocumentViewerStore extends signalStore(
   withReducer(
     on(SetZoomAction, ({ payload: zoom }) => ({ zoom })),
     on(SetPositionAction, ({ payload: { x, y } }) => ({ positionX: x, positionY: y })),
+    on(SetContainerRectAction, ({ payload: containerRect }) => ({ containerRect })),
   ),
 
   withComputed(store => ({
-    zoomKoeff: computed(() => Math.pow(2, store.zoom() - 1))
+    zoomKoeff: computed(() => Math.pow(2, store.zoom() - 1)),
+    containerWidth: computed(() => store.containerRect().width),
+    containerHeight: computed(() => store.containerRect().height),
   })),
 ) {
   private readonly documentStore = inject(DocumentStore);
