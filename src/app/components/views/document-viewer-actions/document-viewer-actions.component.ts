@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, output } from "@angular/core";
 import { IsMacOs } from "@helpers/app";
 import { Direction } from "@models/app";
 import { Dispatcher } from "@ngrx/signals/events";
@@ -19,10 +19,10 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
   private readonly documentViewerStore = inject(DocumentViewerStore);
 
 
-  readonly currentPageIndex = input(-1);
-  readonly prevPageIndex = input(-1);
-  readonly nextPageIndex = input(-1);
-  readonly pagesCount = input(0);
+  readonly currentPageIndex = this.documentViewerStore.currentPage;
+  readonly prevPageAvailable = this.documentViewerStore.prevPageAvailable;
+  readonly nextPageAvailable = this.documentViewerStore.nextPageAvailable;
+  readonly pagesCount = this.documentViewerStore.pagesCount;
 
   readonly changePage = output<Direction>();
 

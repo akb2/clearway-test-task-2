@@ -39,7 +39,7 @@
       matIconButton
       color="primary"
       aria-label="Предыдущая страница"
-      [disabled]="prevPageIndex() < 0"
+      [disabled]="!prevPageAvailable()"
       (click)="changePage.emit(-1)"
     >
       <mat-icon>chevron_left</mat-icon>
@@ -51,7 +51,7 @@
       matIconButton
       color="primary"
       aria-label="Следующая страница"
-      [disabled]="nextPageIndex() < 0"
+      [disabled]="!nextPageAvailable()"
       (click)="changePage.emit(1)"
     >
       <mat-icon>chevron_right</mat-icon>

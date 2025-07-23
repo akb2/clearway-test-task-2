@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, inject, input, OnDestroy, signal, } from "@angular/core";
 import { Router } from "@angular/router";
-import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
 import { Direction, DraggingEvent, DragStartEvent } from "@models/app";
 import { DocumentItem } from "@models/document";
@@ -42,13 +41,15 @@ export class DocumentViewerComponent implements OnDestroy {
 
   private readonly isPageLoading = signal(false);
 
+  readonly nextDocumentIndex = this.documentViewerStore.nextPage;
+  readonly prevDocumentIndex = this.documentViewerStore.prevPage;
+
   private isWaitingForCreateSnippet = false;
 
   private readonly pageChangindDelayMs = 300;
   private readonly createSnippetTimeout = 750;
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
-  readonly documentsCount = computed(() => AnyToInt(this.documents()?.length));
 
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
   private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
@@ -61,30 +62,6 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
   private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
   private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
-
-  readonly currentDocumentIndex = computed(() => {
-    const documents = this.documents();
-    const document = this.document();
-
-    return AnyToInt(documents?.findIndex(({ id }) => id === document?.id), -1);
-  });
-
-  readonly nextDocumentIndex = computed(() => {
-    const index = this.currentDocumentIndex();
-    const count = this.documentsCount();
-
-    return index + 1 < count
-      ? index + 1
-      : -1;
-  });
-
-  readonly prevDocumentIndex = computed(() => {
-    const index = this.currentDocumentIndex();
-
-    return index - 1 >= 0
-      ? index - 1
-      : -1;
-  });
 
   private readonly imageAspectedWidth = computed(() => this.isVertical()
     ? this.containerHeight() * this.aspectRatio()
@@ -199,7 +176,7 @@ export class DocumentViewerComponent implements OnDestroy {
       const newIndex = direction > 0
         ? this.nextDocumentIndex()
         : this.prevDocumentIndex();
-      const nextDocument = this.documents()?.[newIndex];
+      const nextDocument = this.documents()?.[newIndex - 1];
 
       if (nextDocument) {
         this.isPageLoading.set(true);
