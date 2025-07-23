@@ -1,8 +1,15 @@
 @let dragging = isDragging();
 
 <span
+  class="overlay"
+  resizeObserver
+  (resized)="onHostResized($event)"
+></span>
+
+<span
   #helperElm
   class="helper"
+  [ngStyle]="styles()"
   [class.dragging]="dragging"
   [(isDragging)]="isDragging"
   (dragStart)="onDragStart($event)"

@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, model, viewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, model, signal, viewChild } from "@angular/core";
 import { DraggingEvent, DragStartEvent } from "@models/app";
+import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { ClearCreateSnippetEventAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
@@ -17,19 +18,41 @@ export class DocumentViewerSnippetsHelperComponent {
 
   readonly isDragging = model(false);
 
-  readonly helperElm = viewChild("helperElm", { read: ElementRef<HTMLElement> });
+  private readonly positionX = signal(0);
+  private readonly positionY = signal(0);
+  readonly hostPositionX = signal(0);
+  private readonly hostPositionY = signal(0);
+
+  readonly helperElm = viewChild("helperElm", { read: ElementRef });
+
+  readonly styles = computed(() => {
+    const left = this.positionX() - this.hostPositionX();
+    const top = this.positionY() - this.hostPositionY();
+
+    return {
+      left: left + "px",
+      top: top + "px",
+    };
+  });
 
   constructor() {
     this.createSnippetActionListener();
   }
 
   onDragStart(event: DragStartEvent) {
+    this.positionX.set(event.startX);
+    this.positionY.set(event.startY);
   }
 
   onDragging(event: DraggingEvent) {
   }
 
   onDragEnd() { }
+
+  onHostResized({ left, top }: ResizeEvent) {
+    this.hostPositionX.set(left);
+    this.hostPositionY.set(top);
+  }
 
   private createSnippetActionListener() {
     effect(() => {

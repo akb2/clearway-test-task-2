@@ -1,8 +1,17 @@
 @use "sass:map";
 @use "colors";
+@use "mixins";
 
 $animationTime: 0.3s;
 $color: map.get(colors.$matPrimary, 40);
+
+.overlay {
+  @include mixins.inset;
+
+  pointer-events: none;
+  display: block;
+  position: absolute;
+}
 
 .helper {
   position: absolute;
