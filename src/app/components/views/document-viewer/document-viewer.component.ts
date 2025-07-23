@@ -32,7 +32,6 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly imageOriginalWidth = signal(0);
   private readonly imageOriginalHeight = signal(0);
 
-  readonly zoom = this.documentViewerStore.zoom;
   readonly isImageDragging = signal(false);
   readonly isPageScrolling = signal(false);
   readonly isCreatingSnippet = signal(false);
@@ -44,6 +43,7 @@ export class DocumentViewerComponent implements OnDestroy {
 
   private readonly imageShiftX = this.documentViewerStore.positionX;
   private readonly imageShiftY = this.documentViewerStore.positionY;
+  private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
 
   private isWaitingForCreateSnippet = false;
 
@@ -52,7 +52,6 @@ export class DocumentViewerComponent implements OnDestroy {
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
 
-  private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
   private readonly containerWidth = computed(() => this.containerRect().width);
   private readonly containerHeight = computed(() => this.containerRect().height);
   private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());

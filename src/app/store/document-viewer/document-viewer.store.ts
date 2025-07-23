@@ -1,7 +1,7 @@
 import { computed, inject, Injectable } from "@angular/core";
 import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
-import { signalStore, withState } from "@ngrx/signals";
+import { signalStore, withComputed, withState } from "@ngrx/signals";
 import { on, withReducer } from "@ngrx/signals/events";
 import { DocumentStore } from "@store/document/document.store";
 import { SetPositionAction, SetZoomAction } from "./document-viewer.actions";
@@ -15,6 +15,10 @@ export class DocumentViewerStore extends signalStore(
     on(SetZoomAction, ({ payload: zoom }) => ({ zoom })),
     on(SetPositionAction, ({ payload: { x, y } }) => ({ positionX: x, positionY: y })),
   ),
+
+  withComputed(store => ({
+    zoomKoeff: computed(() => Math.pow(2, store.zoom() - 1))
+  })),
 ) {
   private readonly documentStore = inject(DocumentStore);
 
