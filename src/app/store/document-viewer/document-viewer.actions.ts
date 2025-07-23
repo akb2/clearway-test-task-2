@@ -9,7 +9,7 @@ export const SetZoomAction = event(
 
 export const SetPositionAction = event(
   "[ПРОСМОТР_ДОКУМЕНТОВ] Установить позицию просмотра документа",
-  type<{ x: number; y: number }>()
+  type<Pick<RectData, "left" | "top">>()
 );
 
 export const SetContainerRectAction = event(

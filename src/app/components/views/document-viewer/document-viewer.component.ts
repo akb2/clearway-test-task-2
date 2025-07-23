@@ -38,8 +38,8 @@ export class DocumentViewerComponent implements OnDestroy {
   readonly nextDocumentIndex = this.documentViewerStore.nextPage;
   readonly prevDocumentIndex = this.documentViewerStore.prevPage;
 
-  private readonly imageShiftX = this.documentViewerStore.positionX;
-  private readonly imageShiftY = this.documentViewerStore.positionY;
+  private readonly imageShiftX = this.documentViewerStore.imagePositionLeft;
+  private readonly imageShiftY = this.documentViewerStore.imagePositionTop;
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
   private readonly containerWidth = this.documentViewerStore.containerWidth;
   private readonly containerHeight = this.documentViewerStore.containerHeight;
@@ -116,8 +116,8 @@ export class DocumentViewerComponent implements OnDestroy {
     const maxY = this.imageShiftDistanceY();
 
     this.dispatcher.dispatch(SetPositionAction({
-      x: Clamp(x, -maxX, maxX) / zoomKoeff,
-      y: Clamp(y, -maxY, maxY) / zoomKoeff
+      left: Clamp(x, -maxX, maxX) / zoomKoeff,
+      top: Clamp(y, -maxY, maxY) / zoomKoeff
     }));
   }
 

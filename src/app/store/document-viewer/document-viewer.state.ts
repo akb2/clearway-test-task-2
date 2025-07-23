@@ -4,13 +4,19 @@ import { RectData } from "@models/ui";
 export interface DocumentViewerState {
   zoom: number;
   containerRect: RectData;
-  positionX: number;
-  positionY: number;
+  imageRect: Pick<RectData, "left" | "top"> & {
+    naturalWidth: number;
+    naturalHeight: number;
+  };
 }
 
 export const DocumentViewerInitialState: DocumentViewerState = {
   zoom: 1,
   containerRect: DefaultRectData,
-  positionX: 0,
-  positionY: 0,
+  imageRect: {
+    left: DefaultRectData.left,
+    top: DefaultRectData.top,
+    naturalWidth: 0,
+    naturalHeight: 0,
+  },
 };

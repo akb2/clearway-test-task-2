@@ -13,7 +13,14 @@ export class DocumentViewerStore extends signalStore(
 
   withReducer(
     on(SetZoomAction, ({ payload: zoom }) => ({ zoom })),
-    on(SetPositionAction, ({ payload: { x, y } }) => ({ positionX: x, positionY: y })),
+    on(SetPositionAction, ({ payload: { left, top } }, { imageRect }) => ({
+      imageRect: {
+        naturalWidth: AnyToInt(imageRect?.naturalWidth),
+        naturalHeight: AnyToInt(imageRect?.naturalHeight),
+        left,
+        top,
+      }
+    })),
     on(SetContainerRectAction, ({ payload: containerRect }) => ({ containerRect })),
   ),
 
@@ -21,6 +28,8 @@ export class DocumentViewerStore extends signalStore(
     zoomKoeff: computed(() => Math.pow(2, store.zoom() - 1)),
     containerWidth: computed(() => store.containerRect().width),
     containerHeight: computed(() => store.containerRect().height),
+    imagePositionLeft: computed(() => store.imageRect().left),
+    imagePositionTop: computed(() => store.imageRect().top),
   })),
 ) {
   private readonly documentStore = inject(DocumentStore);
