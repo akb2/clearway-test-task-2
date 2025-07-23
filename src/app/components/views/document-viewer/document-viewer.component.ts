@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, inject, input, OnDestroy, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, OnDestroy, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { Clamp } from "@helpers/math";
 import { DefaultRectData } from "@helpers/ui";
@@ -20,7 +20,6 @@ import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
   standalone: false
 })
 export class DocumentViewerComponent implements OnDestroy {
-  private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   private readonly dispatcher = inject(Dispatcher);
   private readonly documentViewerStore = inject(DocumentViewerStore);
