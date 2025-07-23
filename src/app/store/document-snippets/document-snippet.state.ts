@@ -1,11 +1,12 @@
-import { DragStartEvent, Nullable } from "@models/app";
+import { Nullable } from "@models/app";
 import { DocumentItem, DocumentSnippet } from "@models/document";
+import { RectData } from "@models/ui";
 import { type } from "@ngrx/signals";
 
 export const LocalStorageSnippetsKey = "document_snippets";
 
 export interface DocumentSnippetState {
-  createEvent: Nullable<DragStartEvent>;
+  helperRect: Nullable<RectData>;
 }
 
 export interface DocumentForSnippet extends Pick<DocumentItem, "id"> {
@@ -13,7 +14,12 @@ export interface DocumentForSnippet extends Pick<DocumentItem, "id"> {
 }
 
 export const DocumentSnippetInitialState: DocumentSnippetState = {
-  createEvent: undefined,
+  helperRect: {
+    width: 0,
+    height: 0,
+    left: 0,
+    top: 0,
+  },
 };
 
 export const SnippetEntitiesConfig = {

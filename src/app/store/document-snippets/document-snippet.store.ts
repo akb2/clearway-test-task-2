@@ -1,5 +1,6 @@
 import { computed, effect, inject, Injectable } from "@angular/core";
 import { DeepClone } from "@helpers/app";
+import { AnyToInt } from "@helpers/converters";
 import { LocalStorageGet, LocalStorageSet } from "@helpers/local-storage";
 import { DocumentSnippet } from "@models/document";
 import { Actions, ofType } from "@ngrx/effects";
@@ -25,8 +26,15 @@ export class DocumentSnippetsStore extends signalStore(
   })),
 
   withReducer(
-    on(CreateSnippetAction, ({ payload: createEvent }) => ({ createEvent })),
-    on(ClearCreateSnippetEventAction, () => ({ createEvent: undefined })),
+    on(CreateSnippetAction, ({ payload: { startX, startY } }, { helperRect }) => ({
+      helperRect: {
+        width: AnyToInt(helperRect?.width),
+        height: AnyToInt(helperRect?.height),
+        left: startX,
+        top: startY,
+      }
+    })),
+    on(ClearCreateSnippetEventAction, () => ({ helperRect: undefined })),
   ),
 
   // Методы для работы с аннотациями

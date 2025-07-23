@@ -64,7 +64,7 @@ export class DocumentViewerSnippetsHelperComponent {
 
   private createSnippetActionListener() {
     effect(() => {
-      const event = this.documentSnippetsStore.createEvent();
+      const event = this.documentSnippetsStore.helperRect();
       const elm = this.helperElm()?.nativeElement;
 
       if (event && elm) {
@@ -72,8 +72,8 @@ export class DocumentViewerSnippetsHelperComponent {
           bubbles: true,
           cancelable: true,
           button: 0,
-          clientX: event.startX,
-          clientY: event.startY
+          clientX: event.left,
+          clientY: event.top
         }));
 
         this.dispatcher.dispatch(ClearCreateSnippetEventAction());

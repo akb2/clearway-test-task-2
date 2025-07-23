@@ -3,9 +3,11 @@ export interface BreadCrumbs {
   link?: string;
 }
 
-export interface ResizeEvent {
+export interface RectData {
   width: number;
   height: number;
   left: number;
   top: number;
 }
+
+export type ResizeEvent = RectData;
