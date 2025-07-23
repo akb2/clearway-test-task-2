@@ -7,7 +7,7 @@ export const SetZoomAction = event(
   type<number>()
 );
 
-export const SetPositionAction = event(
+export const SetImagePositionAction = event(
   "[ПРОСМОТР_ДОКУМЕНТОВ] Установить позицию просмотра документа",
   type<Pick<RectData, "left" | "top">>()
 );
@@ -15,4 +15,9 @@ export const SetPositionAction = event(
 export const SetContainerRectAction = event(
   "[ПРОСМОТР_ДОКУМЕНТОВ] Установить размеры контейнера просмотра документа",
   type<RectData>()
+);
+
+export const SetImageSizeAction = event(
+  "[ПРОСМОТР_ДОКУМЕНТОВ] Установить размеры изображения документа",
+  type<Pick<RectData, "width" | "height">>()
 );

@@ -25,8 +25,6 @@ export class DocumentViewerSnippetsHelperComponent {
   readonly hostRect = signal<ResizeEvent>({ width: 0, height: 0, left: 0, top: 0 });
 
   private readonly zoom = this.documentViewerStore.zoom;
-  private readonly imageShiftX = this.documentViewerStore.imagePositionLeft;
-  private readonly imageShiftY = this.documentViewerStore.imagePositionTop;
 
   readonly helperElm = viewChild("helperElm", { read: ElementRef });
 

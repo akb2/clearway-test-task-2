@@ -4,7 +4,7 @@ import { Clamp } from "@helpers/math";
 import { signalStore, withComputed, withState } from "@ngrx/signals";
 import { on, withReducer } from "@ngrx/signals/events";
 import { DocumentStore } from "@store/document/document.store";
-import { SetContainerRectAction, SetPositionAction, SetZoomAction } from "./document-viewer.actions";
+import { SetContainerRectAction, SetImagePositionAction, SetImageSizeAction, SetZoomAction } from "./document-viewer.actions";
 import { DocumentViewerInitialState } from "./document-viewer.state";
 
 @Injectable()
@@ -13,15 +13,23 @@ export class DocumentViewerStore extends signalStore(
 
   withReducer(
     on(SetZoomAction, ({ payload: zoom }) => ({ zoom })),
-    on(SetPositionAction, ({ payload: { left, top } }, { imageRect }) => ({
+    on(SetContainerRectAction, ({ payload: containerRect }) => ({ containerRect })),
+    on(SetImagePositionAction, ({ payload: { left, top } }, { imageRect }) => ({
       imageRect: {
-        naturalWidth: AnyToInt(imageRect?.naturalWidth),
-        naturalHeight: AnyToInt(imageRect?.naturalHeight),
+        width: AnyToInt(imageRect?.width),
+        height: AnyToInt(imageRect?.height),
         left,
         top,
       }
     })),
-    on(SetContainerRectAction, ({ payload: containerRect }) => ({ containerRect })),
+    on(SetImageSizeAction, ({ payload: { width, height } }, { imageRect }) => ({
+      imageRect: {
+        width,
+        height,
+        left: AnyToInt(imageRect?.left),
+        top: AnyToInt(imageRect?.top),
+      }
+    })),
   ),
 
   withComputed(store => ({
@@ -30,6 +38,8 @@ export class DocumentViewerStore extends signalStore(
     containerHeight: computed(() => store.containerRect().height),
     imagePositionLeft: computed(() => store.imageRect().left),
     imagePositionTop: computed(() => store.imageRect().top),
+    imageOriginalWidth: computed(() => store.imageRect().width),
+    imageOriginalHeight: computed(() => store.imageRect().height),
   })),
 ) {
   private readonly documentStore = inject(DocumentStore);

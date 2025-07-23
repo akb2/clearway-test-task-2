@@ -7,7 +7,7 @@ import { DocumentViewUrl } from "@models/route";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { CreateSnippetAction } from "@store/document-snippets/document-snippet.actions";
-import { SetContainerRectAction, SetPositionAction } from "@store/document-viewer/document-viewer.actions";
+import { SetContainerRectAction, SetImagePositionAction, SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
@@ -26,9 +26,6 @@ export class DocumentViewerComponent implements OnDestroy {
   readonly documents = input<DocumentItem[]>();
   readonly document = input<DocumentItem>();
 
-  private readonly imageOriginalWidth = signal(0);
-  private readonly imageOriginalHeight = signal(0);
-
   readonly isImageDragging = signal(false);
   readonly isPageScrolling = signal(false);
   readonly isCreatingSnippet = signal(false);
@@ -44,6 +41,8 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly containerWidth = this.documentViewerStore.containerWidth;
   private readonly containerHeight = this.documentViewerStore.containerHeight;
   private readonly containerRect = this.documentViewerStore.containerRect;
+  private readonly imageOriginalWidth = this.documentViewerStore.imageOriginalWidth;
+  private readonly imageOriginalHeight = this.documentViewerStore.imageOriginalHeight;
 
   private isWaitingForCreateSnippet = false;
 
@@ -115,7 +114,7 @@ export class DocumentViewerComponent implements OnDestroy {
     const maxX = this.imageShiftDistanceX();
     const maxY = this.imageShiftDistanceY();
 
-    this.dispatcher.dispatch(SetPositionAction({
+    this.dispatcher.dispatch(SetImagePositionAction({
       left: Clamp(x, -maxX, maxX) / zoomKoeff,
       top: Clamp(y, -maxY, maxY) / zoomKoeff
     }));
@@ -135,10 +134,9 @@ export class DocumentViewerComponent implements OnDestroy {
   }
 
   onImageLoad(event: Event) {
-    const imgElement = event.target as HTMLImageElement;
+    const { naturalWidth: width, naturalHeight: height } = event.target as HTMLImageElement;
 
-    this.imageOriginalWidth.set(imgElement.naturalWidth);
-    this.imageOriginalHeight.set(imgElement.naturalHeight);
+    this.dispatcher.dispatch(SetImageSizeAction({ width, height }));
   }
 
   onImageDragStart(event: DragStartEvent) {
