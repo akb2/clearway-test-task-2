@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input, model, OnDestroy, OnInit, output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, output } from "@angular/core";
 import { IsMacOs } from "@helpers/app";
 import { Direction } from "@models/app";
+import { Dispatcher } from "@ngrx/signals/events";
+import { SetZoomAction } from "@store/document-viewer/document-viewer.actions";
+import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { filter, fromEvent, Subject, takeUntil, tap } from "rxjs";
 import { Clamp } from '../../../helpers/math';
 
@@ -12,13 +15,18 @@ import { Clamp } from '../../../helpers/math';
   standalone: false
 })
 export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
-  readonly zoom = model(1);
+  private readonly dispatcher = inject(Dispatcher);
+  private readonly documentViewerStore = inject(DocumentViewerStore);
+
+
   readonly currentPageIndex = input(-1);
   readonly prevPageIndex = input(-1);
   readonly nextPageIndex = input(-1);
   readonly pagesCount = input(0);
 
   readonly changePage = output<Direction>();
+
+  readonly zoom = this.documentViewerStore.zoom;
 
   readonly zoomMin = 1;
   readonly zoomMax = 4;
@@ -46,7 +54,7 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
   }
 
   setZoom(zoom: number) {
-    this.zoom.set(Clamp(zoom, this.zoomMin, this.zoomMax));
+    this.dispatcher.dispatch(SetZoomAction(Clamp(zoom, this.zoomMin, this.zoomMax)));
   }
 
   private keyboardZoomListener() {

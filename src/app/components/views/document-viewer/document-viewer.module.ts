@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { DirectivesModule } from "@modules/directives.module";
+import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { DocumentViewerActionsModule } from "../document-viewer-actions/document-viewer-actions.module";
 import { DocumentViewerSnippetsModule } from "../document-viewer-snippets/document-viewer-snippets.module";
 import { DocumentViewerComponent } from './document-viewer.component';
@@ -19,6 +20,9 @@ import { DocumentViewerComponent } from './document-viewer.component';
   ],
   exports: [
     DocumentViewerComponent
+  ],
+  providers: [
+    DocumentViewerStore,
   ]
 })
 export class DocumentViewerModule { }

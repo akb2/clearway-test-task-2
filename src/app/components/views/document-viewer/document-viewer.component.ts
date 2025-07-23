@@ -8,6 +8,7 @@ import { DocumentViewUrl } from "@models/route";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { CreateSnippetAction } from "@store/document-snippets/document-snippet.actions";
+import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
 @Component({
@@ -21,6 +22,7 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   private readonly dispatcher = inject(Dispatcher);
+  private readonly documentViewerStore = inject(DocumentViewerStore);
 
   readonly documents = input<DocumentItem[]>();
   readonly document = input<DocumentItem>();
@@ -33,7 +35,7 @@ export class DocumentViewerComponent implements OnDestroy {
   private readonly imageShiftX = signal(0);
   private readonly imageShiftY = signal(0);
 
-  readonly zoom = signal(1);
+  readonly zoom = this.documentViewerStore.zoom;
   readonly isImageDragging = signal(false);
   readonly isPageScrolling = signal(false);
   readonly isCreatingSnippet = signal(false);

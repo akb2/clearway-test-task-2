@@ -36,7 +36,12 @@ export class DocumentStore extends signalStore(
     on(SetViewingDocumentIdAction, ({ payload: viewingDocumentId }) => ({ viewingDocumentId })),
   ),
 
-  withEffects((store, events = inject(Events), actions = inject(Actions), documentService = inject(DocumentService)) => ({
+  withEffects((
+    store,
+    events = inject(Events),
+    actions = inject(Actions),
+    documentService = inject(DocumentService)
+  ) => ({
     // Инициализация при навигации
     initialViewingId$: actions.pipe(
       ofType(routerNavigatedAction),
