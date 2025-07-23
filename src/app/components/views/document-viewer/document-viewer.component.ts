@@ -7,6 +7,7 @@ import { DocumentViewUrl } from "@models/route";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { CreateSnippetAction } from "@store/document-snippets/document-snippet.actions";
+import { SetPositionAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
@@ -31,8 +32,6 @@ export class DocumentViewerComponent implements OnDestroy {
 
   private readonly imageOriginalWidth = signal(0);
   private readonly imageOriginalHeight = signal(0);
-  private readonly imageShiftX = signal(0);
-  private readonly imageShiftY = signal(0);
 
   readonly zoom = this.documentViewerStore.zoom;
   readonly isImageDragging = signal(false);
@@ -43,6 +42,9 @@ export class DocumentViewerComponent implements OnDestroy {
 
   readonly nextDocumentIndex = this.documentViewerStore.nextPage;
   readonly prevDocumentIndex = this.documentViewerStore.prevPage;
+
+  private readonly imageShiftX = this.documentViewerStore.positionX;
+  private readonly imageShiftY = this.documentViewerStore.positionY;
 
   private isWaitingForCreateSnippet = false;
 
@@ -115,8 +117,10 @@ export class DocumentViewerComponent implements OnDestroy {
     const maxX = this.imageShiftDistanceX();
     const maxY = this.imageShiftDistanceY();
 
-    this.imageShiftX.set(Clamp(x, -maxX, maxX) / zoomKoeff);
-    this.imageShiftY.set(Clamp(y, -maxY, maxY) / zoomKoeff);
+    this.dispatcher.dispatch(SetPositionAction({
+      x: Clamp(x, -maxX, maxX) / zoomKoeff,
+      y: Clamp(y, -maxY, maxY) / zoomKoeff
+    }));
   }
 
   constructor() {
