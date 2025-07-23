@@ -1,11 +1,11 @@
-import { DragStartEvent } from "@models/app";
+import { DragStartEvent, Nullable } from "@models/app";
 import { DocumentItem, DocumentSnippet } from "@models/document";
 import { type } from "@ngrx/signals";
 
 export const LocalStorageSnippetsKey = "document_snippets";
 
 export interface DocumentSnippetState {
-  createEvent: DragStartEvent | undefined;
+  createEvent: Nullable<DragStartEvent>;
 }
 
 export interface DocumentForSnippet extends Pick<DocumentItem, "id"> {

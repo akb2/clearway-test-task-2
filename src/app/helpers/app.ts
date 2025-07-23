@@ -1,6 +1,6 @@
 import { Type } from "@angular/core";
 import { Route } from "@angular/router";
-import { BaseTypes, TypeOrArray } from "@models/app";
+import { BaseTypes, Nullable, TypeOrArray } from "@models/app";
 
 /**
  * Проверка переменной на инициализацию
@@ -10,9 +10,9 @@ import { BaseTypes, TypeOrArray } from "@models/app";
  * @returns Результат проверки TRUE/FALSE
  * @template D - Тип значения
  */
-export const IsDefined = <T>(value?: T): boolean => value !== undefined && value !== null;
+export const IsDefined = <T>(value: Nullable<T>): boolean => value !== undefined && value !== null;
 
-export const DeepClone = <U extends TypeOrArray<BaseTypes>>(value?: U): U => {
+export const DeepClone = <U extends TypeOrArray<BaseTypes>>(value: Nullable<U>): U => {
   if (!!value) {
     if (Array.isArray(value)) {
       return value.map(item => DeepClone(item)) as U;

@@ -1,7 +1,7 @@
 import { AfterViewInit, Directive, ElementRef, input, model, OnDestroy, output } from "@angular/core";
 import { IsMacOs, IsSafari } from "@helpers/app";
 import { AnyToInt } from "@helpers/converters";
-import { Direction } from "@models/app";
+import { Direction, Nullable } from "@models/app";
 import { filter, fromEvent, pairwise, skipWhile, startWith, Subject, switchMap, takeUntil, tap, timer } from "rxjs";
 
 @Directive({
@@ -29,7 +29,7 @@ export class ScrollableDirective implements AfterViewInit, OnDestroy {
       : !cancelable && timeStamp > 0;
   }
 
-  private filterEvents([prev, next]: (WheelEvent | undefined)[]): boolean {
+  private filterEvents([prev, next]: Nullable<WheelEvent>[]): boolean {
     const cancelable = !!next!.cancelable;
     const timeStamp = AnyToInt(next?.timeStamp);
     const lastTime = AnyToInt(prev?.timeStamp);
@@ -38,7 +38,7 @@ export class ScrollableDirective implements AfterViewInit, OnDestroy {
     return !isInertion || (isInertion && this.inertion());
   }
 
-  private getFilterOperator<T extends WheelEvent | undefined>() {
+  private getFilterOperator<T extends Nullable<WheelEvent>>() {
     return IsMacOs() && IsSafari()
       ? skipWhile((data: T[]) => this.filterEvents(data))
       : filter((data: T[]) => this.filterEvents(data));

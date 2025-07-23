@@ -1,3 +1,4 @@
+import { Nullable } from "@models/app";
 import { IsDefined } from "./app";
 
 /**
@@ -10,7 +11,7 @@ import { IsDefined } from "./app";
  * @returns Преобразованное значение в виде массива.
  * @template D - Тип значения.
  */
-export const AnyToArray = <D>(value?: null | D | D[]): D[] => IsDefined(value)
+export const AnyToArray = <D>(value: Nullable<D | D[]>): D[] => IsDefined(value)
   ? Array.isArray(value)
     ? value
     : [value!]

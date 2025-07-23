@@ -7,10 +7,11 @@ export interface RouterStateUrl<P = Params, Q = Params> {
   title: string;
 }
 
-export type SimpleTypes = string | number | boolean | null | undefined;
+export type SimpleTypes = Nullable<string | number | boolean>;
 export type ObjectTypes = {} | object;
 export type BaseTypes = SimpleTypes | ObjectTypes;
 export type TypeOrArray<T> = T | T[];
+export type Nullable<T> = T | null | undefined;
 
 export interface DragStartEvent {
   startX: number;
