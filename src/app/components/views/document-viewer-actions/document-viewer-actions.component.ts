@@ -63,8 +63,8 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
     const zoomClear = ["Digit0", "Numpad0"];
     const nextPage = ["ArrowDown", "ArrowRight"];
     const prevPage = ["ArrowUp", "ArrowLeft"];
-    const ctrlKeys = [...zoomInKeys, ...zoomOutKeys, ...zoomClear];
-    const simpleKeys = [...prevPage, ...nextPage];
+    const ctrlKeys = [...zoomInKeys, ...zoomOutKeys, ...zoomClear, ...prevPage, ...nextPage];
+    const simpleKeys: string[] = [];
     const isMacOs = IsMacOs();
 
     fromEvent<KeyboardEvent>(document, "keydown")
@@ -84,9 +84,13 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
         } else if (zoomClear.includes(code)) {
           this.setZoom(1);
         } else if (prevPage.includes(code)) {
-          this.changePage.emit(-1);
+          if (this.prevPageAvailable()) {
+            this.changePage.emit(-1);
+          }
         } else if (nextPage.includes(code)) {
-          this.changePage.emit(1);
+          if (this.nextPageAvailable()) {
+            this.changePage.emit(1);
+          }
         }
       });
   }
