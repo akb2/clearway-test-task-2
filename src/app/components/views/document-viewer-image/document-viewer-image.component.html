@@ -1,4 +1,5 @@
 @let doc = document();
+@let isImageDrawing = isImageDragging();
 @let isSnippetDrawing = isCreatingSnippet();
 
 @if (doc) {
@@ -9,7 +10,8 @@
     <img
       [src]="doc.imageUrl"
       [alt]="doc.name"
-      [class.dragging]="isImageDragging()"
+      [class.dragging]="isImageDrawing && !isSnippetDrawing"
+      [class.moving]="!isImageDrawing && isSnippetDrawing"
       [class.loading]="pageLoading()"
       [disabledDrag]="isSnippetDrawing"
       [(isDragging)]="isImageDragging"

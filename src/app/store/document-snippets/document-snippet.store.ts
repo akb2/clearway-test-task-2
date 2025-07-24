@@ -22,7 +22,7 @@ export class DocumentSnippetsStore extends signalStore(
   withEntities(DocumentIdTableEntitiesConfig),
 
   withComputed(({ documentIdTableEntityMap }) => ({
-    documentIdTable: computed(documentIdTableEntityMap)
+    documentIdTable: computed(documentIdTableEntityMap),
   })),
 
   withReducer(
