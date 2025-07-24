@@ -32,7 +32,12 @@ export class DocumentViewerStore extends signalStore(
     })),
   ),
 
-  withComputed(store => ({
+  withComputed((store, documentStore = inject(DocumentStore)) => ({
+    pagesCount: computed(() => AnyToInt(documentStore.documents()?.length)),
+    currentPage: computed(() => AnyToInt(
+      documentStore.documents()?.findIndex(({ id }) => id === documentStore.viewingDocumentId()),
+      -1
+    ) + 1),
     zoomKoeff: computed(() => Math.pow(2, store.zoom() - 1)),
     containerWidth: computed(() => store.containerRect().width),
     containerHeight: computed(() => store.containerRect().height),
@@ -42,18 +47,59 @@ export class DocumentViewerStore extends signalStore(
     imageOriginalHeight: computed(() => store.imageRect().height),
   })),
 ) {
-  private readonly documentStore = inject(DocumentStore);
 
-  readonly pagesCount = computed(() => AnyToInt(this.documentStore.documents()?.length));
   readonly prevPage = computed(() => Clamp(this.currentPage() - 1, 1, this.pagesCount()));
   readonly nextPage = computed(() => Clamp(this.currentPage() + 1, 1, this.pagesCount()));
   readonly prevPageAvailable = computed(() => this.currentPage() - 1 > 0);
   readonly nextPageAvailable = computed(() => this.currentPage() + 1 <= this.pagesCount());
+  readonly imageScaledWidth = computed(() => this.imageAspectedWidth() * this.zoomKoeff());
+  readonly imageScaledHeight = computed(() => this.imageAspectedHeight() * this.zoomKoeff());
 
-  readonly currentPage = computed(() =>
-    AnyToInt(
-      this.documentStore.documents()?.findIndex(({ id }) => id === this.documentStore.viewingDocumentId()),
-      -1
-    ) + 1
+  private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
+  private readonly isVertical = computed(() => this.containerWidth() / this.containerHeight() > this.aspectRatio());
+  private readonly imageInitialPositionX = computed(() => (this.containerWidth() - this.imageScaledWidth()) / 2);
+  private readonly imageInitialPositionY = computed(() => (this.containerHeight() - this.imageScaledHeight()) / 2);
+  private readonly minImageShiftX = computed(() => this.imageInitialPositionX() - this.imageShiftDistanceX());
+  private readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
+  private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
+  private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
+
+  readonly imageShiftDistanceX = computed(() => this.imageScaledWidth() > this.containerWidth()
+    ? -this.imageInitialPositionX()
+    : 0
   );
+
+  readonly imageShiftDistanceY = computed(() => this.imageScaledHeight() > this.containerHeight()
+    ? -this.imageInitialPositionY()
+    : 0
+  );
+
+  private readonly imageAspectedWidth = computed(() => this.isVertical()
+    ? this.containerHeight() * this.aspectRatio()
+    : this.containerWidth()
+  );
+
+  private readonly imageAspectedHeight = computed(() => this.isVertical()
+    ? this.containerHeight()
+    : this.containerWidth() / this.aspectRatio()
+  );
+
+  readonly imageLoaded = computed(() => (
+    this.containerWidth() > 0
+    && this.containerHeight() > 0
+    && this.imageOriginalWidth() > 0
+    && this.imageOriginalWidth() > 0
+  ));
+
+  readonly imageShiftTop = computed(() => Clamp(
+    this.imagePositionTop() * this.zoomKoeff() + this.imageInitialPositionY(),
+    this.minImageShiftY(),
+    this.maxImageShiftY()
+  ));
+
+  readonly imageShiftLeft = computed(() => Clamp(
+    this.imagePositionLeft() * this.zoomKoeff() + this.imageInitialPositionX(),
+    this.minImageShiftX(),
+    this.maxImageShiftX()
+  ));
 }

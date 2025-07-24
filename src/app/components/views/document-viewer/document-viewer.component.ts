@@ -1,15 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, OnDestroy, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { Clamp } from "@helpers/math";
-import { Direction, DraggingEvent, DragStartEvent } from "@models/app";
-import { DocumentItem } from "@models/document";
+import { Direction } from "@models/app";
+import { XYCoords } from "@models/math";
 import { DocumentViewUrl } from "@models/route";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
-import { CreateSnippetAction } from "@store/document-snippets/document-snippet.actions";
-import { SetContainerRectAction, SetImagePositionAction, SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
+import { SetContainerRectAction, SetImagePositionAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
-import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
+import { DocumentStore } from "@store/document/document.store";
+import { defer, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 
 @Component({
   selector: "app-document-viewer",
@@ -21,95 +21,30 @@ import { defer, filter, forkJoin, from, Subject, takeUntil, timer } from "rxjs";
 export class DocumentViewerComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly dispatcher = inject(Dispatcher);
+  private readonly documentStore = inject(DocumentStore);
   private readonly documentViewerStore = inject(DocumentViewerStore);
 
-  readonly documents = input<DocumentItem[]>();
-  readonly document = input<DocumentItem>();
-
-  readonly isImageDragging = signal(false);
   readonly isPageScrolling = signal(false);
-  readonly isCreatingSnippet = signal(false);
 
   private readonly isPageLoading = signal(false);
 
   readonly nextDocumentIndex = this.documentViewerStore.nextPage;
   readonly prevDocumentIndex = this.documentViewerStore.prevPage;
 
-  private readonly imageShiftX = this.documentViewerStore.imagePositionLeft;
-  private readonly imageShiftY = this.documentViewerStore.imagePositionTop;
+  private readonly documents = this.documentStore.documents;
+  private readonly imagePositionLeft = this.documentViewerStore.imagePositionLeft;
+  private readonly imagePositionTop = this.documentViewerStore.imagePositionTop;
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
-  private readonly containerWidth = this.documentViewerStore.containerWidth;
-  private readonly containerHeight = this.documentViewerStore.containerHeight;
-  private readonly containerRect = this.documentViewerStore.containerRect;
-  private readonly imageOriginalWidth = this.documentViewerStore.imageOriginalWidth;
-  private readonly imageOriginalHeight = this.documentViewerStore.imageOriginalHeight;
-
-  private isWaitingForCreateSnippet = false;
+  private readonly imageShiftDistanceX = this.documentViewerStore.imageShiftDistanceX;
+  private readonly imageShiftDistanceY = this.documentViewerStore.imageShiftDistanceY;
 
   private readonly pageChangindDelayMs = 300;
-  private readonly createSnippetTimeout = 750;
 
   readonly pageLoading = computed(() => this.isPageLoading() || this.isPageScrolling());
 
-  private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
-  private readonly imageScaledWidth = computed(() => this.imageAspectedWidth() * this.zoomKoeff());
-  private readonly imageScaledHeight = computed(() => this.imageAspectedHeight() * this.zoomKoeff());
-  private readonly imageInitialPositionX = computed(() => (this.containerWidth() - this.imageScaledWidth()) / 2);
-  private readonly imageInitialPositionY = computed(() => (this.containerHeight() - this.imageScaledHeight()) / 2);
-  private readonly minImageShiftX = computed(() => this.imageInitialPositionX() - this.imageShiftDistanceX());
-  private readonly maxImageShiftX = computed(() => this.imageInitialPositionX() + this.imageShiftDistanceX());
-  private readonly minImageShiftY = computed(() => this.imageInitialPositionY() - this.imageShiftDistanceY());
-  private readonly maxImageShiftY = computed(() => this.imageInitialPositionY() + this.imageShiftDistanceY());
-  private readonly isVertical = computed(() => this.containerWidth() / this.containerHeight() > this.aspectRatio());
-
-  private readonly imagePositionTop = computed(() => Clamp(
-    this.imageShiftY() * this.zoomKoeff() + this.imageInitialPositionY(),
-    this.minImageShiftY(),
-    this.maxImageShiftY()
-  ));
-
-  private readonly imagePositionLeft = computed(() => Clamp(
-    this.imageShiftX() * this.zoomKoeff() + this.imageInitialPositionX(),
-    this.minImageShiftX(),
-    this.maxImageShiftX()
-  ));
-
-  private readonly imageAspectedWidth = computed(() => this.isVertical()
-    ? this.containerHeight() * this.aspectRatio()
-    : this.containerWidth()
-  );
-
-  private readonly imageAspectedHeight = computed(() => this.isVertical()
-    ? this.containerHeight()
-    : this.containerWidth() / this.aspectRatio()
-  );
-
-  private readonly imageShiftDistanceX = computed(() => this.imageScaledWidth() > this.containerWidth()
-    ? -this.imageInitialPositionX()
-    : 0
-  );
-
-  private readonly imageShiftDistanceY = computed(() => this.imageScaledHeight() > this.containerHeight()
-    ? -this.imageInitialPositionY()
-    : 0
-  );
-
   private readonly destroyed$ = new Subject<void>();
 
-  readonly styles = computed<Record<string, string>>(() => {
-    if (this.containerWidth() > 0 && this.containerHeight() > 0 && this.imageOriginalWidth() > 0 && this.imageAspectedHeight() > 0) {
-      return {
-        width: this.imageScaledWidth() + "px",
-        height: this.imageScaledHeight() + "px",
-        left: this.imagePositionLeft() + "px",
-        top: this.imagePositionTop() + "px"
-      };
-    }
-
-    return {} as Record<string, string>;
-  });
-
-  private setImageShifts(x: number, y: number) {
+  setImageShifts({ x, y }: XYCoords) {
     const zoomKoeff = this.zoomKoeff();
     const maxX = this.imageShiftDistanceX();
     const maxY = this.imageShiftDistanceY();
@@ -131,48 +66,6 @@ export class DocumentViewerComponent implements OnDestroy {
 
   onResize(event: ResizeEvent) {
     this.dispatcher.dispatch(SetContainerRectAction(event));
-  }
-
-  onImageLoad(event: Event) {
-    const { naturalWidth: width, naturalHeight: height } = event.target as HTMLImageElement;
-
-    this.dispatcher.dispatch(SetImageSizeAction({ width, height }));
-  }
-
-  onImageDragStart(event: DragStartEvent) {
-    this.isWaitingForCreateSnippet = true;
-
-    timer(this.createSnippetTimeout)
-      .pipe(
-        filter(() => this.isWaitingForCreateSnippet && this.isImageDragging()),
-        takeUntil(this.destroyed$)
-      )
-      .subscribe(() => {
-        const zoomKoeff = this.zoomKoeff();
-        const containerRect = this.containerRect();
-        const helperRect = {
-          left: (event.startX - containerRect.left - this.imagePositionLeft()) / zoomKoeff,
-          top: (event.startY - containerRect.top - this.imagePositionTop()) / zoomKoeff,
-        };
-
-        this.isWaitingForCreateSnippet = false;
-
-        this.dispatcher.dispatch(CreateSnippetAction(helperRect));
-      });
-  }
-
-  onImageDrag(event: DraggingEvent) {
-    const zoomKoeff = this.zoomKoeff();
-
-    this.setImageShifts(
-      this.imageShiftX() * zoomKoeff + event.deltaX,
-      this.imageShiftY() * zoomKoeff + event.deltaY
-    );
-    this.isWaitingForCreateSnippet = false;
-  }
-
-  onImageDragEnd() {
-    this.isWaitingForCreateSnippet = false;
   }
 
   onScrollStart(direction: Direction) {
@@ -204,7 +97,10 @@ export class DocumentViewerComponent implements OnDestroy {
       if (zoomKoeff !== prevZoomKoeff) {
         const scaleRatio = prevZoomKoeff * zoomKoeff / prevZoomKoeff;
 
-        this.setImageShifts(this.imageShiftX() * scaleRatio, this.imageShiftY() * scaleRatio);
+        this.setImageShifts({
+          x: this.imagePositionLeft() * scaleRatio,
+          y: this.imagePositionTop() * scaleRatio
+        });
 
         prevZoomKoeff = zoomKoeff;
       }

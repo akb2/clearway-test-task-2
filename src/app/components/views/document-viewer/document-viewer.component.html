@@ -1,65 +1,44 @@
-@let doc = document();
 @let loading = pageLoading();
-@let isSnippetDrawing = isCreatingSnippet();
 
-@if (doc) {
-  <div class="image">
+<div class="image">
+  <div
+    #imageBorderElm
+    class="image__border"
+    resizeObserver
+    scrollable
+    [inertion]="false"
+    [disabledScroll]="loading"
+    [disabledBottomScroll]="nextDocumentIndex() < 0"
+    [disabledTopScroll]="prevDocumentIndex() < 0"
+    [(isScrolling)]="isPageScrolling"
+    (scrollStart)="onScrollStart($event)"
+    (resized)="onResize($event)"
+  >
+    <app-document-viewer-image
+      [pageLoading]="loading"
+      (changePosition)="setImageShifts($event)"
+    />
+    <!-- Загрузка -->
     <div
-      #imageBorderElm
-      class="image__border"
-      resizeObserver
-      scrollable
-      [inertion]="false"
-      [disabledScroll]="loading"
-      [disabledBottomScroll]="nextDocumentIndex() < 0"
-      [disabledTopScroll]="prevDocumentIndex() < 0"
-      [(isScrolling)]="isPageScrolling"
-      (scrollStart)="onScrollStart($event)"
-      (resized)="onResize($event)"
+      class="image__loader"
+      [class.loading]="loading"
+      (mousedown)="$event.stopPropagation()"
+      (mouseleave)="$event.stopPropagation()"
+      (click)="$event.stopPropagation()"
     >
-      <div
-        class="image__overlay"
-        [ngStyle]="styles()"
-      >
-        <img
-          [src]="doc.imageUrl"
-          [alt]="doc.name"
-          [class.dragging]="isImageDragging()"
-          [class.loading]="loading"
-          [disabledDrag]="isSnippetDrawing"
-          [(isDragging)]="isImageDragging"
-          (load)="onImageLoad($event)"
-          (dragStart)="onImageDragStart($event)"
-          (dragging)="onImageDrag($event)"
-          (dragEnd)="onImageDragEnd()"
-        />
-        <!-- Создание аннотации -->
-        <app-document-viewer-snippets
-          [(isSnippetHelperDragging)]="isCreatingSnippet"
-        />
-      </div>
-      <!-- Загрузка -->
-      <div
-        class="image__loader"
-        [class.loading]="loading"
-        (mousedown)="$event.stopPropagation()"
-        (mouseleave)="$event.stopPropagation()"
-        (click)="$event.stopPropagation()"
-      >
-        <mat-spinner
-          mode="indeterminate"
-          color="primary"
-          [diameter]="128"
-          [strokeWidth]="12"
-        />
-      </div>
-      <!-- Управление -->
-      @if (!loading) {
-        <app-document-viewer-actions
-          class="image__actions"
-          (changePage)="onScrollStart($event)"
-        />
-      }
+      <mat-spinner
+        mode="indeterminate"
+        color="primary"
+        [diameter]="128"
+        [strokeWidth]="12"
+      />
     </div>
+    <!-- Управление -->
+    @if (!loading) {
+      <app-document-viewer-actions
+        class="image__actions"
+        (changePage)="onScrollStart($event)"
+      />
+    }
   </div>
-}
+</div>

@@ -1,3 +1,4 @@
+import { Signal } from "@angular/core";
 import { Params } from "@angular/router";
 
 export interface RouterStateUrl<P = Params, Q = Params> {
@@ -29,3 +30,7 @@ export interface LocalStorageItemInterface<T = any> {
   value: T;
   expiry: number;
 }
+
+export type Signalized<T extends Record<string, any>> = {
+  [key in keyof T]: Signal<T[keyof T]>
+};

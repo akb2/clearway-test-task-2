@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
-import { DocumentStore } from "@store/document/document.store";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 
 @Component({
   selector: "page-document-view",
@@ -8,9 +7,4 @@ import { DocumentStore } from "@store/document/document.store";
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
-export class DocumentViewComponent {
-  private readonly documentStore = inject(DocumentStore);
-
-  readonly documents = this.documentStore.documents;
-  readonly document = this.documentStore.viewingDocument;
-}
+export class DocumentViewComponent { }

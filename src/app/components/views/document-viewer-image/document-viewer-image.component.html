@@ -1,0 +1,26 @@
+@let doc = document();
+@let isSnippetDrawing = isCreatingSnippet();
+
+@if (doc) {
+  <div
+    class="overlay"
+    [ngStyle]="styles()"
+  >
+    <img
+      [src]="doc.imageUrl"
+      [alt]="doc.name"
+      [class.dragging]="isImageDragging()"
+      [class.loading]="pageLoading()"
+      [disabledDrag]="isSnippetDrawing"
+      [(isDragging)]="isImageDragging"
+      (load)="onLoad($event)"
+      (dragStart)="onDragStart($event)"
+      (dragging)="onDrag($event)"
+      (dragEnd)="onDragEnd()"
+    />
+    <!-- Создание аннотации -->
+    <app-document-viewer-snippets
+      [(isSnippetHelperDragging)]="isCreatingSnippet"
+    />
+  </div>
+}
