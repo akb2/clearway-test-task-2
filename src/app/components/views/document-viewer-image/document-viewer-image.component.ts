@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy,
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { XYCoords } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
-import { CreateSnippetAction } from "@store/document-snippets/document-snippet.actions";
+import { SetCreatingSnippetPositionAction } from "@store/document-snippets/document-snippet.actions";
 import { SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { DocumentStore } from "@store/document/document.store";
@@ -87,7 +87,7 @@ export class DocumentViewerImageComponent implements OnDestroy {
 
         this.isWaitingForCreateSnippet = false;
 
-        this.dispatcher.dispatch(CreateSnippetAction(helperRect));
+        this.dispatcher.dispatch(SetCreatingSnippetPositionAction(helperRect));
       });
   }
 

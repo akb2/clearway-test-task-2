@@ -8,7 +8,7 @@ import { patchState, signalStore, withComputed, withHooks, withMethods, withStat
 import { setEntities, upsertEntities, withEntities } from "@ngrx/signals/entities";
 import { on, withEffects, withReducer } from "@ngrx/signals/events";
 import { map } from "rxjs";
-import { ClearCreateSnippetEventAction, CreateSnippetAction, UpsertSnippetsAction } from "./document-snippet.actions";
+import { ClearCreatingSnippetAction, SetCreatingSnippetPositionAction, UpsertSnippetsAction } from "./document-snippet.actions";
 import { DocumentForSnippet, DocumentIdTableEntitiesConfig, DocumentSnippetInitialState, DocumentSnippetState, EmptyDocumentForSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
@@ -26,7 +26,7 @@ export class DocumentSnippetsStore extends signalStore(
   })),
 
   withReducer(
-    on(CreateSnippetAction, ({ payload: { left, top } }, { helperRect }) => ({
+    on(SetCreatingSnippetPositionAction, ({ payload: { left, top } }, { helperRect }) => ({
       helperRect: {
         width: AnyToInt(helperRect?.width),
         height: AnyToInt(helperRect?.height),
@@ -34,7 +34,7 @@ export class DocumentSnippetsStore extends signalStore(
         top,
       }
     })),
-    on(ClearCreateSnippetEventAction, () => ({ helperRect: undefined })),
+    on(ClearCreatingSnippetAction, () => ({ helperRect: undefined })),
   ),
 
   // Методы для работы с аннотациями

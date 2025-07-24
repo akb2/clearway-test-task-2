@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, injec
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
-import { ClearCreateSnippetEventAction } from "@store/document-snippets/document-snippet.actions";
+import { ClearCreatingSnippetAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
@@ -73,7 +73,7 @@ export class DocumentViewerSnippetsHelperComponent {
           clientY: event.top
         }));
 
-        this.dispatcher.dispatch(ClearCreateSnippetEventAction());
+        this.dispatcher.dispatch(ClearCreatingSnippetAction());
       }
     });
   }

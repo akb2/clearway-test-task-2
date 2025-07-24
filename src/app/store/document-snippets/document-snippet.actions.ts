@@ -8,11 +8,11 @@ export const UpsertSnippetsAction = event(
   type<DocumentSnippet[]>()
 );
 
-export const CreateSnippetAction = event(
+export const SetCreatingSnippetPositionAction = event(
   "[АННОТАЦИИ] Начало создания новой аннотации",
   type<Pick<RectData, "left" | "top">>(),
 );
 
-export const ClearCreateSnippetEventAction = event(
+export const ClearCreatingSnippetAction = event(
   "[АННОТАЦИИ] Очистка информации о начале создания аннотации",
 );
