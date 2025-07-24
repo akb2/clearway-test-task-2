@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, injec
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
-import { ClearCreatingSnippetAction } from "@store/document-snippets/document-snippet.actions";
+import { ClearCreatingSnippetAction, SetCreatingSnippetSizeAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
@@ -20,25 +20,41 @@ export class DocumentViewerSnippetsHelperComponent {
 
   readonly isDragging = model(false);
 
-  private readonly positionX = signal(0);
-  private readonly positionY = signal(0);
   readonly hostRect = signal<ResizeEvent>({ width: 0, height: 0, left: 0, top: 0 });
 
   private readonly zoom = this.documentViewerStore.zoom;
+  private readonly containerRect = this.documentViewerStore.containerRect;
+  private readonly imageShiftLeft = this.documentViewerStore.imageShiftLeft;
+  private readonly imageShiftTop = this.documentViewerStore.imageShiftTop;
+  private readonly helperRect = this.documentSnippetsStore.helperRect;
 
   readonly helperElm = viewChild("helperElm", { read: ElementRef });
 
   private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
 
   readonly styles = computed(() => {
-    const zoomKoeff = this.zoomKoeff();
-    const left = this.positionX() * zoomKoeff;
-    const top = this.positionY() * zoomKoeff;
+    const helperRect = this.helperRect();
 
-    return {
-      left: left + "px",
-      top: top + "px",
-    };
+    if (helperRect) {
+      const zoomKoeff = this.zoomKoeff();
+      const width = Math.abs(helperRect.width * zoomKoeff);
+      const height = Math.abs(helperRect.height * zoomKoeff);
+      const left = helperRect.width > 0
+        ? helperRect.left * zoomKoeff
+        : (helperRect.left + helperRect.width) * zoomKoeff;
+      const top = helperRect.height > 0
+        ? helperRect.top * zoomKoeff
+        : (helperRect.top + helperRect.height) * zoomKoeff;
+
+      return {
+        width: width + "px",
+        height: height + "px",
+        left: left + "px",
+        top: top + "px",
+      };
+    }
+
+    return undefined;
   });
 
   constructor() {
@@ -46,25 +62,40 @@ export class DocumentViewerSnippetsHelperComponent {
   }
 
   onDragStart(event: DragStartEvent) {
-    this.positionX.set(event.startX);
-    this.positionY.set(event.startY);
   }
 
-  onDragging(event: DraggingEvent) {
+  onDragging({ clientX, clientY }: DraggingEvent) {
+    const zoomKoeff = this.zoomKoeff();
+    const helperRect = this.helperRect();
+    const containerRect = this.containerRect();
+    const data = {
+      width: ((clientX - containerRect.left - this.imageShiftLeft()) / zoomKoeff) - helperRect.left,
+      height: ((clientY - containerRect.top - this.imageShiftTop()) / zoomKoeff) - helperRect.top,
+    };
+
+    this.dispatcher.dispatch(SetCreatingSnippetSizeAction(data));
   }
 
-  onDragEnd() { }
+  onDragEnd() {
+    this.dispatcher.dispatch(ClearCreatingSnippetAction());
+  }
 
   onHostResized(event: ResizeEvent) {
     this.hostRect.set(event);
   }
 
   private createSnippetActionListener() {
+    let lastLeft = -1;
+    let lastTop = -1;
+
     effect(() => {
-      const event = this.documentSnippetsStore.helperRect();
+      const event = this.helperRect();
       const elm = this.helperElm()?.nativeElement;
 
-      if (event && elm) {
+      if (event && elm && (lastLeft !== event.left || lastTop !== event.top)) {
+        lastLeft = event.left;
+        lastTop = event.top;
+
         elm.dispatchEvent(new MouseEvent("mousedown", {
           bubbles: true,
           cancelable: true,
@@ -72,8 +103,6 @@ export class DocumentViewerSnippetsHelperComponent {
           clientX: event.left,
           clientY: event.top
         }));
-
-        this.dispatcher.dispatch(ClearCreatingSnippetAction());
       }
     });
   }

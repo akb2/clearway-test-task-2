@@ -17,8 +17,6 @@ $color: map.get(colors.$matPrimary, 40);
   position: absolute;
   background-color: rgba($color, 0.3);
   border: 1px solid #{$color};
-  min-width: 8px;
-  min-height: 8px;
   opacity: 0;
   visibility: hidden;
   transition:

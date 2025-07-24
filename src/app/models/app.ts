@@ -19,7 +19,7 @@ export interface DragStartEvent {
   startY: number;
 }
 
-export interface DraggingEvent {
+export interface DraggingEvent extends Pick<MouseEvent, "clientX" | "clientY"> {
   deltaX: number;
   deltaY: number;
 }

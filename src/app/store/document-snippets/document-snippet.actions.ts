@@ -9,8 +9,13 @@ export const UpsertSnippetsAction = event(
 );
 
 export const SetCreatingSnippetPositionAction = event(
-  "[АННОТАЦИИ] Начало создания новой аннотации",
+  "[АННОТАЦИИ] Установка позиции создаваемой аннотации",
   type<Pick<RectData, "left" | "top">>(),
+);
+
+export const SetCreatingSnippetSizeAction = event(
+  "[АННОТАЦИИ] Установка размера создаваемой аннотации",
+  type<Pick<RectData, "width" | "height">>(),
 );
 
 export const ClearCreatingSnippetAction = event(

@@ -8,7 +8,7 @@ import { patchState, signalStore, withComputed, withHooks, withMethods, withStat
 import { setEntities, upsertEntities, withEntities } from "@ngrx/signals/entities";
 import { on, withEffects, withReducer } from "@ngrx/signals/events";
 import { map } from "rxjs";
-import { ClearCreatingSnippetAction, SetCreatingSnippetPositionAction, UpsertSnippetsAction } from "./document-snippet.actions";
+import { ClearCreatingSnippetAction, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, UpsertSnippetsAction } from "./document-snippet.actions";
 import { DocumentForSnippet, DocumentIdTableEntitiesConfig, DocumentSnippetInitialState, DocumentSnippetState, EmptyDocumentForSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
@@ -32,6 +32,14 @@ export class DocumentSnippetsStore extends signalStore(
         height: AnyToInt(helperRect?.height),
         left,
         top,
+      }
+    })),
+    on(SetCreatingSnippetSizeAction, ({ payload: { width, height } }, { helperRect }) => ({
+      helperRect: {
+        width,
+        height,
+        left: AnyToInt(helperRect?.left),
+        top: AnyToInt(helperRect?.top),
       }
     })),
     on(ClearCreatingSnippetAction, () => ({ helperRect: undefined })),
