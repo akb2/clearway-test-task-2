@@ -81,7 +81,11 @@ export class DocumentViewerSnippetsHelperComponent {
   }
 
   onDragEnd() {
-    this.dispatcher.dispatch(CreateSnippetAction());
+    const helperRect = this.helperRect();
+
+    if (helperRect.width !== 0 && helperRect.height !== 0) {
+      this.dispatcher.dispatch(CreateSnippetAction());
+    }
   }
 
   onHostResized(event: ResizeEvent) {
