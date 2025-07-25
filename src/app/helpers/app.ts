@@ -51,3 +51,17 @@ export const NoSubRoutes = <C>(component: Type<C>): Route[] => ([{ path: "", com
 export const IsMacOs = () => /mac\s?os/i.test(navigator.userAgent);
 
 export const IsSafari = () => /^Mozilla\/.*AppleWebKit\/.*\(KHTML, like Gecko\)(?!.*Chrome\/)(?!.*Chromium\/).*Version\/[\d.]+ Safari\/[\d.]+$/i.test(navigator.userAgent);
+
+export const CreateNewId = <T>(table: Record<number, T>): number => {
+  let id = 1;
+
+  while (id in table) {
+    id++;
+  }
+
+  return id;
+};
+
+export const CompareObjects = <T extends Record<string, any>>(a: T, b: T) => !Object
+  .keys(a)
+  .some(key => a[key] !== b[key]);
