@@ -23,7 +23,13 @@ export const LocalStorageGet = <T extends any = any>(key: string, typeCallback: 
       const item = JSON.parse(itemStr) as LocalStorageItemInterface;
 
       if (now <= item.expiry || item.expiry <= 0) {
-        return typeCallback(JSON.parse(item.value));
+        try {
+          return typeCallback(item.value);
+        }
+        // Вернуть в виде строки
+        catch (_) {
+          LocalStorageRemove(key);
+        }
       }
 
       LocalStorageRemove(key);

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, injec
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
-import { ClearCreatingSnippetAction, SetCreatingSnippetSizeAction } from "@store/document-snippets/document-snippet.actions";
+import { CreateSnippetAction, SetCreatingSnippetSizeAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
@@ -27,10 +27,10 @@ export class DocumentViewerSnippetsHelperComponent {
   private readonly imageShiftLeft = this.documentViewerStore.imageShiftLeft;
   private readonly imageShiftTop = this.documentViewerStore.imageShiftTop;
   private readonly helperRect = this.documentSnippetsStore.helperRect;
+  private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
 
   readonly helperElm = viewChild("helperElm", { read: ElementRef });
 
-  private readonly zoomKoeff = computed(() => Math.pow(2, this.zoom() - 1));
 
   readonly styles = computed(() => {
     const helperRect = this.helperRect();
@@ -77,7 +77,7 @@ export class DocumentViewerSnippetsHelperComponent {
   }
 
   onDragEnd() {
-    this.dispatcher.dispatch(ClearCreatingSnippetAction());
+    this.dispatcher.dispatch(CreateSnippetAction());
   }
 
   onHostResized(event: ResizeEvent) {

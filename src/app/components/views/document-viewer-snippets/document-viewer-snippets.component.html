@@ -1,1 +1,14 @@
+@let snippets = snippetsSignal();
+
+@if (snippets.length) {
+  <div class="snippets">
+    @for (snippet of snippets; track snippet) {
+      <div
+        class="snippets__item"
+        [ngStyle]="snippet.styles"
+      ></div>
+    }
+  </div>
+}
+
 <app-document-viewer-snippets-helper [(isDragging)]="isSnippetHelperDragging" />

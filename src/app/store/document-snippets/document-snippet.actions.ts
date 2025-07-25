@@ -1,12 +1,6 @@
-import { DocumentSnippet } from "@models/document";
 import { RectData } from "@models/ui";
 import { type } from "@ngrx/signals";
 import { event } from "@ngrx/signals/events";
-
-export const UpsertSnippetsAction = event(
-  "[АННОТАЦИИ] Сохранение аннотаций",
-  type<DocumentSnippet[]>()
-);
 
 export const SetCreatingSnippetPositionAction = event(
   "[АННОТАЦИИ] Установка позиции создаваемой аннотации",
@@ -21,3 +15,14 @@ export const SetCreatingSnippetSizeAction = event(
 export const ClearCreatingSnippetAction = event(
   "[АННОТАЦИИ] Очистка информации о начале создания аннотации",
 );
+
+export const CreateSnippetAction = event(
+  "[АННОТАЦИИ] Создание аннотации",
+);
+
+export const DocumentSnippetActions = [
+  SetCreatingSnippetPositionAction,
+  SetCreatingSnippetSizeAction,
+  ClearCreatingSnippetAction,
+  CreateSnippetAction,
+];

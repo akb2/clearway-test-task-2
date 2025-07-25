@@ -1,18 +1,21 @@
 import { computed, effect, inject, Injectable } from "@angular/core";
-import { DeepClone } from "@helpers/app";
-import { AnyToInt } from "@helpers/converters";
+import { CreateNewId, DeepClone } from "@helpers/app";
+import { AnyToArray, AnyToInt } from "@helpers/converters";
 import { LocalStorageGet, LocalStorageSet } from "@helpers/local-storage";
 import { DocumentSnippet } from "@models/document";
-import { Actions, ofType } from "@ngrx/effects";
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from "@ngrx/signals";
-import { setEntities, upsertEntities, withEntities } from "@ngrx/signals/entities";
-import { on, withEffects, withReducer } from "@ngrx/signals/events";
-import { map } from "rxjs";
-import { ClearCreatingSnippetAction, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, UpsertSnippetsAction } from "./document-snippet.actions";
+import { addEntities, addEntity, EntityMap, upsertEntity, withEntities } from "@ngrx/signals/entities";
+import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
+import { debugActions } from "@store/debug.actions";
+import { DocumentStore } from "@store/document/document.store";
+import { filter, map, tap } from "rxjs";
+import { ClearCreatingSnippetAction, CreateSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction } from "./document-snippet.actions";
 import { DocumentForSnippet, DocumentIdTableEntitiesConfig, DocumentSnippetInitialState, DocumentSnippetState, EmptyDocumentForSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
 export class DocumentSnippetsStore extends signalStore(
+  debugActions(DocumentSnippetActions),
+
   withState<DocumentSnippetState>(DocumentSnippetInitialState),
 
   // Таблица аннотаций
@@ -21,8 +24,21 @@ export class DocumentSnippetsStore extends signalStore(
   // Таблица связей аннотаций с документами
   withEntities(DocumentIdTableEntitiesConfig),
 
-  withComputed(({ documentIdTableEntityMap }) => ({
-    documentIdTable: computed(documentIdTableEntityMap),
+  withComputed(({ snippetsEntities, snippetsEntityMap, documentIdTableEntityMap }) => ({
+    snippetsArray: computed(() => snippetsEntities()),
+    snippetsTable: computed<EntityMap<DocumentSnippet>>(() => snippetsEntityMap()),
+    documentIdTable: computed<EntityMap<DocumentForSnippet>>(() => documentIdTableEntityMap()),
+  })),
+
+  withComputed((store, documentStore = inject(DocumentStore)) => ({
+    currentDocumentSnippets: computed<DocumentSnippet[]>(() => {
+      const documentId = documentStore.viewingDocumentId();
+      const snippetsTable = store.snippetsTable();
+      const documentIdTable = store.documentIdTable();
+      const snippetsIds = AnyToArray(documentIdTable[documentId]?.snippetsIds);
+
+      return snippetsIds.map(id => snippetsTable[id]);
+    })
   })),
 
   withReducer(
@@ -46,43 +62,85 @@ export class DocumentSnippetsStore extends signalStore(
   ),
 
   // Методы для работы с аннотациями
-  withMethods(state => ({
-    // Обновить аннотации
-    upsertSnippets(items: DocumentSnippet[]) {
-      const documentIdTable = state.documentIdTable();
-      const documentIds: DocumentForSnippet[] = [];
+  withMethods(store => ({
+    addSnippetToDocument(documentId: number, snippetId: number) {
+      const documentIdTable = store.documentIdTable();
+      const documentIdItem = documentIdTable[documentId] ?? EmptyDocumentForSnippet(documentId);
 
-      items.forEach(({ id, documentId }) => {
-        const documentIdItem = documentIdTable[documentId] ?? EmptyDocumentForSnippet(documentId);
+      documentIdItem.snippetsIds.add(snippetId);
 
-        documentIdTable[documentId] = documentIdItem;
-        documentIdItem.snippetsIds.add(id);
+      return documentIdItem;
+    },
+    // Добавить ID к аннатоции
+    addIdToSnippet: (snippet: DocumentSnippet | Omit<DocumentSnippet, "id">) => snippet.hasOwnProperty("id")
+      ? <DocumentSnippet>snippet
+      : <DocumentSnippet>({ ...snippet, id: CreateNewId(store.snippetsTable()) })
+  })),
 
-        documentIds.push(documentIdItem);
+  // Методы для работы с аннотациями
+  withMethods(({ documentIdTableEntityMap, snippetsEntityMap, documentIdTableEntities, ...store }) => ({
+    // Добавить аннотацию
+    addSnippet(mixedSnippet: DocumentSnippet | Omit<DocumentSnippet, "id">) {
+      const snippet = store.addIdToSnippet(mixedSnippet);
+      const documentSnippets = store.addSnippetToDocument(snippet.documentId, snippet.id);
+
+      patchState(
+        store,
+        addEntity(DeepClone(snippet), SnippetEntitiesConfig),
+        upsertEntity(DeepClone(documentSnippets), DocumentIdTableEntitiesConfig),
+      );
+    },
+    // Добавить аннотации
+    addSnippets(mixedSnippets: Array<DocumentSnippet | Omit<DocumentSnippet, "id">>) {
+      const documentsSnippets: DocumentForSnippet[] = [];
+      const snippets: DocumentSnippet[] = [];
+
+      mixedSnippets.forEach(mixedSnippet => {
+        const snippet = store.addIdToSnippet(mixedSnippet);
+        const documentSnippets = store.addSnippetToDocument(snippet.documentId, snippet.id);
+
+        snippets.push(snippet);
+        documentsSnippets.push(documentSnippets);
       });
 
       patchState(
-        state,
-        upsertEntities(DeepClone(items), SnippetEntitiesConfig),
-        setEntities(DeepClone(documentIds), DocumentIdTableEntitiesConfig)
+        store,
+        addEntities(DeepClone(snippets), SnippetEntitiesConfig),
+        addEntities(DeepClone(documentsSnippets), DocumentIdTableEntitiesConfig),
       );
     }
   })),
 
-  withEffects((store, actions = inject(Actions)) => ({
-    upsertSnippetsAction$: actions.pipe(
-      ofType(UpsertSnippetsAction),
-      map(({ payload: snippets }) => store.upsertSnippets(snippets)),
-    )
+  withEffects((store, documentStore = inject(DocumentStore), events = inject(Events)) => ({
+    createSnippetAction$: events.on(CreateSnippetAction).pipe(
+      map(() => ({
+        helperRect: store.helperRect(),
+        documentId: documentStore.viewingDocumentId(),
+      })),
+      filter(({ helperRect, documentId }) => !!helperRect && !!documentId),
+      tap(({ helperRect, documentId }) => store.addSnippet({
+        width: Math.abs(helperRect.width),
+        height: Math.abs(helperRect.height),
+        left: helperRect.width > 0
+          ? helperRect.left
+          : helperRect.left + helperRect.width,
+        top: helperRect.height > 0
+          ? helperRect.top
+          : helperRect.top + helperRect.height,
+        documentId,
+        text: "",
+      })),
+      map(() => ClearCreatingSnippetAction())
+    ),
   })),
 
   // Работа с localStorage
-  withHooks(({ snippetsEntities }) => ({
+  withHooks(store => ({
     onInit: () => {
       // Загрузить аннотации из localStorage
-      UpsertSnippetsAction(LocalStorageGet<DocumentSnippet[]>(LocalStorageSnippetsKey));
+      store.addSnippets(AnyToArray(LocalStorageGet<DocumentSnippet[]>(LocalStorageSnippetsKey)));
       // Записать изменения в localStorage
-      effect(() => LocalStorageSet(LocalStorageSnippetsKey, snippetsEntities()))
+      effect(() => LocalStorageSet(LocalStorageSnippetsKey, store.snippetsArray()))
     }
   })),
 ) { }
