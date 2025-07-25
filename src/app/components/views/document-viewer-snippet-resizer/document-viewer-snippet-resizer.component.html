@@ -1,9 +1,10 @@
-<span class="corner left top"></span>
-<span class="corner right top"></span>
-<span class="corner right bottom"></span>
-<span class="corner left bottom"></span>
+@for (direction of directions; track direction) {
+  @let x = direction[0];
+  @let y = direction[1];
 
-<span class="side top"></span>
-<span class="side right"></span>
-<span class="side bottom"></span>
-<span class="side left"></span>
+  <span
+    [class.corner]="x !== 0 && y !== 0"
+    [class.side]="x === 0 || y === 0"
+    [ngClass]="getDirectionName(x, y)"
+  ></span>
+}
