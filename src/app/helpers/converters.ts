@@ -11,10 +11,12 @@ import { IsDefined } from "./app";
  * @returns Преобразованное значение в виде массива.
  * @template D - Тип значения.
  */
-export const AnyToArray = <D>(value: Nullable<D | D[]>): D[] => IsDefined(value)
+export const AnyToArray = <D>(value: Nullable<D | D[] | Set<D>>): D[] => IsDefined(value)
   ? Array.isArray(value)
     ? value
-    : [value!]
+    : value instanceof Set
+      ? Array.from(value)
+      : [value!]
   : [] as D[];
 
 
