@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, model, signal, viewChild } from "@angular/core";
-import { DraggingEvent, DragStartEvent } from "@models/app";
+import { DraggingEvent } from "@models/app";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
@@ -62,9 +62,6 @@ export class DocumentViewerSnippetsHelperComponent {
 
   constructor() {
     this.createSnippetActionListener();
-  }
-
-  onDragStart(event: DragStartEvent) {
   }
 
   onDragging({ clientX, clientY }: DraggingEvent) {
