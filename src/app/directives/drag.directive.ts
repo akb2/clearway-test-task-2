@@ -8,6 +8,7 @@ import { filter, fromEvent, merge, Observable, Subject, takeUntil, tap } from "r
 })
 export class DragDirective implements AfterViewInit, OnDestroy {
   readonly disabledDrag = input(false);
+  readonly strictTarget = input(false);
   readonly isDragging = model(false);
   readonly dragStart = output<DragStartEvent>();
   readonly dragging = output<DraggingEvent>();
@@ -54,7 +55,10 @@ export class DragDirective implements AfterViewInit, OnDestroy {
   }
 
   private onDragStart(event: MouseEvent) {
-    if (!this.disabledDrag()) {
+    const strictTarget = this.strictTarget();
+    const canStart = !strictTarget || event.target === this.elementRef.nativeElement;
+
+    if (canStart && !this.disabledDrag()) {
       this.lastX = event.clientX;
       this.lastY = event.clientY;
 
