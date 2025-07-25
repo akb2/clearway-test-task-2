@@ -5,19 +5,14 @@
     @for (snippet of snippets; track snippetsTracking(snippet)) {
       <div
         class="snippets__item"
+        [class.dragging]="snippet.dragging()"
         [ngStyle]="snippet.styles"
+        [strictTarget]="true"
+        [(isDragging)]="snippet.dragging"
         (dragStart)="onStart(snippet, $event)"
         (dragging)="onDragging(snippet, $event)"
       >
-        <span class="snippets__item-corner left top"></span>
-        <span class="snippets__item-corner right top"></span>
-        <span class="snippets__item-corner right bottom"></span>
-        <span class="snippets__item-corner left bottom"></span>
-
-        <span class="snippets__item-side top"></span>
-        <span class="snippets__item-side right"></span>
-        <span class="snippets__item-side bottom"></span>
-        <span class="snippets__item-side left"></span>
+        <app-document-viewer-snippet-resizer />
       </div>
     }
   </div>

@@ -62,6 +62,7 @@ $animationTime: 0.3s;
     transition:
       opacity #{$animationTime} ease,
       visibility #{$animationTime} ease;
+    z-index: 3;
   }
 
   &__snippets {

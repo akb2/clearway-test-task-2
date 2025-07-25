@@ -1,0 +1,88 @@
+@use "sass:math";
+
+$cornerSize: 8px;
+$resizerPosition: math.div($cornerSize, 2);
+
+.corner,
+.side {
+  position: absolute;
+}
+
+.corner {
+  width: $cornerSize;
+  height: $cornerSize;
+  background-color: red;
+
+  &.top {
+    top: -$resizerPosition;
+  }
+
+  &.right {
+    right: -$resizerPosition;
+  }
+
+  &.bottom {
+    bottom: -$resizerPosition;
+  }
+
+  &.left {
+    left: -$resizerPosition;
+  }
+
+  &.top.left {
+    cursor: nw-resize;
+  }
+
+  &.top.right {
+    cursor: ne-resize;
+  }
+
+  &.bottom.right {
+    cursor: se-resize;
+  }
+
+  &.bottom.left {
+    cursor: sw-resize;
+  }
+}
+
+.side {
+  $largeSize: calc(100% - #{$cornerSize});
+
+  width: $cornerSize;
+  height: $cornerSize;
+  background-color: green;
+
+  &.left,
+  &.right {
+    height: $largeSize;
+    top: $resizerPosition;
+  }
+
+  &.top,
+  &.bottom {
+    width: $largeSize;
+  }
+
+  &.top {
+    top: -$resizerPosition;
+    left: $resizerPosition;
+    cursor: n-resize;
+  }
+
+  &.right {
+    right: -$resizerPosition;
+    cursor: e-resize;
+  }
+
+  &.bottom {
+    right: $resizerPosition;
+    bottom: -$resizerPosition;
+    cursor: s-resize;
+  }
+
+  &.left {
+    left: -$resizerPosition;
+    cursor: w-resize;
+  }
+}

@@ -1,3 +1,4 @@
+import { WritableSignal } from "@angular/core";
 import { RectData } from "./ui";
 
 export interface DocumentItem {
@@ -16,6 +17,7 @@ export type DocumentSnippetPosition = Pick<DocumentSnippet, "id" | "top" | "left
 export type DocumentSnippetSizes = Pick<DocumentSnippet, "id" | "width" | "height">;
 export type DocumentSnippetRect = DocumentSnippetPosition & DocumentSnippetSizes;
 
-export interface DocumentSnippetWithStyles extends DocumentSnippetRect {
+export interface DocumentSnippetForHtml extends DocumentSnippetRect {
   styles: Record<string, string>;
+  dragging: WritableSignal<boolean>;
 }

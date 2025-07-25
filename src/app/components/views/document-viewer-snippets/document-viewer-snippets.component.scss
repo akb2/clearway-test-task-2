@@ -1,13 +1,9 @@
-@use "sass:math";
 @use "sass:map";
 @use "colors";
 @use "mixins";
 
 $animationTime: 0.3s;
 $color: map.get(colors.$matPrimary, 40);
-
-$cornerSize: 8px;
-$resizerPosition: math.div($cornerSize, 2);
 
 :host {
   @include mixins.inset;
@@ -27,7 +23,7 @@ $resizerPosition: math.div($cornerSize, 2);
     border: 1px solid #{$color};
     opacity: 0.2;
     transition: opacity #{$animationTime} ease;
-    cursor: pointer;
+    cursor: grab;
     z-index: 1;
 
     &:hover {
@@ -35,86 +31,8 @@ $resizerPosition: math.div($cornerSize, 2);
       z-index: 2;
     }
 
-    &-corner,
-    &-side {
-      position: absolute;
-    }
-
-    &-corner {
-      width: $cornerSize;
-      height: $cornerSize;
-
-      &.top {
-        top: -$resizerPosition;
-      }
-
-      &.right {
-        right: -$resizerPosition;
-      }
-
-      &.bottom {
-        bottom: -$resizerPosition;
-      }
-
-      &.left {
-        left: -$resizerPosition;
-      }
-
-      &.top.left {
-        cursor: nw-resize;
-      }
-
-      &.top.right {
-        cursor: ne-resize;
-      }
-
-      &.bottom.right {
-        cursor: se-resize;
-      }
-
-      &.bottom.left {
-        cursor: sw-resize;
-      }
-    }
-
-    &-side {
-      $largeSize: calc(100% - #{$cornerSize});
-
-      width: $cornerSize;
-      height: $cornerSize;
-
-      &.left,
-      &.right {
-        height: $largeSize;
-        top: $resizerPosition;
-      }
-
-      &.top,
-      &.bottom {
-        width: $largeSize;
-      }
-
-      &.top {
-        top: -$resizerPosition;
-        left: $resizerPosition;
-        cursor: n-resize;
-      }
-
-      &.right {
-        right: -$resizerPosition;
-        cursor: e-resize;
-      }
-
-      &.bottom {
-        right: $resizerPosition;
-        bottom: -$resizerPosition;
-        cursor: s-resize;
-      }
-
-      &.left {
-        left: -$resizerPosition;
-        cursor: w-resize;
-      }
+    &.dragging {
+      cursor: grabbing;
     }
   }
 }
