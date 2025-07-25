@@ -22,9 +22,15 @@ export const SetImageSizeAction = event(
   type<Pick<RectData, "width" | "height">>()
 );
 
+export const SetImageElmRectAction = event(
+  "[ПРОСМОТР_ДОКУМЕНТОВ] Установить размеры HTML элемента картинки",
+  type<RectData>()
+);
+
 export const DocumentViewerActions = [
   SetZoomAction,
   SetImagePositionAction,
   SetContainerRectAction,
   SetImageSizeAction,
+  SetImageElmRectAction,
 ];

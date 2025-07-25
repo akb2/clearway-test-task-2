@@ -8,6 +8,7 @@
     [ngStyle]="styles()"
   >
     <img
+      resizeObserver
       [src]="doc.imageUrl"
       [alt]="doc.name"
       [class.dragging]="isImageDrawing && !isSnippetDrawing"
@@ -19,6 +20,7 @@
       (dragStart)="onDragStart($event)"
       (dragging)="onDrag($event)"
       (dragEnd)="onDragEnd()"
+      (resized)="onResize($event)"
     />
     <!-- Создание аннотации -->
     <app-document-viewer-snippets

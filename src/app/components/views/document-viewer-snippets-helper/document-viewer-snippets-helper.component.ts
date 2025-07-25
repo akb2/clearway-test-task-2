@@ -28,23 +28,22 @@ export class DocumentViewerSnippetsHelperComponent {
   private readonly imageShiftTop = this.documentViewerStore.imageShiftTop;
   private readonly helperRect = this.documentSnippetsStore.helperRect;
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
+  private readonly imageByElmScaled = this.documentViewerStore.imageByElmScaled;
 
   readonly helperElm = viewChild("helperElm", { read: ElementRef });
-
 
   readonly styles = computed(() => {
     const helperRect = this.helperRect();
 
     if (helperRect) {
-      const zoomKoeff = this.zoomKoeff();
-      const width = Math.abs(helperRect.width * zoomKoeff);
-      const height = Math.abs(helperRect.height * zoomKoeff);
+      const width = Math.abs(this.getZoomedSize(helperRect.width));
+      const height = Math.abs(this.getZoomedSize(helperRect.height));
       const left = helperRect.width > 0
-        ? helperRect.left * zoomKoeff
-        : (helperRect.left + helperRect.width) * zoomKoeff;
+        ? this.getZoomedSize(helperRect.left)
+        : this.getZoomedSize(helperRect.left + helperRect.width);
       const top = helperRect.height > 0
-        ? helperRect.top * zoomKoeff
-        : (helperRect.top + helperRect.height) * zoomKoeff;
+        ? this.getZoomedSize(helperRect.top)
+        : this.getZoomedSize(helperRect.top + helperRect.height);
 
       return {
         width: width + "px",
@@ -57,6 +56,20 @@ export class DocumentViewerSnippetsHelperComponent {
     return undefined;
   });
 
+  private getUnZoomedSize(size: number): number {
+    const zoomKoeff = this.zoomKoeff();
+    const imageByElmScaled = this.imageByElmScaled();
+
+    return (size / zoomKoeff) * imageByElmScaled;
+  }
+
+  private getZoomedSize(size: number): number {
+    const zoomKoeff = this.zoomKoeff();
+    const imageByElmScaled = this.imageByElmScaled();
+
+    return (size / imageByElmScaled) * zoomKoeff;
+  }
+
   constructor() {
     this.createSnippetActionListener();
   }
@@ -65,12 +78,11 @@ export class DocumentViewerSnippetsHelperComponent {
   }
 
   onDragging({ clientX, clientY }: DraggingEvent) {
-    const zoomKoeff = this.zoomKoeff();
     const helperRect = this.helperRect();
     const containerRect = this.containerRect();
     const data = {
-      width: ((clientX - containerRect.left - this.imageShiftLeft()) / zoomKoeff) - helperRect.left,
-      height: ((clientY - containerRect.top - this.imageShiftTop()) / zoomKoeff) - helperRect.top,
+      width: this.getUnZoomedSize(clientX - containerRect.left - this.imageShiftLeft()) - helperRect.left,
+      height: this.getUnZoomedSize(clientY - containerRect.top - this.imageShiftTop()) - helperRect.top,
     };
 
     this.dispatcher.dispatch(SetCreatingSnippetSizeAction(data));

@@ -5,7 +5,7 @@ import { signalStore, withComputed, withState } from "@ngrx/signals";
 import { on, withReducer } from "@ngrx/signals/events";
 import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
-import { DocumentViewerActions, SetContainerRectAction, SetImagePositionAction, SetImageSizeAction, SetZoomAction } from "./document-viewer.actions";
+import { DocumentViewerActions, SetContainerRectAction, SetImageElmRectAction, SetImagePositionAction, SetImageSizeAction, SetZoomAction } from "./document-viewer.actions";
 import { DocumentViewerInitialState } from "./document-viewer.state";
 
 @Injectable()
@@ -17,6 +17,7 @@ export class DocumentViewerStore extends signalStore(
   withReducer(
     on(SetZoomAction, ({ payload: zoom }) => ({ zoom })),
     on(SetContainerRectAction, ({ payload: containerRect }) => ({ containerRect })),
+    on(SetImageElmRectAction, ({ payload: imageElmRect }) => ({ imageElmRect })),
     on(SetImagePositionAction, ({ payload: { left, top } }, { imageRect }) => ({
       imageRect: {
         width: AnyToInt(imageRect?.width),
@@ -57,6 +58,7 @@ export class DocumentViewerStore extends signalStore(
   readonly nextPageAvailable = computed(() => this.currentPage() + 1 <= this.pagesCount());
   readonly imageScaledWidth = computed(() => this.imageAspectedWidth() * this.zoomKoeff());
   readonly imageScaledHeight = computed(() => this.imageAspectedHeight() * this.zoomKoeff());
+  readonly imageByElmScaled = computed(() => this.imageOriginalWidth() / this.imageElmRect().width);
 
   private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
   private readonly isVertical = computed(() => this.containerWidth() / this.containerHeight() > this.aspectRatio());

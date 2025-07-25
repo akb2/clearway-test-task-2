@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, output, signal } from "@angular/core";
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { XYCoords } from "@models/math";
+import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { SetCreatingSnippetPositionAction } from "@store/document-snippets/document-snippet.actions";
-import { SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
+import { SetImageElmRectAction, SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { DocumentStore } from "@store/document/document.store";
 import { filter, Subject, takeUntil, timer } from "rxjs";
@@ -30,6 +31,7 @@ export class DocumentViewerImageComponent implements OnDestroy {
   readonly document = this.documentStore.viewingDocument;
 
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
+  private readonly imageByElmScaled = this.documentViewerStore.imageByElmScaled;
   private readonly containerRect = this.documentViewerStore.containerRect;
   private readonly imagePositionTop = this.documentViewerStore.imagePositionTop;
   private readonly imagePositionLeft = this.documentViewerStore.imagePositionLeft;
@@ -58,6 +60,13 @@ export class DocumentViewerImageComponent implements OnDestroy {
     return {} as Record<string, string>;
   });
 
+  private getUnZoomedSize(size: number): number {
+    const zoomKoeff = this.zoomKoeff();
+    const imageByElmScaled = this.imageByElmScaled();
+
+    return (size / zoomKoeff) * imageByElmScaled;
+  }
+
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
@@ -78,11 +87,10 @@ export class DocumentViewerImageComponent implements OnDestroy {
         takeUntil(this.destroyed$)
       )
       .subscribe(() => {
-        const zoomKoeff = this.zoomKoeff();
         const containerRect = this.containerRect();
         const helperRect = {
-          left: (event.startX - containerRect.left - this.imageShiftLeft()) / zoomKoeff,
-          top: (event.startY - containerRect.top - this.imageShiftTop()) / zoomKoeff,
+          left: this.getUnZoomedSize(event.startX - containerRect.left - this.imageShiftLeft()),
+          top: this.getUnZoomedSize(event.startY - containerRect.top - this.imageShiftTop()),
         };
 
         this.isWaitingForCreateSnippet = false;
@@ -103,5 +111,9 @@ export class DocumentViewerImageComponent implements OnDestroy {
 
   onDragEnd() {
     this.isWaitingForCreateSnippet = false;
+  }
+
+  onResize(event: ResizeEvent) {
+    this.dispatcher.dispatch(SetImageElmRectAction(event));
   }
 }

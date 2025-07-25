@@ -15,9 +15,16 @@ export class DocumentViewerSnippetsComponent {
 
   readonly isSnippetHelperDragging = model(false);
 
-  private readonly helperRect = this.documentSnippetsStore.helperRect;
   private readonly currentDocumentSnippets = this.documentSnippetsStore.currentDocumentSnippets;
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
+  private readonly imageByElmScaled = this.documentViewerStore.imageByElmScaled;
+
+  private getZoomedSize(size: number): number {
+    const zoomKoeff = this.zoomKoeff();
+    const imageByElmScaled = this.imageByElmScaled();
+
+    return (size / imageByElmScaled) * zoomKoeff;
+  }
 
   readonly snippetsSignal = computed(() => {
     const snippets = this.currentDocumentSnippets();
@@ -26,10 +33,10 @@ export class DocumentViewerSnippetsComponent {
     return snippets.map(({ id, width, height, left, top }) => ({
       id,
       styles: {
-        width: (width * zoomKoeff) + "px",
-        height: (height * zoomKoeff) + "px",
-        left: (left * zoomKoeff) + "px",
-        top: (top * zoomKoeff) + "px",
+        width: this.getZoomedSize(width) + "px",
+        height: this.getZoomedSize(height) + "px",
+        left: this.getZoomedSize(left) + "px",
+        top: this.getZoomedSize(top) + "px",
       }
     }));
   });
