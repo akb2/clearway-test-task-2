@@ -4,7 +4,7 @@ import { AnyToArray, AnyToInt } from "@helpers/converters";
 import { LocalStorageGet, LocalStorageSet } from "@helpers/local-storage";
 import { DocumentSnippet } from "@models/document";
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from "@ngrx/signals";
-import { addEntities, addEntity, EntityMap, upsertEntity, withEntities } from "@ngrx/signals/entities";
+import { addEntities, addEntity, EntityMap, upsertEntities, upsertEntity, withEntities } from "@ngrx/signals/entities";
 import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
@@ -63,9 +63,13 @@ export class DocumentSnippetsStore extends signalStore(
 
   // Методы для работы с аннотациями
   withMethods(store => ({
-    addSnippetToDocument(documentId: number, snippetId: number) {
+    addSnippetToDocument(documentId: number, snippetId: number, documentIdArray: DocumentForSnippet[] = []): DocumentForSnippet {
       const documentIdTable = store.documentIdTable();
-      const documentIdItem = documentIdTable[documentId] ?? EmptyDocumentForSnippet(documentId);
+      const documentIdItem = (
+        documentIdArray.find(item => item.id === documentId)
+        ?? documentIdTable[documentId]
+        ?? EmptyDocumentForSnippet(documentId)
+      );
 
       documentIdItem.snippetsIds.add(snippetId);
 
@@ -97,7 +101,7 @@ export class DocumentSnippetsStore extends signalStore(
 
       mixedSnippets.forEach(mixedSnippet => {
         const snippet = store.addIdToSnippet(mixedSnippet);
-        const documentSnippets = store.addSnippetToDocument(snippet.documentId, snippet.id);
+        const documentSnippets = store.addSnippetToDocument(snippet.documentId, snippet.id, documentsSnippets);
 
         snippets.push(snippet);
         documentsSnippets.push(documentSnippets);
@@ -106,7 +110,7 @@ export class DocumentSnippetsStore extends signalStore(
       patchState(
         store,
         addEntities(DeepClone(snippets), SnippetEntitiesConfig),
-        addEntities(DeepClone(documentsSnippets), DocumentIdTableEntitiesConfig),
+        upsertEntities(DeepClone(documentsSnippets), DocumentIdTableEntitiesConfig),
       );
     }
   })),

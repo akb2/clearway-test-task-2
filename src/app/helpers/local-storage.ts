@@ -40,5 +40,5 @@ export const LocalStorageGet = <T extends any = any>(key: string, typeCallback: 
     }
   }
 
-  return typeCallback("");
+  return typeCallback(undefined);
 };
