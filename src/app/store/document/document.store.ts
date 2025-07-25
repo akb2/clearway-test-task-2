@@ -12,12 +12,12 @@ import { DocumentService } from "@services/document.service";
 import { debugActions } from "@store/debug.actions";
 import { map, mergeMap, switchMap } from 'rxjs';
 import { PageLoaderDisableAction, PageLoaderEnableAction, SetBreadCrumbsAction, SetPageTitleAction } from "../layout/layout.actions";
-import { SetViewingDocumentIdAction, UpdateDocumentsAction } from "./document.actions";
+import { DocumentActions, SetViewingDocumentIdAction, UpdateDocumentsAction } from "./document.actions";
 import { DocumentInitialState } from "./document.state";
 
 @Injectable()
 export class DocumentStore extends signalStore(
-  debugActions,
+  debugActions(DocumentActions),
 
   withState(DocumentInitialState),
 

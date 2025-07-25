@@ -19,3 +19,10 @@ export const SetBreadCrumbsAction = event(
   "[ШАБЛОН] Установка хлебных крошек",
   type<BreadCrumbs[]>()
 );
+
+export const LayoutActions = [
+  PageLoaderEnableAction,
+  PageLoaderDisableAction,
+  SetPageTitleAction,
+  SetBreadCrumbsAction,
+];

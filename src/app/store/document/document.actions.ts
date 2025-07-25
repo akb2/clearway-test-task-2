@@ -11,3 +11,8 @@ export const SetViewingDocumentIdAction = event(
   "[ДОКУМЕНТЫ] Установить просматриваемый документ",
   type<number>()
 );
+
+export const DocumentActions = [
+  UpdateDocumentsAction,
+  SetViewingDocumentIdAction,
+];

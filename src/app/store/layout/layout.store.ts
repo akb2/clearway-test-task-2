@@ -7,12 +7,12 @@ import { signalStore, withHooks, withState } from '@ngrx/signals';
 import { on, withEffects, withReducer } from '@ngrx/signals/events';
 import { debugActions } from "@store/debug.actions";
 import { map } from "rxjs";
-import { PageLoaderDisableAction, PageLoaderEnableAction, SetBreadCrumbsAction, SetPageTitleAction } from "./layout.actions";
+import { LayoutActions, PageLoaderDisableAction, PageLoaderEnableAction, SetBreadCrumbsAction, SetPageTitleAction } from "./layout.actions";
 import { LayoutInitialState, LayoutTitleSeparator } from "./layout.state";
 
 @Injectable({ providedIn: "root" })
 export class LayoutStore extends signalStore(
-  debugActions,
+  debugActions(LayoutActions),
 
   withState(LayoutInitialState),
 

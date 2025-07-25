@@ -21,3 +21,10 @@ export const SetImageSizeAction = event(
   "[ПРОСМОТР_ДОКУМЕНТОВ] Установить размеры изображения документа",
   type<Pick<RectData, "width" | "height">>()
 );
+
+export const DocumentViewerActions = [
+  SetZoomAction,
+  SetImagePositionAction,
+  SetContainerRectAction,
+  SetImageSizeAction,
+];

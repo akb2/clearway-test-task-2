@@ -3,12 +3,15 @@ import { AnyToInt } from "@helpers/converters";
 import { Clamp } from "@helpers/math";
 import { signalStore, withComputed, withState } from "@ngrx/signals";
 import { on, withReducer } from "@ngrx/signals/events";
+import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
-import { SetContainerRectAction, SetImagePositionAction, SetImageSizeAction, SetZoomAction } from "./document-viewer.actions";
+import { DocumentViewerActions, SetContainerRectAction, SetImagePositionAction, SetImageSizeAction, SetZoomAction } from "./document-viewer.actions";
 import { DocumentViewerInitialState } from "./document-viewer.state";
 
 @Injectable()
 export class DocumentViewerStore extends signalStore(
+  debugActions(DocumentViewerActions),
+
   withState(DocumentViewerInitialState),
 
   withReducer(

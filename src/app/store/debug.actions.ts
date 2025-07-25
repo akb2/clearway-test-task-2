@@ -1,9 +1,9 @@
 import { inject } from "@angular/core";
 import { getState, signalStoreFeature, withHooks } from "@ngrx/signals";
-import { Events } from "@ngrx/signals/events";
+import { EventCreator, Events } from "@ngrx/signals/events";
 import { Subject, takeUntil } from "rxjs";
 
-export const debugActions = signalStoreFeature(withHooks((store, events = inject(Events)) => {
+export const debugActions = (actions: EventCreator<string, any>[]) => signalStoreFeature(withHooks((store, events = inject(Events)) => {
   const destroyed$ = new Subject<void>();
 
   const tagColor = "color: lightgreen; font-weight: bold;";
@@ -12,7 +12,7 @@ export const debugActions = signalStoreFeature(withHooks((store, events = inject
   const varColor = "color: orange; font-weight: bold;";
   const defaultColor = "color: lightgray; font-weight: normal;";
 
-  const onInit = () => events.on()
+  const onInit = () => events.on(...actions)
     .pipe(takeUntil(destroyed$))
     .subscribe({
       next: ({ type, payload }) => {
