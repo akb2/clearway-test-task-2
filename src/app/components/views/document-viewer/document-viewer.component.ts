@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { Clamp } from "@helpers/math";
-import { Direction } from "@models/app";
-import { XYCoords } from "@models/math";
+import { Direction, XYCoords } from "@models/math";
 import { DocumentViewUrl } from "@models/route";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";

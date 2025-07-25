@@ -1,7 +1,8 @@
 import { AfterViewInit, Directive, ElementRef, input, model, OnDestroy, output } from "@angular/core";
 import { IsMacOs, IsSafari } from "@helpers/app";
 import { AnyToInt } from "@helpers/converters";
-import { Direction, Nullable } from "@models/app";
+import { Nullable } from "@models/app";
+import { Direction } from "@models/math";
 import { filter, fromEvent, pairwise, skipWhile, startWith, Subject, switchMap, takeUntil, tap, timer } from "rxjs";
 
 @Directive({

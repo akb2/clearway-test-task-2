@@ -24,8 +24,6 @@ export interface DraggingEvent extends Pick<MouseEvent, "clientX" | "clientY"> {
   deltaY: number;
 }
 
-export type Direction = -1 | 0 | 1;
-
 export interface LocalStorageItemInterface<T = any> {
   value: T;
   expiry: number;

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, output } from "@angular/core";
 import { IsMacOs } from "@helpers/app";
-import { Direction } from "@models/app";
+import { Direction } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
 import { SetZoomAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
