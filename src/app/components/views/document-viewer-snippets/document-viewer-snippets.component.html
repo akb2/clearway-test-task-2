@@ -8,7 +8,17 @@
         [ngStyle]="snippet.styles"
         (dragStart)="onStart(snippet, $event)"
         (dragging)="onDragging(snippet, $event)"
-      ></div>
+      >
+        <span class="snippets__item-corner left top"></span>
+        <span class="snippets__item-corner right top"></span>
+        <span class="snippets__item-corner right bottom"></span>
+        <span class="snippets__item-corner left bottom"></span>
+
+        <span class="snippets__item-side top"></span>
+        <span class="snippets__item-side right"></span>
+        <span class="snippets__item-side bottom"></span>
+        <span class="snippets__item-side left"></span>
+      </div>
     }
   </div>
 }
