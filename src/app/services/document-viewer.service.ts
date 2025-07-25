@@ -5,20 +5,13 @@ import { DocumentViewerStore } from "@store/document-viewer/document-viewer.stor
 export class DocumentViewerService {
   private readonly documentViewerStore = inject(DocumentViewerStore);
 
-  private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
   private readonly imageByElmScaled = this.documentViewerStore.imageByElmScaled;
 
   getUnZoomedSize(size: number): number {
-    const zoomKoeff = this.zoomKoeff();
-    const imageByElmScaled = this.imageByElmScaled();
-
-    return (size / zoomKoeff) * imageByElmScaled;
+    return size / this.imageByElmScaled();
   }
 
   getZoomedSize(size: number): number {
-    const zoomKoeff = this.zoomKoeff();
-    const imageByElmScaled = this.imageByElmScaled();
-
-    return (size / imageByElmScaled) * zoomKoeff;
+    return size * this.imageByElmScaled();
   }
 }

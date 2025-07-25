@@ -10,10 +10,6 @@ $animationTime: 0.3s;
     height: 100%;
     transition: opacity #{$animationTime} ease;
 
-    + img {
-      margin-top: $spacing;
-    }
-
     &.moving {
       cursor: all-scroll;
     }

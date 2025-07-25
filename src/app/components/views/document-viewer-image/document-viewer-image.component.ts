@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, output, signal } from "@angular/core";
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { XYCoords } from "@models/math";
-import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
 import { SetCreatingSnippetPositionAction } from "@store/document-snippets/document-snippet.actions";
-import { SetImageElmRectAction, SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
+import { SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { DocumentStore } from "@store/document/document.store";
 import { filter, Subject, takeUntil, timer } from "rxjs";
@@ -107,9 +106,5 @@ export class DocumentViewerImageComponent implements OnDestroy {
 
   onDragEnd() {
     this.isWaitingForCreateSnippet = false;
-  }
-
-  onResize(event: ResizeEvent) {
-    this.dispatcher.dispatch(SetImageElmRectAction(event));
   }
 }

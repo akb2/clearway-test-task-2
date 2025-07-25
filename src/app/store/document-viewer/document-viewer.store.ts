@@ -5,7 +5,7 @@ import { signalStore, withComputed, withState } from "@ngrx/signals";
 import { on, withReducer } from "@ngrx/signals/events";
 import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
-import { DocumentViewerActions, SetContainerRectAction, SetImageElmRectAction, SetImagePositionAction, SetImageSizeAction, SetZoomAction } from "./document-viewer.actions";
+import { DocumentViewerActions, SetContainerRectAction, SetImagePositionAction, SetImageSizeAction, SetZoomAction } from "./document-viewer.actions";
 import { DocumentViewerInitialState } from "./document-viewer.state";
 
 @Injectable()
@@ -17,7 +17,6 @@ export class DocumentViewerStore extends signalStore(
   withReducer(
     on(SetZoomAction, ({ payload: zoom }) => ({ zoom })),
     on(SetContainerRectAction, ({ payload: containerRect }) => ({ containerRect })),
-    on(SetImageElmRectAction, ({ payload: imageElmRect }) => ({ imageElmRect })),
     on(SetImagePositionAction, ({ payload: { left, top } }, { imageRect }) => ({
       imageRect: {
         width: AnyToInt(imageRect?.width),
@@ -51,14 +50,20 @@ export class DocumentViewerStore extends signalStore(
     imageOriginalHeight: computed(() => store.imageRect().height),
   })),
 ) {
-
   readonly prevPage = computed(() => Clamp(this.currentPage() - 1, 1, this.pagesCount()));
   readonly nextPage = computed(() => Clamp(this.currentPage() + 1, 1, this.pagesCount()));
   readonly prevPageAvailable = computed(() => this.currentPage() - 1 > 0);
   readonly nextPageAvailable = computed(() => this.currentPage() + 1 <= this.pagesCount());
   readonly imageScaledWidth = computed(() => this.imageAspectedWidth() * this.zoomKoeff());
   readonly imageScaledHeight = computed(() => this.imageAspectedHeight() * this.zoomKoeff());
-  readonly imageByElmScaled = computed(() => this.imageOriginalWidth() / this.imageElmRect().width);
+  readonly imageByElmScaled = computed(() => {
+    const originalWidth = this.imageOriginalWidth();
+    const scaledWidth = this.imageScaledWidth();
+
+    return originalWidth > 0 && scaledWidth > 0
+      ? scaledWidth / originalWidth
+      : 0;
+  });
 
   private readonly aspectRatio = computed(() => this.imageOriginalWidth() / this.imageOriginalHeight());
   private readonly isVertical = computed(() => this.containerWidth() / this.containerHeight() > this.aspectRatio());
