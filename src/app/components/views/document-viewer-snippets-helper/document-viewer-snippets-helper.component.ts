@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, injec
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
+import { DocumentViewerService } from "@services/document-viewer.service";
 import { CreateSnippetAction, SetCreatingSnippetSizeAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
@@ -14,6 +15,7 @@ import { DocumentViewerStore } from "@store/document-viewer/document-viewer.stor
   standalone: false,
 })
 export class DocumentViewerSnippetsHelperComponent {
+  private readonly documentViewerService = inject(DocumentViewerService);
   private readonly documentSnippetsStore = inject(DocumentSnippetsStore);
   private readonly documentViewerStore = inject(DocumentViewerStore);
   private readonly dispatcher = inject(Dispatcher);
@@ -36,14 +38,16 @@ export class DocumentViewerSnippetsHelperComponent {
     const helperRect = this.helperRect();
 
     if (helperRect) {
-      const width = Math.abs(this.getZoomedSize(helperRect.width));
-      const height = Math.abs(this.getZoomedSize(helperRect.height));
-      const left = helperRect.width > 0
-        ? this.getZoomedSize(helperRect.left)
-        : this.getZoomedSize(helperRect.left + helperRect.width);
-      const top = helperRect.height > 0
-        ? this.getZoomedSize(helperRect.top)
-        : this.getZoomedSize(helperRect.top + helperRect.height);
+      const width = Math.abs(this.documentViewerService.getZoomedSize(helperRect.width));
+      const height = Math.abs(this.documentViewerService.getZoomedSize(helperRect.height));
+      const left = this.documentViewerService.getZoomedSize(helperRect.width > 0
+        ? helperRect.left
+        : helperRect.left + helperRect.width
+      );
+      const top = this.documentViewerService.getZoomedSize(helperRect.height > 0
+        ? helperRect.top
+        : helperRect.top + helperRect.height
+      );
 
       return {
         width: width + "px",
@@ -56,20 +60,6 @@ export class DocumentViewerSnippetsHelperComponent {
     return undefined;
   });
 
-  private getUnZoomedSize(size: number): number {
-    const zoomKoeff = this.zoomKoeff();
-    const imageByElmScaled = this.imageByElmScaled();
-
-    return (size / zoomKoeff) * imageByElmScaled;
-  }
-
-  private getZoomedSize(size: number): number {
-    const zoomKoeff = this.zoomKoeff();
-    const imageByElmScaled = this.imageByElmScaled();
-
-    return (size / imageByElmScaled) * zoomKoeff;
-  }
-
   constructor() {
     this.createSnippetActionListener();
   }
@@ -80,9 +70,11 @@ export class DocumentViewerSnippetsHelperComponent {
   onDragging({ clientX, clientY }: DraggingEvent) {
     const helperRect = this.helperRect();
     const containerRect = this.containerRect();
+    const left = clientX - containerRect.left - this.imageShiftLeft();
+    const top = clientY - containerRect.top - this.imageShiftTop();
     const data = {
-      width: this.getUnZoomedSize(clientX - containerRect.left - this.imageShiftLeft()) - helperRect.left,
-      height: this.getUnZoomedSize(clientY - containerRect.top - this.imageShiftTop()) - helperRect.top,
+      width: this.documentViewerService.getUnZoomedSize(left) - helperRect.left,
+      height: this.documentViewerService.getUnZoomedSize(top) - helperRect.top,
     };
 
     this.dispatcher.dispatch(SetCreatingSnippetSizeAction(data));

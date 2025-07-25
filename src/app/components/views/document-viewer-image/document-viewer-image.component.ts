@@ -3,6 +3,7 @@ import { DraggingEvent, DragStartEvent } from "@models/app";
 import { XYCoords } from "@models/math";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
+import { DocumentViewerService } from "@services/document-viewer.service";
 import { SetCreatingSnippetPositionAction } from "@store/document-snippets/document-snippet.actions";
 import { SetImageElmRectAction, SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
@@ -20,6 +21,7 @@ export class DocumentViewerImageComponent implements OnDestroy {
   private readonly dispatcher = inject(Dispatcher);
   private readonly documentStore = inject(DocumentStore);
   private readonly documentViewerStore = inject(DocumentViewerStore);
+  private readonly documentViewerService = inject(DocumentViewerService);
 
   readonly pageLoading = input(false);
 
@@ -31,7 +33,6 @@ export class DocumentViewerImageComponent implements OnDestroy {
   readonly document = this.documentStore.viewingDocument;
 
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
-  private readonly imageByElmScaled = this.documentViewerStore.imageByElmScaled;
   private readonly containerRect = this.documentViewerStore.containerRect;
   private readonly imagePositionTop = this.documentViewerStore.imagePositionTop;
   private readonly imagePositionLeft = this.documentViewerStore.imagePositionLeft;
@@ -60,13 +61,6 @@ export class DocumentViewerImageComponent implements OnDestroy {
     return {} as Record<string, string>;
   });
 
-  private getUnZoomedSize(size: number): number {
-    const zoomKoeff = this.zoomKoeff();
-    const imageByElmScaled = this.imageByElmScaled();
-
-    return (size / zoomKoeff) * imageByElmScaled;
-  }
-
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
@@ -88,9 +82,11 @@ export class DocumentViewerImageComponent implements OnDestroy {
       )
       .subscribe(() => {
         const containerRect = this.containerRect();
+        const top = event.startY - containerRect.top - this.imageShiftTop();
+        const left = event.startX - containerRect.left - this.imageShiftLeft();
         const helperRect = {
-          left: this.getUnZoomedSize(event.startX - containerRect.left - this.imageShiftLeft()),
-          top: this.getUnZoomedSize(event.startY - containerRect.top - this.imageShiftTop()),
+          left: this.documentViewerService.getUnZoomedSize(left),
+          top: this.documentViewerService.getUnZoomedSize(top),
         };
 
         this.isWaitingForCreateSnippet = false;
