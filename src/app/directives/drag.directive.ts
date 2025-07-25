@@ -67,8 +67,8 @@ export class DragDirective implements AfterViewInit, OnDestroy {
   }
 
   private onDragging({ clientX, clientY }: MouseEvent) {
-    if (!this.disabledDrag()) {
-      if (this.isDragging()) {
+    if (this.isDragging()) {
+      if (!this.disabledDrag()) {
         const deltaX = clientX - this.lastX;
         const deltaY = clientY - this.lastY;
 
@@ -77,16 +77,18 @@ export class DragDirective implements AfterViewInit, OnDestroy {
 
         this.dragging.emit({ deltaX, deltaY, clientX, clientY });
       }
-    }
 
-    else {
-      this.onDragEnd();
+      else {
+        this.onDragEnd();
+      }
     }
   }
 
   private onDragEnd() {
-    this.isDragging.set(false);
-    this.dragEnd.emit();
+    if (this.isDragging()) {
+      this.isDragging.set(false);
+      this.dragEnd.emit();
+    }
   }
 
   private disabledDragStateListener() {

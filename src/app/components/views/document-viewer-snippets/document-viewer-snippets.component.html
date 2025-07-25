@@ -2,10 +2,12 @@
 
 @if (snippets.length) {
   <div class="snippets">
-    @for (snippet of snippets; track snippet) {
+    @for (snippet of snippets; track snippetsTracking(snippet)) {
       <div
         class="snippets__item"
         [ngStyle]="snippet.styles"
+        (dragStart)="onStart(snippet, $event)"
+        (dragging)="onDragging(snippet, $event)"
       ></div>
     }
   </div>

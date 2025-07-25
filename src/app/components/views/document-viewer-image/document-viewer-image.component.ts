@@ -32,7 +32,6 @@ export class DocumentViewerImageComponent implements OnDestroy {
   readonly document = this.documentStore.viewingDocument;
 
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
-  private readonly containerRect = this.documentViewerStore.containerRect;
   private readonly imagePositionTop = this.documentViewerStore.imagePositionTop;
   private readonly imagePositionLeft = this.documentViewerStore.imagePositionLeft;
   private readonly imageShiftLeft = this.documentViewerStore.imageShiftLeft;
@@ -71,7 +70,7 @@ export class DocumentViewerImageComponent implements OnDestroy {
     this.dispatcher.dispatch(SetImageSizeAction({ width, height }));
   }
 
-  onDragStart(event: DragStartEvent) {
+  onDragStart({ startX, startY }: DragStartEvent) {
     this.isWaitingForCreateSnippet = true;
 
     timer(this.createSnippetTimeout)
@@ -80,12 +79,9 @@ export class DocumentViewerImageComponent implements OnDestroy {
         takeUntil(this.destroyed$)
       )
       .subscribe(() => {
-        const containerRect = this.containerRect();
-        const top = event.startY - containerRect.top - this.imageShiftTop();
-        const left = event.startX - containerRect.left - this.imageShiftLeft();
         const helperRect = {
-          left: this.documentViewerService.getUnZoomedSize(left),
-          top: this.documentViewerService.getUnZoomedSize(top),
+          left: this.documentViewerService.getUnShiftedUnZoomedX(startX),
+          top: this.documentViewerService.getUnShiftedUnZoomedY(startY),
         };
 
         this.isWaitingForCreateSnippet = false;
@@ -94,12 +90,12 @@ export class DocumentViewerImageComponent implements OnDestroy {
       });
   }
 
-  onDrag(event: DraggingEvent) {
+  onDrag({ deltaX, deltaY }: DraggingEvent) {
     const zoomKoeff = this.zoomKoeff();
 
     this.changePosition.emit({
-      x: this.imagePositionLeft() * zoomKoeff + event.deltaX,
-      y: this.imagePositionTop() * zoomKoeff + event.deltaY,
+      x: this.imagePositionLeft() * zoomKoeff + deltaX,
+      y: this.imagePositionTop() * zoomKoeff + deltaY,
     });
     this.isWaitingForCreateSnippet = false;
   }

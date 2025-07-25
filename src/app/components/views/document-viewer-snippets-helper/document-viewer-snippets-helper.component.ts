@@ -5,7 +5,6 @@ import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
 import { CreateSnippetAction, SetCreatingSnippetSizeAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
-import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
 @Component({
   selector: "app-document-viewer-snippets-helper",
@@ -17,20 +16,13 @@ import { DocumentViewerStore } from "@store/document-viewer/document-viewer.stor
 export class DocumentViewerSnippetsHelperComponent {
   private readonly documentViewerService = inject(DocumentViewerService);
   private readonly documentSnippetsStore = inject(DocumentSnippetsStore);
-  private readonly documentViewerStore = inject(DocumentViewerStore);
   private readonly dispatcher = inject(Dispatcher);
 
   readonly isDragging = model(false);
 
   readonly hostRect = signal<ResizeEvent>({ width: 0, height: 0, left: 0, top: 0 });
 
-  private readonly zoom = this.documentViewerStore.zoom;
-  private readonly containerRect = this.documentViewerStore.containerRect;
-  private readonly imageShiftLeft = this.documentViewerStore.imageShiftLeft;
-  private readonly imageShiftTop = this.documentViewerStore.imageShiftTop;
   private readonly helperRect = this.documentSnippetsStore.helperRect;
-  private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
-  private readonly imageByElmScaled = this.documentViewerStore.imageByElmScaled;
 
   readonly helperElm = viewChild("helperElm", { read: ElementRef });
 
@@ -66,21 +58,21 @@ export class DocumentViewerSnippetsHelperComponent {
 
   onDragging({ clientX, clientY }: DraggingEvent) {
     const helperRect = this.helperRect();
-    const containerRect = this.containerRect();
-    const left = clientX - containerRect.left - this.imageShiftLeft();
-    const top = clientY - containerRect.top - this.imageShiftTop();
-    const data = {
-      width: this.documentViewerService.getUnZoomedSize(left) - helperRect.left,
-      height: this.documentViewerService.getUnZoomedSize(top) - helperRect.top,
-    };
 
-    this.dispatcher.dispatch(SetCreatingSnippetSizeAction(data));
+    if (helperRect) {
+      const data = {
+        width: this.documentViewerService.getUnShiftedUnZoomedX(clientX) - helperRect.left,
+        height: this.documentViewerService.getUnShiftedUnZoomedY(clientY) - helperRect.top,
+      };
+
+      this.dispatcher.dispatch(SetCreatingSnippetSizeAction(data));
+    }
   }
 
   onDragEnd() {
     const helperRect = this.helperRect();
 
-    if (helperRect.width !== 0 && helperRect.height !== 0) {
+    if (helperRect && helperRect.width !== 0 && helperRect.height !== 0) {
       this.dispatcher.dispatch(CreateSnippetAction());
     }
   }

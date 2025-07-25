@@ -2,14 +2,14 @@ import { computed, effect, inject, Injectable } from "@angular/core";
 import { CreateNewId, DeepClone } from "@helpers/app";
 import { AnyToArray, AnyToInt } from "@helpers/converters";
 import { LocalStorageGet, LocalStorageSet } from "@helpers/local-storage";
-import { DocumentSnippet } from "@models/document";
+import { DocumentSnippet, DocumentSnippetPosition } from "@models/document";
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from "@ngrx/signals";
-import { addEntities, addEntity, EntityMap, upsertEntities, upsertEntity, withEntities } from "@ngrx/signals/entities";
+import { addEntities, addEntity, EntityMap, updateEntity, upsertEntities, upsertEntity, withEntities } from "@ngrx/signals/entities";
 import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
 import { filter, map, tap } from "rxjs";
-import { ClearCreatingSnippetAction, CreateSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction } from "./document-snippet.actions";
+import { ClearCreatingSnippetAction, CreateSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetSnippetPositionAction } from "./document-snippet.actions";
 import { DocumentForSnippet, DocumentIdTableEntitiesConfig, DocumentSnippetInitialState, DocumentSnippetState, EmptyDocumentForSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
@@ -63,7 +63,11 @@ export class DocumentSnippetsStore extends signalStore(
 
   // Методы для работы с аннотациями
   withMethods(store => ({
-    addSnippetToDocument(documentId: number, snippetId: number, documentIdArray: DocumentForSnippet[] = []): DocumentForSnippet {
+    addSnippetToDocument(
+      documentId: number,
+      snippetId: number,
+      documentIdArray: DocumentForSnippet[] = []
+    ): DocumentForSnippet {
       const documentIdTable = store.documentIdTable();
       const documentIdItem = (
         documentIdArray.find(item => item.id === documentId)
@@ -112,10 +116,18 @@ export class DocumentSnippetsStore extends signalStore(
         addEntities(DeepClone(snippets), SnippetEntitiesConfig),
         upsertEntities(DeepClone(documentsSnippets), DocumentIdTableEntitiesConfig),
       );
+    },
+    // Обновить аннотацию
+    updateSnippetPosition({ id, top, left }: DocumentSnippetPosition) {
+      patchState(
+        store,
+        updateEntity({ id, changes: <Partial<DocumentSnippet>>{ top, left } }, SnippetEntitiesConfig),
+      );
     }
   })),
 
   withEffects((store, documentStore = inject(DocumentStore), events = inject(Events)) => ({
+    // Создание аннотации
     createSnippetAction$: events.on(CreateSnippetAction).pipe(
       map(() => ({
         helperRect: store.helperRect(),
@@ -135,6 +147,10 @@ export class DocumentSnippetsStore extends signalStore(
         text: "",
       })),
       map(() => ClearCreatingSnippetAction())
+    ),
+    // Установка позиции аннотации
+    setSnippetPositionAction$: events.on(SetSnippetPositionAction).pipe(
+      tap(({ payload: position }) => store.updateSnippetPosition(position)),
     ),
   })),
 
