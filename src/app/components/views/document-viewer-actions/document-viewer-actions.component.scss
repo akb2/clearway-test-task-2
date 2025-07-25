@@ -48,6 +48,7 @@ $panelHeight: $iconSize + ($spacing * 2);
 
 .label {
   color: white;
+  white-space: nowrap;
 }
 
 button {
