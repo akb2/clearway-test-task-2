@@ -26,10 +26,16 @@ export const SetSnippetRectAction = event(
   type<Pick<DocumentSnippet, "id"> & Partial<RectData>>(),
 );
 
+export const DeleteSnippetAction = event(
+  "[АННОТАЦИИ] Удаление аннотации",
+  type<number>(),
+);
+
 export const DocumentSnippetActions = [
   SetCreatingSnippetPositionAction,
   SetCreatingSnippetSizeAction,
   ClearCreatingSnippetAction,
   CreateSnippetAction,
   SetSnippetRectAction,
+  DeleteSnippetAction,
 ];

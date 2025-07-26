@@ -1,7 +1,23 @@
 @use "sass:math";
+@use "mixins";
+@use "colors";
+@use "vars";
 
 $cornerSize: 8px;
 $resizerPosition: math.div($cornerSize, 2);
+$removeSize: 24px;
+$removeSizeIcon: 18px;
+
+:host {
+  @include mixins.inset;
+
+  position: absolute;
+
+  &:hover .remove {
+    opacity: 1;
+    visibility: visible;
+  }
+}
 
 .corner,
 .side {
@@ -82,5 +98,41 @@ $resizerPosition: math.div($cornerSize, 2);
   &.left {
     left: -$resizerPosition;
     cursor: w-resize;
+  }
+}
+
+.remove {
+  position: absolute;
+  top: -($removeSize + $resizerPosition);
+  right: 0;
+  background-color: rgba(colors.$snippetColor, 0.3);
+  border: 1px solid #{colors.$snippetColor};
+  width: $removeSize;
+  height: $removeSize;
+  line-height: $removeSize;
+  opacity: 0;
+  visibility: hidden;
+  cursor: pointer;
+  transition:
+    opacity #{vars.$animationTime} ease,
+    visibility #{vars.$animationTime} ease;
+
+  > mat-icon {
+    width: $removeSize - 2px;
+    height: $removeSize - 2px;
+    line-height: $removeSize - 2px;
+    display: block;
+    text-align: center;
+    font-size: $removeSizeIcon;
+    color: colors.$snippetColor;
+    padding: 0;
+  }
+
+  &:active {
+    background-color: colors.$snippetColor;
+
+    > mat-icon {
+      color: white;
+    }
   }
 }

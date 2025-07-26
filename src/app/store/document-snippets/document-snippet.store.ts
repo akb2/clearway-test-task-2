@@ -5,12 +5,12 @@ import { LocalStorageGet, LocalStorageSet } from "@helpers/local-storage";
 import { DocumentSnippet } from "@models/document";
 import { RectData } from "@models/ui";
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from "@ngrx/signals";
-import { addEntities, addEntity, EntityMap, updateEntity, upsertEntities, upsertEntity, withEntities } from "@ngrx/signals/entities";
+import { addEntities, addEntity, EntityMap, removeEntity, updateEntity, upsertEntities, upsertEntity, withEntities } from "@ngrx/signals/entities";
 import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
 import { filter, map, tap } from "rxjs";
-import { ClearCreatingSnippetAction, CreateSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetSnippetRectAction } from "./document-snippet.actions";
+import { ClearCreatingSnippetAction, CreateSnippetAction, DeleteSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetSnippetRectAction } from "./document-snippet.actions";
 import { DocumentForSnippet, DocumentIdTableEntitiesConfig, DocumentSnippetInitialState, DocumentSnippetState, EmptyDocumentForSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
@@ -80,6 +80,15 @@ export class DocumentSnippetsStore extends signalStore(
 
       return documentIdItem;
     },
+    // Удалить аннотацию из таблицы аннотаций
+    removeSnippetFromDocument(documentId: number, snippetId: number) {
+      const documentIdTable = store.documentIdTable();
+      const documentIdItem = documentIdTable[documentId] ?? EmptyDocumentForSnippet(documentId);
+
+      documentIdItem.snippetsIds.delete(snippetId);
+
+      return documentIdItem;
+    },
     // Добавить ID к аннатоции
     addIdToSnippet: (snippet: DocumentSnippet | Omit<DocumentSnippet, "id">) => snippet.hasOwnProperty("id")
       ? <DocumentSnippet>snippet
@@ -124,7 +133,18 @@ export class DocumentSnippetsStore extends signalStore(
         store,
         updateEntity({ id, changes: <Partial<DocumentSnippet>>positions }, SnippetEntitiesConfig),
       );
-    }
+    },
+    // Удалить аннотацию
+    removeSnippet(id: number) {
+      const documentId = store.snippetsTable()[id]?.documentId;
+      const documentSnippets = store.removeSnippetFromDocument(documentId, id);
+
+      patchState(
+        store,
+        removeEntity(id, SnippetEntitiesConfig),
+        upsertEntity(DeepClone(documentSnippets), DocumentIdTableEntitiesConfig),
+      );
+    },
   })),
 
   withEffects((store, documentStore = inject(DocumentStore), events = inject(Events)) => ({
@@ -152,6 +172,10 @@ export class DocumentSnippetsStore extends signalStore(
     // Установка позиции аннотации
     setSnippetPositionAction$: events.on(SetSnippetRectAction).pipe(
       tap(({ payload: position }) => store.updateSnippetRect(position)),
+    ),
+    // Удаление аннотации
+    deleteSnippetAction$: events.on(DeleteSnippetAction).pipe(
+      tap(({ payload: id }) => store.removeSnippet(id)),
     ),
   })),
 

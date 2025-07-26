@@ -5,7 +5,7 @@ import { DocumentSnippetRect } from "@models/document";
 import { Direction } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
-import { SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
+import { DeleteSnippetAction, SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
 @Component({
@@ -84,5 +84,13 @@ export class DocumentViewerSnippetActionsComponent {
       width,
       height,
     }));
+  }
+
+  onDelete() {
+    const snippet = this.snippet();
+
+    if (snippet) {
+      this.dispatcher.dispatch(DeleteSnippetAction(snippet.id));
+    }
   }
 }
