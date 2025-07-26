@@ -14,6 +14,13 @@
   ></span>
 }
 
+@if (isEditing) {
+  <textarea
+    class="editor"
+    [(ngModel)]="editingText"
+  ></textarea>
+}
+
 <div class="actions">
   @if (isEditing) {
     <span

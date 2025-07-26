@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Clamp, DirectionXNamesByDirection, DirectionYNamesByDirection } from "@helpers/math";
 import { DraggingEvent, DragStartEvent } from "@models/app";
-import { DocumentSnippetRect } from "@models/document";
+import { DocumentSnippet } from "@models/document";
 import { Direction } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
@@ -22,7 +22,9 @@ export class DocumentViewerSnippetActionsComponent {
   private readonly documentViewerService = inject(DocumentViewerService);
   private readonly dispatcher = inject(Dispatcher);
 
-  readonly snippet = input.required<DocumentSnippetRect>();
+  readonly snippet = input.required<DocumentSnippet>();
+
+  readonly editingText = signal("");
 
   private readonly imageOriginalWidth = this.documentViewerStore.imageOriginalWidth;
   private readonly imageOriginalHeight = this.documentViewerStore.imageOriginalHeight;
@@ -44,6 +46,7 @@ export class DocumentViewerSnippetActionsComponent {
   private startHeight = 0;
 
   readonly isEditingSignal = computed(() => this.snippet().id === this.documentSnippetsStore.editingId());
+  readonly isHasChanges = computed(() => this.snippet().text !== this.editingText());
 
   getDirectionName(x: Direction, y: Direction): Record<string, boolean> {
     const xName = DirectionXNamesByDirection[x];
@@ -92,9 +95,13 @@ export class DocumentViewerSnippetActionsComponent {
 
   onEdit() {
     this.dispatcher.dispatch(SetEditingIdAction(this.snippet().id));
+
+    this.editingText.set(this.snippet().text);
   }
 
   onSave() {
+    if (this.isHasChanges() && !!this.editingText().length) {
+    }
   }
 
   onDelete() {

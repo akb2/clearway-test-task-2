@@ -25,6 +25,11 @@ export class DragDirective implements AfterViewInit, OnDestroy {
         (event.type !== "mousedown" && event.type !== "mouseup")
         || event.button === 0
       )),
+      filter(event => (
+        !this.strictTarget()
+        || event.target === document
+        || event.target === this.elementRef.nativeElement
+      )),
       tap(event => {
         event.preventDefault();
         callback(event);
@@ -55,10 +60,7 @@ export class DragDirective implements AfterViewInit, OnDestroy {
   }
 
   private onDragStart(event: MouseEvent) {
-    const strictTarget = this.strictTarget();
-    const canStart = !strictTarget || event.target === this.elementRef.nativeElement;
-
-    if (canStart && !this.disabledDrag()) {
+    if (!this.disabledDrag()) {
       this.lastX = event.clientX;
       this.lastY = event.clientY;
 

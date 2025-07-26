@@ -7,6 +7,14 @@ $resizerPosition: math.div($cornerSize, 2);
 $removeSize: 24px;
 $removeSizeIcon: 16px;
 $borderSize: 1px;
+$sideSize: calc(100% - #{$cornerSize});
+
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 
 ::ng-deep .snippets__item:hover .actions {
   opacity: 1;
@@ -56,20 +64,18 @@ $borderSize: 1px;
 }
 
 .side {
-  $largeSize: calc(100% - #{$cornerSize});
-
   width: $cornerSize;
   height: $cornerSize;
 
   &.left,
   &.right {
-    height: $largeSize;
+    height: $sideSize;
     top: $resizerPosition;
   }
 
   &.top,
   &.bottom {
-    width: $largeSize;
+    width: $sideSize;
   }
 
   &.top {
@@ -116,6 +122,7 @@ $borderSize: 1px;
     height: $removeSize;
     line-height: $removeSize;
     cursor: pointer;
+    pointer-events: auto;
 
     > mat-icon {
       width: $removeSize - 2px;
@@ -136,4 +143,17 @@ $borderSize: 1px;
       }
     }
   }
+}
+
+.editor {
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  background-color: colors.$snippetColor;
+  color: white;
+  pointer-events: auto;
+  resize: none;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 300;
 }
