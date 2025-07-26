@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { DirectivesModule } from "@modules/directives.module";
-import { DocumentViewerSnippetResizerComponent } from "./document-viewer-snippet-resizer.component";
+import { DocumentViewerSnippetActionsComponent } from "./document-viewer-snippet-actions.component";
 
 @NgModule({
   imports: [
@@ -9,10 +9,10 @@ import { DocumentViewerSnippetResizerComponent } from "./document-viewer-snippet
     DirectivesModule
   ],
   declarations: [
-    DocumentViewerSnippetResizerComponent,
+    DocumentViewerSnippetActionsComponent,
   ],
   exports: [
-    DocumentViewerSnippetResizerComponent,
+    DocumentViewerSnippetActionsComponent,
   ]
 })
-export class DocumentViewerSnippetResizerModule { }
+export class DocumentViewerSnippetActionsModule { }

@@ -8,13 +8,13 @@ import { DocumentViewerService } from "@services/document-viewer.service";
 import { SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
 
 @Component({
-  selector: 'app-document-viewer-snippet-resizer',
-  templateUrl: './document-viewer-snippet-resizer.component.html',
-  styleUrls: ['./document-viewer-snippet-resizer.component.scss'],
+  selector: 'app-document-viewer-snippet-actions',
+  templateUrl: './document-viewer-snippet-actions.component.html',
+  styleUrls: ['./document-viewer-snippet-actions.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
-export class DocumentViewerSnippetResizerComponent {
+export class DocumentViewerSnippetActionsComponent {
   private readonly documentViewerService = inject(DocumentViewerService);
   private readonly dispatcher = inject(Dispatcher);
 
