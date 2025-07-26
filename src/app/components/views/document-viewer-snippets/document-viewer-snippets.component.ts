@@ -3,7 +3,7 @@ import { DraggingEvent, DragStartEvent } from "@models/app";
 import { DocumentSnippetForHtml, DocumentSnippetPosition } from "@models/document";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
-import { SetSnippetPositionAction } from "@store/document-snippets/document-snippet.actions";
+import { SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
 
 @Component({
@@ -60,7 +60,7 @@ export class DocumentViewerSnippetsComponent {
   }
 
   onDragging({ id }: DocumentSnippetPosition, { clientX, clientY }: DraggingEvent) {
-    this.dispatcher.dispatch(SetSnippetPositionAction({
+    this.dispatcher.dispatch(SetSnippetRectAction({
       id,
       top: this.documentViewerService.getUnShiftedUnZoomedY(clientY) - this.startY,
       left: this.documentViewerService.getUnShiftedUnZoomedX(clientX) - this.startX,

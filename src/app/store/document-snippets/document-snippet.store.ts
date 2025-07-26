@@ -2,14 +2,15 @@ import { computed, effect, inject, Injectable } from "@angular/core";
 import { CreateNewId, DeepClone } from "@helpers/app";
 import { AnyToArray, AnyToInt } from "@helpers/converters";
 import { LocalStorageGet, LocalStorageSet } from "@helpers/local-storage";
-import { DocumentSnippet, DocumentSnippetPosition } from "@models/document";
+import { DocumentSnippet } from "@models/document";
+import { RectData } from "@models/ui";
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from "@ngrx/signals";
 import { addEntities, addEntity, EntityMap, updateEntity, upsertEntities, upsertEntity, withEntities } from "@ngrx/signals/entities";
 import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
 import { filter, map, tap } from "rxjs";
-import { ClearCreatingSnippetAction, CreateSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetSnippetPositionAction } from "./document-snippet.actions";
+import { ClearCreatingSnippetAction, CreateSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetSnippetRectAction } from "./document-snippet.actions";
 import { DocumentForSnippet, DocumentIdTableEntitiesConfig, DocumentSnippetInitialState, DocumentSnippetState, EmptyDocumentForSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
@@ -118,10 +119,10 @@ export class DocumentSnippetsStore extends signalStore(
       );
     },
     // Обновить аннотацию
-    updateSnippetPosition({ id, top, left }: DocumentSnippetPosition) {
+    updateSnippetRect({ id, ...positions }: Pick<DocumentSnippet, "id"> & Partial<RectData>) {
       patchState(
         store,
-        updateEntity({ id, changes: <Partial<DocumentSnippet>>{ top, left } }, SnippetEntitiesConfig),
+        updateEntity({ id, changes: <Partial<DocumentSnippet>>positions }, SnippetEntitiesConfig),
       );
     }
   })),
@@ -149,8 +150,8 @@ export class DocumentSnippetsStore extends signalStore(
       map(() => ClearCreatingSnippetAction())
     ),
     // Установка позиции аннотации
-    setSnippetPositionAction$: events.on(SetSnippetPositionAction).pipe(
-      tap(({ payload: position }) => store.updateSnippetPosition(position)),
+    setSnippetPositionAction$: events.on(SetSnippetRectAction).pipe(
+      tap(({ payload: position }) => store.updateSnippetRect(position)),
     ),
   })),
 

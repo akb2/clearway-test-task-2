@@ -1,4 +1,4 @@
-import { DocumentSnippetPosition } from "@models/document";
+import { DocumentSnippet } from "@models/document";
 import { RectData } from "@models/ui";
 import { type } from "@ngrx/signals";
 import { event } from "@ngrx/signals/events";
@@ -21,9 +21,9 @@ export const CreateSnippetAction = event(
   "[АННОТАЦИИ] Создание аннотации",
 );
 
-export const SetSnippetPositionAction = event(
+export const SetSnippetRectAction = event(
   "[АННОТАЦИИ] Установка позиции аннотации",
-  type<DocumentSnippetPosition>(),
+  type<Pick<DocumentSnippet, "id"> & Partial<RectData>>(),
 );
 
 export const DocumentSnippetActions = [
@@ -31,5 +31,5 @@ export const DocumentSnippetActions = [
   SetCreatingSnippetSizeAction,
   ClearCreatingSnippetAction,
   CreateSnippetAction,
-  SetSnippetPositionAction,
+  SetSnippetRectAction,
 ];
