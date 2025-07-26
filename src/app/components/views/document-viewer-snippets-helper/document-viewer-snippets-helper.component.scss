@@ -1,8 +1,8 @@
 @use "sass:map";
 @use "colors";
 @use "mixins";
+@use "vars";
 
-$animationTime: 0.3s;
 $color: map.get(colors.$matPrimary, 40);
 
 .overlay {
@@ -20,8 +20,8 @@ $color: map.get(colors.$matPrimary, 40);
   opacity: 0;
   visibility: hidden;
   transition:
-    opacity #{$animationTime} ease,
-    visibility #{$animationTime} ease;
+    opacity #{vars.$animationTime} ease,
+    visibility #{vars.$animationTime} ease;
 
   &.dragging {
     opacity: 1;

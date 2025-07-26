@@ -1,5 +1,6 @@
+@use "vars";
+
 $spacing: 15px;
-$animationTime: 0.3s;
 
 .overlay {
   position: relative;
@@ -8,7 +9,7 @@ $animationTime: 0.3s;
     cursor: grab;
     width: 100%;
     height: 100%;
-    transition: opacity #{$animationTime} ease;
+    transition: opacity #{vars.$animationTime} ease;
 
     &.moving {
       cursor: all-scroll;

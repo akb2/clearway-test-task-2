@@ -1,9 +1,7 @@
 @use "sass:map";
 @use "colors";
 @use "mixins";
-
-$animationTime: 0.3s;
-$color: map.get(colors.$matPrimary, 40);
+@use "vars";
 
 :host {
   @include mixins.inset;
@@ -19,10 +17,10 @@ $color: map.get(colors.$matPrimary, 40);
   &__item {
     pointer-events: auto;
     position: absolute;
-    background-color: rgba($color, 0.3);
-    border: 1px solid #{$color};
+    background-color: rgba(colors.$snippetColor, 0.3);
+    border: 1px solid #{colors.$snippetColor};
     opacity: 0.2;
-    transition: opacity #{$animationTime} ease;
+    transition: opacity #{vars.$animationTime} ease;
     cursor: grab;
     z-index: 1;
 

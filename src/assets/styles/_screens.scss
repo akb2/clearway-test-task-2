@@ -11,8 +11,6 @@ $breakpoints: (
   xlarge: 100000
 );
 
-$animationTime: 0.3s;
-
 // Максимальное разрешение брейкпоинта
 @function maxResolution($screen) {
   @if (map.has-key($breakpoints, $screen)) {

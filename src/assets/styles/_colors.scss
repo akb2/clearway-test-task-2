@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "@angular/material";
 
 $matPrimary: material.$azure-palette;
@@ -17,3 +18,5 @@ $titleDark: #fff;
 $subTitleDark: #ececec;
 $textDark: #c0c0c0;
 $borderLight: #ddd;
+
+$snippetColor: map.get($matPrimary, 40);

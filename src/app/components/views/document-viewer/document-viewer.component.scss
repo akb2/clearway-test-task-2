@@ -1,8 +1,8 @@
 @use "mixins";
+@use "vars";
 
 $spacing: 15px;
 $background: #ccc;
-$animationTime: 0.3s;
 
 .image {
   height: 100%;
@@ -41,8 +41,8 @@ $animationTime: 0.3s;
     visibility: hidden;
     pointer-events: none;
     transition:
-      opacity #{$animationTime} ease,
-      visibility #{$animationTime} ease;
+      opacity #{vars.$animationTime} ease,
+      visibility #{vars.$animationTime} ease;
 
     &.loading {
       opacity: 1;
@@ -60,8 +60,8 @@ $animationTime: 0.3s;
     visibility: hidden;
     transform: translateX(-50%);
     transition:
-      opacity #{$animationTime} ease,
-      visibility #{$animationTime} ease;
+      opacity #{vars.$animationTime} ease,
+      visibility #{vars.$animationTime} ease;
     z-index: 3;
   }
 

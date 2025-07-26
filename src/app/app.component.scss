@@ -3,8 +3,6 @@
 @use "mixins";
 @use "vars";
 
-$animationTime: 0.3s;
-
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -18,7 +16,7 @@ $animationTime: 0.3s;
   overflow: hidden;
   height: vars.$headerHeight * 2;
   transition-property: height, overflow;
-  transition-duration: $animationTime;
+  transition-duration: vars.$animationTime;
   transition-timing-function: ease;
 
   &.visible {
@@ -39,7 +37,7 @@ $animationTime: 0.3s;
   opacity: 0;
   pointer-events: none;
   transition-property: opacity, visibility, pointer-events;
-  transition-duration: $animationTime;
+  transition-duration: vars.$animationTime;
   transition-timing-function: ease;
 
   &.visible {
