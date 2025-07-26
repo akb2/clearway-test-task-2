@@ -10,7 +10,7 @@ import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
 import { filter, map, tap } from "rxjs";
-import { ClearCreatingSnippetAction, ClearEditingIdAction, CreateSnippetAction, DeleteSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetEditingIdAction, SetSnippetRectAction } from "./document-snippet.actions";
+import { ClearCreatingSnippetAction, ClearEditingIdAction, CreateSnippetAction, DeleteSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetEditingIdAction, SetSnippetRectAction, SetSnippetTextAxtion } from "./document-snippet.actions";
 import { DocumentForSnippet, DocumentIdTableEntitiesConfig, DocumentSnippetInitialState, DocumentSnippetState, EmptyDocumentForSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
@@ -183,6 +183,10 @@ export class DocumentSnippetsStore extends signalStore(
     // Удаление аннотации
     deleteSnippetAction$: events.on(DeleteSnippetAction).pipe(
       tap(({ payload: id }) => store.removeSnippet(id)),
+    ),
+    // Установить текст аннотации
+    setSnippetTextAxtion$: events.on(SetSnippetTextAxtion).pipe(
+      tap(({ payload: data }) => store.updateSnippetRect(data)),
     ),
   })),
 

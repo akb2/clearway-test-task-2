@@ -19,6 +19,8 @@
     class="editor"
     [(ngModel)]="editingText"
   ></textarea>
+} @else {
+  <span class="text">{{ snippet().text }}</span>
 }
 
 <div class="actions">

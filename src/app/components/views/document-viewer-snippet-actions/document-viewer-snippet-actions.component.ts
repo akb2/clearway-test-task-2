@@ -5,7 +5,7 @@ import { DocumentSnippet } from "@models/document";
 import { Direction } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
-import { ClearEditingIdAction, DeleteSnippetAction, SetEditingIdAction, SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
+import { ClearEditingIdAction, DeleteSnippetAction, SetEditingIdAction, SetSnippetRectAction, SetSnippetTextAxtion } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
@@ -105,8 +105,11 @@ export class DocumentViewerSnippetActionsComponent {
   }
 
   onSave() {
-    if (this.isHasChanges() && !!this.editingText().length) {
-    }
+    this.dispatcher.dispatch(SetSnippetTextAxtion({
+      id: this.snippet().id,
+      text: this.editingText(),
+    }));
+    this.dispatcher.dispatch(ClearEditingIdAction());
   }
 
   onDelete() {

@@ -47,3 +47,18 @@
   bottom: $bottom;
   left: $left;
 }
+
+@mixin textOutline($color: black) {
+  $size: 1px;
+  $shadows: ();
+
+  @for $x from -1 through 1 {
+    @for $y from -1 through 1 {
+      @if not($x == 0 and $y == 0) {
+        $shadows: append($shadows, #{$x * $size} #{$y * $size} 0 #{$color}, comma);
+      }
+    }
+  }
+
+  text-shadow: $shadows;
+}

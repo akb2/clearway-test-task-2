@@ -8,6 +8,7 @@
         [class.dragging]="snippet.dragging()"
         [ngStyle]="snippet.styles"
         [strictTarget]="true"
+        [matTooltip]="snippet.text"
         [(isDragging)]="snippet.dragging"
         (dragStart)="onStart(snippet, $event)"
         (dragging)="onDragging(snippet, $event)"

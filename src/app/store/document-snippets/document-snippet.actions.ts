@@ -26,6 +26,11 @@ export const SetSnippetRectAction = event(
   type<Pick<DocumentSnippet, "id"> & Partial<RectData>>(),
 );
 
+export const SetSnippetTextAxtion = event(
+  "[АННОТАЦИИ] Установка текста аннотации",
+  type<Pick<DocumentSnippet, "id" | "text">>(),
+);
+
 export const DeleteSnippetAction = event(
   "[АННОТАЦИИ] Удаление аннотации",
   type<number>(),
