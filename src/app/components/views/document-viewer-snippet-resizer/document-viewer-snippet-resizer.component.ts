@@ -59,14 +59,18 @@ export class DocumentViewerSnippetResizerComponent {
     const snippet = this.snippet();
     const moveX = this.documentViewerService.getUnShiftedUnZoomedX(clientX);
     const moveY = this.documentViewerService.getUnShiftedUnZoomedY(clientY);
+    const left = x < 0
+      ? moveX - this.startLeft
+      : snippet.left;
+    const top = y < 0
+      ? moveY - this.startTop
+      : snippet.top;
     const width = x > 0
       ? moveX - snippet.left - this.startWidth
-      : snippet.width;
+      : snippet.left + snippet.width - left;
     const height = y > 0
       ? moveY - snippet.top - this.startHeight
-      : snippet.height;
-    const top = snippet.top;
-    const left = snippet.left;
+      : snippet.top + snippet.height - top;
 
     this.dispatcher.dispatch(SetSnippetRectAction({
       id: snippet.id,
