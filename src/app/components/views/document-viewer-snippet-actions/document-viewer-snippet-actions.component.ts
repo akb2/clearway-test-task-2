@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { DirectionXNamesByDirection, DirectionYNamesByDirection } from "@helpers/math";
+import { Clamp, DirectionXNamesByDirection, DirectionYNamesByDirection } from "@helpers/math";
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { DocumentSnippetRect } from "@models/document";
 import { Direction } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
 import { SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
+import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
 @Component({
   selector: 'app-document-viewer-snippet-actions',
@@ -15,10 +16,14 @@ import { SetSnippetRectAction } from "@store/document-snippets/document-snippet.
   standalone: false,
 })
 export class DocumentViewerSnippetActionsComponent {
+  private readonly documentViewerStore = inject(DocumentViewerStore);
   private readonly documentViewerService = inject(DocumentViewerService);
   private readonly dispatcher = inject(Dispatcher);
 
   readonly snippet = input.required<DocumentSnippetRect>();
+
+  private readonly imageOriginalWidth = this.documentViewerStore.imageOriginalWidth;
+  private readonly imageOriginalHeight = this.documentViewerStore.imageOriginalHeight;
 
   readonly directions: [Direction, Direction][] = [
     [-1, -1],  // left, top
@@ -60,16 +65,16 @@ export class DocumentViewerSnippetActionsComponent {
     const moveX = this.documentViewerService.getUnShiftedUnZoomedX(clientX);
     const moveY = this.documentViewerService.getUnShiftedUnZoomedY(clientY);
     const left = x < 0
-      ? moveX - this.startLeft
+      ? Clamp(moveX - this.startLeft, 0, snippet.left + snippet.width)
       : snippet.left;
     const top = y < 0
-      ? moveY - this.startTop
+      ? Clamp(moveY - this.startTop, 0, snippet.top + snippet.height)
       : snippet.top;
     const width = x > 0
-      ? moveX - snippet.left - this.startWidth
+      ? Clamp(moveX - snippet.left - this.startWidth, 0, this.imageOriginalWidth() - snippet.left)
       : snippet.left + snippet.width - left;
     const height = y > 0
-      ? moveY - snippet.top - this.startHeight
+      ? Clamp(moveY - snippet.top - this.startHeight, 0, this.imageOriginalHeight() - snippet.top)
       : snippet.top + snippet.height - top;
 
     this.dispatcher.dispatch(SetSnippetRectAction({

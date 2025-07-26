@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, model, signal, WritableSignal } from "@angular/core";
+import { Clamp } from "@helpers/math";
 import { DraggingEvent, DragStartEvent } from "@models/app";
-import { DocumentSnippetForHtml, DocumentSnippetPosition } from "@models/document";
+import { DocumentSnippetForHtml, DocumentSnippetPosition, DocumentSnippetSizes } from "@models/document";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
 import { SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
+import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
 @Component({
   selector: "app-document-viewer-snippets",
@@ -16,6 +18,7 @@ import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet
 export class DocumentViewerSnippetsComponent {
   private readonly documentSnippetsStore = inject(DocumentSnippetsStore);
   private readonly documentViewerService = inject(DocumentViewerService);
+  private readonly documentViewerStore = inject(DocumentViewerStore);
   private readonly dispatcher = inject(Dispatcher);
 
   readonly isSnippetHelperDragging = model(false);
@@ -26,6 +29,8 @@ export class DocumentViewerSnippetsComponent {
   private readonly snippetsDraggingSignals: Record<number, WritableSignal<boolean>> = {};
 
   private readonly currentDocumentSnippets = this.documentSnippetsStore.currentDocumentSnippets;
+  private readonly imageOriginalWidth = this.documentViewerStore.imageOriginalWidth;
+  private readonly imageOriginalHeight = this.documentViewerStore.imageOriginalHeight;
 
   readonly snippetsSignal = computed<DocumentSnippetForHtml[]>(() => this.currentDocumentSnippets()
     .map(({ id, top, left, width, height }) => {
@@ -59,11 +64,14 @@ export class DocumentViewerSnippetsComponent {
     this.startY = this.documentViewerService.getUnShiftedUnZoomedY(startY) - top;
   }
 
-  onDragging({ id }: DocumentSnippetPosition, { clientX, clientY }: DraggingEvent) {
+  onDragging({ id, width, height }: DocumentSnippetSizes, { clientX, clientY }: DraggingEvent) {
+    const top = this.documentViewerService.getUnShiftedUnZoomedY(clientY) - this.startY;
+    const left = this.documentViewerService.getUnShiftedUnZoomedX(clientX) - this.startX;
+
     this.dispatcher.dispatch(SetSnippetRectAction({
       id,
-      top: this.documentViewerService.getUnShiftedUnZoomedY(clientY) - this.startY,
-      left: this.documentViewerService.getUnShiftedUnZoomedX(clientX) - this.startX,
+      top: Clamp(top, 0, this.imageOriginalHeight() - height),
+      left: Clamp(left, 0, this.imageOriginalWidth() - width),
     }));
   }
 }

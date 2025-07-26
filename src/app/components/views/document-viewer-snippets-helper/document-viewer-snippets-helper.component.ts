@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, model, signal, viewChild } from "@angular/core";
+import { Clamp } from "@helpers/math";
 import { DraggingEvent } from "@models/app";
 import { ResizeEvent } from "@models/ui";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
 import { CreateSnippetAction, SetCreatingSnippetSizeAction } from "@store/document-snippets/document-snippet.actions";
 import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
+import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
 @Component({
   selector: "app-document-viewer-snippets-helper",
@@ -16,6 +18,7 @@ import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet
 export class DocumentViewerSnippetsHelperComponent {
   private readonly documentViewerService = inject(DocumentViewerService);
   private readonly documentSnippetsStore = inject(DocumentSnippetsStore);
+  private readonly documentViewerStore = inject(DocumentViewerStore);
   private readonly dispatcher = inject(Dispatcher);
 
   readonly isDragging = model(false);
@@ -23,6 +26,8 @@ export class DocumentViewerSnippetsHelperComponent {
   readonly hostRect = signal<ResizeEvent>({ width: 0, height: 0, left: 0, top: 0 });
 
   private readonly helperRect = this.documentSnippetsStore.helperRect;
+  private readonly imageOriginalWidth = this.documentViewerStore.imageOriginalWidth;
+  private readonly imageOriginalHeight = this.documentViewerStore.imageOriginalHeight;
 
   readonly helperElm = viewChild("helperElm", { read: ElementRef });
 
@@ -60,9 +65,15 @@ export class DocumentViewerSnippetsHelperComponent {
     const helperRect = this.helperRect();
 
     if (helperRect) {
+      const width = this.documentViewerService.getUnShiftedUnZoomedX(clientX) - helperRect.left;
+      const height = this.documentViewerService.getUnShiftedUnZoomedY(clientY) - helperRect.top;
+      const minWidth = -helperRect.left;
+      const minHeight = -helperRect.top;
+      const maxWidth = this.imageOriginalWidth() - helperRect.left;
+      const maxHeight = this.imageOriginalHeight() - helperRect.top;
       const data = {
-        width: this.documentViewerService.getUnShiftedUnZoomedX(clientX) - helperRect.left,
-        height: this.documentViewerService.getUnShiftedUnZoomedY(clientY) - helperRect.top,
+        width: Clamp(width, minWidth, maxWidth),
+        height: Clamp(height, minHeight, maxHeight),
       };
 
       this.dispatcher.dispatch(SetCreatingSnippetSizeAction(data));
