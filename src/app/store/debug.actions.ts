@@ -1,7 +1,7 @@
-import { inject } from "@angular/core";
+import { inject, isDevMode } from "@angular/core";
 import { getState, signalStoreFeature, withHooks } from "@ngrx/signals";
 import { EventCreator, Events } from "@ngrx/signals/events";
-import { Subject, takeUntil } from "rxjs";
+import { filter, Subject, takeUntil } from "rxjs";
 
 export const debugActions = (actions: EventCreator<string, any>[]) => signalStoreFeature(withHooks((store, events = inject(Events)) => {
   const destroyed$ = new Subject<void>();
@@ -13,7 +13,10 @@ export const debugActions = (actions: EventCreator<string, any>[]) => signalStor
   const defaultColor = "color: lightgray; font-weight: normal;";
 
   const onInit = () => events.on(...actions)
-    .pipe(takeUntil(destroyed$))
+    .pipe(
+      filter(() => isDevMode()),
+      takeUntil(destroyed$)
+    )
     .subscribe({
       next: ({ type, payload }) => {
         const regExp = new RegExp("^\\[(.+)\\](.*)$", "i");
