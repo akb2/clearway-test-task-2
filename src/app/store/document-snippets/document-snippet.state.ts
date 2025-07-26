@@ -7,6 +7,7 @@ export const LocalStorageSnippetsKey = "document_snippets";
 
 export interface DocumentSnippetState {
   helperRect: RectData;
+  editingId: number;
 }
 
 export interface DocumentForSnippet extends Pick<DocumentItem, "id"> {
@@ -15,6 +16,7 @@ export interface DocumentForSnippet extends Pick<DocumentItem, "id"> {
 
 export const DocumentSnippetInitialState: DocumentSnippetState = {
   helperRect: DefaultRectData,
+  editingId: 0,
 };
 
 export const SnippetEntitiesConfig = {

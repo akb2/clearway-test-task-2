@@ -31,6 +31,15 @@ export const DeleteSnippetAction = event(
   type<number>(),
 );
 
+export const SetEditingIdAction = event(
+  "[АННОТАЦИИ] Редактирование аннотации",
+  type<number>(),
+);
+
+export const ClearEditingIdAction = event(
+  "[АННОТАЦИИ] Завершение редактирования аннотации",
+);
+
 export const DocumentSnippetActions = [
   SetCreatingSnippetPositionAction,
   SetCreatingSnippetSizeAction,
@@ -38,4 +47,6 @@ export const DocumentSnippetActions = [
   CreateSnippetAction,
   SetSnippetRectAction,
   DeleteSnippetAction,
+  SetEditingIdAction,
+  ClearEditingIdAction,
 ];

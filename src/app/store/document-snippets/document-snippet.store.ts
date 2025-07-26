@@ -10,7 +10,7 @@ import { Events, on, withEffects, withReducer } from "@ngrx/signals/events";
 import { debugActions } from "@store/debug.actions";
 import { DocumentStore } from "@store/document/document.store";
 import { filter, map, tap } from "rxjs";
-import { ClearCreatingSnippetAction, CreateSnippetAction, DeleteSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetSnippetRectAction } from "./document-snippet.actions";
+import { ClearCreatingSnippetAction, ClearEditingIdAction, CreateSnippetAction, DeleteSnippetAction, DocumentSnippetActions, SetCreatingSnippetPositionAction, SetCreatingSnippetSizeAction, SetEditingIdAction, SetSnippetRectAction } from "./document-snippet.actions";
 import { DocumentForSnippet, DocumentIdTableEntitiesConfig, DocumentSnippetInitialState, DocumentSnippetState, EmptyDocumentForSnippet, LocalStorageSnippetsKey, SnippetEntitiesConfig } from "./document-snippet.state";
 
 @Injectable()
@@ -43,6 +43,7 @@ export class DocumentSnippetsStore extends signalStore(
   })),
 
   withReducer(
+    // Задать положение для создаваемой аннотации
     on(SetCreatingSnippetPositionAction, ({ payload: { left, top } }, { helperRect }) => ({
       helperRect: {
         width: AnyToInt(helperRect?.width),
@@ -51,6 +52,7 @@ export class DocumentSnippetsStore extends signalStore(
         top,
       }
     })),
+    // Задать размеры для создаваемой аннотации
     on(SetCreatingSnippetSizeAction, ({ payload: { width, height } }, { helperRect }) => ({
       helperRect: {
         width,
@@ -59,7 +61,12 @@ export class DocumentSnippetsStore extends signalStore(
         top: AnyToInt(helperRect?.top),
       }
     })),
+    // Очистить создаваемую аннотацию
     on(ClearCreatingSnippetAction, () => ({ helperRect: undefined })),
+    // Реактирование аннотации
+    on(SetEditingIdAction, ({ payload: editingId }) => ({ editingId })),
+    // Остановить редактирование аннотации
+    on(ClearEditingIdAction, () => ({ editingId: undefined })),
   ),
 
   // Методы для работы с аннотациями
