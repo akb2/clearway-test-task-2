@@ -1,5 +1,4 @@
 @use "sass:math";
-@use "mixins";
 @use "colors";
 @use "vars";
 
@@ -8,15 +7,9 @@ $resizerPosition: math.div($cornerSize, 2);
 $removeSize: 24px;
 $removeSizeIcon: 18px;
 
-:host {
-  @include mixins.inset;
-
-  position: absolute;
-
-  &:hover .remove {
-    opacity: 1;
-    visibility: visible;
-  }
+::ng-deep .snippets__item:hover .remove {
+  opacity: 1;
+  visibility: visible;
 }
 
 .corner,
