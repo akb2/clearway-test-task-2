@@ -17,7 +17,7 @@ export type DocumentSnippetPosition = Pick<DocumentSnippet, "id" | "top" | "left
 export type DocumentSnippetSizes = Pick<DocumentSnippet, "id" | "width" | "height">;
 export type DocumentSnippetRect = DocumentSnippetPosition & DocumentSnippetSizes;
 
-export interface DocumentSnippetForHtml extends DocumentSnippetRect {
+export interface DocumentSnippetForHtml extends DocumentSnippet {
   styles: Record<string, string>;
   dragging: WritableSignal<boolean>;
 }

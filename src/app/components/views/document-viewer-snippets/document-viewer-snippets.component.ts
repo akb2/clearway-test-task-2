@@ -33,23 +33,19 @@ export class DocumentViewerSnippetsComponent {
   private readonly imageOriginalHeight = this.documentViewerStore.imageOriginalHeight;
 
   readonly snippetsSignal = computed<DocumentSnippetForHtml[]>(() => this.currentDocumentSnippets()
-    .map(({ id, top, left, width, height }) => {
-      const dragging = this.snippetsDraggingSignals[id] || signal(false);
+    .map(snippet => {
+      const dragging = this.snippetsDraggingSignals[snippet.id] || signal(false);
 
-      this.snippetsDraggingSignals[id] = dragging;
+      this.snippetsDraggingSignals[snippet.id] = dragging;
 
       return {
-        id,
-        top,
-        left,
-        width,
-        height,
+        ...snippet,
         dragging,
         styles: {
-          width: this.documentViewerService.getZoomedSize(width) + "px",
-          height: this.documentViewerService.getZoomedSize(height) + "px",
-          left: this.documentViewerService.getZoomedSize(left) + "px",
-          top: this.documentViewerService.getZoomedSize(top) + "px",
+          width: this.documentViewerService.getZoomedSize(snippet.width) + "px",
+          height: this.documentViewerService.getZoomedSize(snippet.height) + "px",
+          left: this.documentViewerService.getZoomedSize(snippet.left) + "px",
+          top: this.documentViewerService.getZoomedSize(snippet.top) + "px",
         }
       };
     })
