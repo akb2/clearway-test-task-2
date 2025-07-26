@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { Clamp, DirectionXNamesByDirection, DirectionYNamesByDirection } from "@helpers/math";
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { DocumentSnippetRect } from "@models/document";
 import { Direction } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
 import { DocumentViewerService } from "@services/document-viewer.service";
-import { DeleteSnippetAction, SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
+import { ClearEditingIdAction, DeleteSnippetAction, SetEditingIdAction, SetSnippetRectAction } from "@store/document-snippets/document-snippet.actions";
+import { DocumentSnippetsStore } from "@store/document-snippets/document-snippet.store";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 
 @Component({
@@ -17,6 +18,7 @@ import { DocumentViewerStore } from "@store/document-viewer/document-viewer.stor
 })
 export class DocumentViewerSnippetActionsComponent {
   private readonly documentViewerStore = inject(DocumentViewerStore);
+  private readonly documentSnippetsStore = inject(DocumentSnippetsStore);
   private readonly documentViewerService = inject(DocumentViewerService);
   private readonly dispatcher = inject(Dispatcher);
 
@@ -40,6 +42,8 @@ export class DocumentViewerSnippetActionsComponent {
   private startTop = 0;
   private startWidth = 0;
   private startHeight = 0;
+
+  readonly isEditingSignal = computed(() => this.snippet().id === this.documentSnippetsStore.editingId());
 
   getDirectionName(x: Direction, y: Direction): Record<string, boolean> {
     const xName = DirectionXNamesByDirection[x];
@@ -86,11 +90,17 @@ export class DocumentViewerSnippetActionsComponent {
     }));
   }
 
-  onDelete() {
-    const snippet = this.snippet();
+  onEdit() {
+    this.dispatcher.dispatch(SetEditingIdAction(this.snippet().id));
+  }
 
-    if (snippet) {
-      this.dispatcher.dispatch(DeleteSnippetAction(snippet.id));
-    }
+  onSave() {
+  }
+
+  onDelete() {
+    this.dispatcher.dispatch(this.isEditingSignal()
+      ? ClearEditingIdAction()
+      : DeleteSnippetAction(this.snippet().id)
+    );
   }
 }

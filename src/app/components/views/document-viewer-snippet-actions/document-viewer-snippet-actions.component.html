@@ -1,3 +1,5 @@
+@let isEditing = isEditingSignal();
+
 @for (direction of directions; track direction) {
   @let x = direction[0];
   @let y = direction[1];
@@ -12,9 +14,27 @@
   ></span>
 }
 
-<span
-  class="remove"
-  (click)="onDelete()"
->
-  <mat-icon>close</mat-icon>
-</span>
+<div class="actions">
+  @if (isEditing) {
+    <span
+      class="actions__item"
+      (click)="onSave()"
+    >
+      <mat-icon>save</mat-icon>
+    </span>
+  } @else {
+    <span
+      class="actions__item"
+      (click)="onEdit()"
+    >
+      <mat-icon>edit</mat-icon>
+    </span>
+  }
+
+  <span
+    class="actions__item"
+    (click)="onDelete()"
+  >
+    <mat-icon>close</mat-icon>
+  </span>
+</div>
