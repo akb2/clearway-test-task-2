@@ -6,6 +6,7 @@
       <div
         class="snippets__item"
         [class.dragging]="snippet.dragging()"
+        [class.editing]="snippet.id === editingId()"
         [ngStyle]="snippet.styles"
         [strictTarget]="true"
         [matTooltip]="snippet.text"

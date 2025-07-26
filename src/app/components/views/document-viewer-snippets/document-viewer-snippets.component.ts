@@ -28,6 +28,8 @@ export class DocumentViewerSnippetsComponent {
 
   private readonly snippetsDraggingSignals: Record<number, WritableSignal<boolean>> = {};
 
+  readonly editingId = this.documentSnippetsStore.editingId;
+
   private readonly currentDocumentSnippets = this.documentSnippetsStore.currentDocumentSnippets;
   private readonly imageOriginalWidth = this.documentViewerStore.imageOriginalWidth;
   private readonly imageOriginalHeight = this.documentViewerStore.imageOriginalHeight;

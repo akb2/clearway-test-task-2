@@ -25,9 +25,14 @@ $textPadding: 8px;
   pointer-events: none;
 }
 
-::ng-deep .snippets__item:hover .actions {
-  opacity: 1;
-  visibility: visible;
+::ng-deep .snippets__item {
+  &.editing,
+  &:hover {
+    .actions {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
 }
 
 .corner,
