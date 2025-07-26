@@ -3,19 +3,23 @@
 @if (snippets.length) {
   <div class="snippets">
     @for (snippet of snippets; track snippetsTracking(snippet)) {
-      <div
-        class="snippets__item"
-        [class.dragging]="snippet.dragging()"
-        [class.editing]="snippet.id === editingId()"
-        [ngStyle]="snippet.styles"
-        [strictTarget]="true"
-        [matTooltip]="snippet.text"
-        [(isDragging)]="snippet.dragging"
-        (dragStart)="onStart(snippet, $event)"
-        (dragging)="onDragging(snippet, $event)"
-      >
-        <app-document-viewer-snippet-actions [snippet]="snippet" />
-      </div>
+      @let editingId = editingIdSignal();
+
+      @if (!editingId || snippet.id === editingId) {
+        <div
+          class="snippets__item"
+          [class.dragging]="snippet.dragging()"
+          [class.editing]="snippet.id === editingId"
+          [ngStyle]="snippet.styles"
+          [strictTarget]="true"
+          [matTooltip]="snippet.text"
+          [(isDragging)]="snippet.dragging"
+          (dragStart)="onStart(snippet, $event)"
+          (dragging)="onDragging(snippet, $event)"
+        >
+          <app-document-viewer-snippet-actions [snippet]="snippet" />
+        </div>
+      }
     }
   </div>
 }
