@@ -5,6 +5,9 @@
   <span
     [class.corner]="x !== 0 && y !== 0"
     [class.side]="x === 0 || y === 0"
+    [strictTarget]="true"
     [ngClass]="getDirectionName(x, y)"
+    (dragStart)="onStart($event)"
+    (dragging)="onDragging(x, y, $event)"
   ></span>
 }

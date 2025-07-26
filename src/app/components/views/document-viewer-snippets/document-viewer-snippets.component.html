@@ -12,7 +12,7 @@
         (dragStart)="onStart(snippet, $event)"
         (dragging)="onDragging(snippet, $event)"
       >
-        <app-document-viewer-snippet-resizer />
+        <app-document-viewer-snippet-resizer [snippet]="snippet" />
       </div>
     }
   </div>
