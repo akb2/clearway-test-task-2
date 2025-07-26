@@ -19,12 +19,29 @@ export class DragDirective implements AfterViewInit, OnDestroy {
 
   private readonly destroyed$ = new Subject<void>();
 
-  private getEvent(elm: Node, eventName: string, callback: (event: MouseEvent) => void): Observable<MouseEvent> {
+  private getEvent(
+    elm: Node,
+    eventName: string,
+    callback: (event: MouseEvent) => void,
+    strictTarget = false
+  ): Observable<MouseEvent> {
     return fromEvent<MouseEvent>(elm, eventName).pipe(
-      filter(event => (
-        (event.type !== "mousedown" && event.type !== "mouseup")
-        || event.button === 0
-      )),
+      filter(event => {
+        const canStart = (
+          !strictTarget
+          || event.target === document
+          || event.target === this.elementRef.nativeElement
+        );
+
+        return (
+          canStart
+          && !this.disabledDrag()
+          && (
+            (event.type !== "mousedown" && event.type !== "mouseup")
+            || event.button === 0
+          )
+        );
+      }),
       tap(event => {
         event.preventDefault();
         callback(event);
@@ -43,7 +60,7 @@ export class DragDirective implements AfterViewInit, OnDestroy {
     merge(
       this.getEvent(document, "mouseup", this.onDragEnd.bind(this)),
       this.getEvent(document, "mousemove", this.onDragging.bind(this)),
-      this.getEvent(this.elementRef.nativeElement, "mousedown", this.onDragStart.bind(this))
+      this.getEvent(this.elementRef.nativeElement, "mousedown", this.onDragStart.bind(this), this.strictTarget())
     )
       .pipe(takeUntil(this.destroyed$))
       .subscribe();
