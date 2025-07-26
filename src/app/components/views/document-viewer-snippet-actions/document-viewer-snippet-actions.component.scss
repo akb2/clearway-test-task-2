@@ -4,8 +4,6 @@
 
 $cornerSize: 8px;
 $resizerPosition: math.div($cornerSize, 2);
-$removeSize: 24px;
-$removeSizeIcon: 16px;
 $borderSize: 1px;
 $sideSize: calc(100% - #{$cornerSize});
 
@@ -103,7 +101,7 @@ $sideSize: calc(100% - #{$cornerSize});
 
 .actions {
   position: absolute;
-  top: -($removeSize + $resizerPosition + $borderSize);
+  bottom: calc(100% + #{$resizerPosition + $borderSize});
   right: -$borderSize;
   display: flex;
   flex-flow: row nowrap;
@@ -111,38 +109,10 @@ $sideSize: calc(100% - #{$cornerSize});
   gap: $resizerPosition;
   opacity: 0;
   visibility: hidden;
+  pointer-events: auto;
   transition:
     opacity #{vars.$animationTime} ease,
     visibility #{vars.$animationTime} ease;
-
-  &__item {
-    background-color: rgba(colors.$snippetColor, 0.3);
-    border: #{$borderSize} solid #{colors.$snippetColor};
-    width: $removeSize;
-    height: $removeSize;
-    line-height: $removeSize;
-    cursor: pointer;
-    pointer-events: auto;
-
-    > mat-icon {
-      width: $removeSize - 2px;
-      height: $removeSize - 2px;
-      line-height: $removeSize - 2px;
-      display: block;
-      text-align: center;
-      font-size: $removeSizeIcon;
-      color: colors.$snippetColor;
-      padding: 0;
-    }
-
-    &:active {
-      background-color: colors.$snippetColor;
-
-      > mat-icon {
-        color: white;
-      }
-    }
-  }
 }
 
 .editor {

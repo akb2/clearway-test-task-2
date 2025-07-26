@@ -23,25 +23,20 @@
 
 <div class="actions">
   @if (isEditing) {
-    <span
-      class="actions__item"
-      (click)="onSave()"
-    >
-      <mat-icon>save</mat-icon>
-    </span>
+    <app-document-viewer-snippet-action
+      icon="save"
+      [disabled]="!isHasChanges()"
+      (action)="onSave()"
+    />
   } @else {
-    <span
-      class="actions__item"
-      (click)="onEdit()"
-    >
-      <mat-icon>edit</mat-icon>
-    </span>
+    <app-document-viewer-snippet-action
+      icon="edit"
+      (action)="onEdit()"
+    />
   }
 
-  <span
-    class="actions__item"
-    (click)="onDelete()"
-  >
-    <mat-icon>close</mat-icon>
-  </span>
+  <app-document-viewer-snippet-action
+    icon="close"
+    (action)="onDelete()"
+  />
 </div>

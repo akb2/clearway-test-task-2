@@ -46,7 +46,12 @@ export class DocumentViewerSnippetActionsComponent {
   private startHeight = 0;
 
   readonly isEditingSignal = computed(() => this.snippet().id === this.documentSnippetsStore.editingId());
-  readonly isHasChanges = computed(() => this.snippet().text !== this.editingText());
+
+  readonly isHasChanges = computed(() => {
+    const text = this.editingText();
+
+    return !!text && this.snippet().text !== text;
+  });
 
   getDirectionName(x: Direction, y: Direction): Record<string, boolean> {
     const xName = DirectionXNamesByDirection[x];

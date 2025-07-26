@@ -1,0 +1,53 @@
+@use "colors";
+@use "vars";
+
+$removeSize: 24px;
+$removeSizeIcon: 16px;
+
+@mixin actionColor($background, $backgroundOpacity, $text) {
+  background-color: rgba($background, $backgroundOpacity);
+  border: 1px solid #{$background};
+
+  > mat-icon {
+    color: $text;
+  }
+}
+
+.action {
+  @include actionColor(colors.$snippetColor, 0.3, colors.$snippetColor);
+
+  width: $removeSize;
+  height: $removeSize;
+  line-height: $removeSize;
+  cursor: pointer;
+  pointer-events: auto;
+  display: block;
+  transition:
+    background-color #{vars.$animationTime} ease,
+    border-color #{vars.$animationTime} ease;
+
+  > mat-icon {
+    width: $removeSize - 2px;
+    height: $removeSize - 2px;
+    line-height: $removeSize - 2px;
+    display: block;
+    text-align: center;
+    font-size: $removeSizeIcon;
+    padding: 0;
+    transition: color #{vars.$animationTime} ease;
+  }
+
+  &:active {
+    @include actionColor(colors.$snippetColor, 1, white);
+  }
+
+  &.disabled {
+    $disabledColor: gray;
+
+    @include actionColor($disabledColor, 0.3, $disabledColor);
+
+    &:active {
+      @include actionColor($disabledColor, 1, white);
+    }
+  }
+}
