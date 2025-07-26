@@ -141,13 +141,17 @@ $textPadding: 8px;
 }
 
 .text {
+  $padding: 1px;
+  $margin: $textPadding - $padding;
+
   @include mixins.textOutline(colors.$snippetColor);
   @extend %text;
 
   color: white;
-  margin: $textPadding;
-  width: calc(100% - #{$textPadding * 2});
-  height: calc(100% - #{$textPadding * 2});
+  padding: $padding;
+  margin: $margin;
+  width: calc(100% - #{$margin * 2});
+  height: calc(100% - #{$margin * 2});
   display: -webkit-box;
   line-clamp: 999;
   -webkit-line-clamp: 999;
