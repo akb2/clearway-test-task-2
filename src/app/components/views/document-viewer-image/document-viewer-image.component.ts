@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, output, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, output, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DraggingEvent, DragStartEvent } from "@models/app";
 import { XYCoords } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
@@ -7,7 +8,7 @@ import { SetCreatingSnippetPositionAction } from "@store/document-snippets/docum
 import { SetImageSizeAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
 import { DocumentStore } from "@store/document/document.store";
-import { filter, Subject, takeUntil, timer } from "rxjs";
+import { filter, timer } from "rxjs";
 
 @Component({
   selector: "app-document-viewer-image",
@@ -16,11 +17,12 @@ import { filter, Subject, takeUntil, timer } from "rxjs";
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false
 })
-export class DocumentViewerImageComponent implements OnDestroy {
+export class DocumentViewerImageComponent {
   private readonly dispatcher = inject(Dispatcher);
   private readonly documentStore = inject(DocumentStore);
   private readonly documentViewerStore = inject(DocumentViewerStore);
   private readonly documentViewerService = inject(DocumentViewerService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly pageLoading = input(false);
 
@@ -44,8 +46,6 @@ export class DocumentViewerImageComponent implements OnDestroy {
 
   private isWaitingForCreateSnippet = false;
 
-  private readonly destroyed$ = new Subject<void>();
-
   readonly styles = computed<Record<string, string>>(() => {
     if (this.imageLoaded()) {
       return {
@@ -59,11 +59,6 @@ export class DocumentViewerImageComponent implements OnDestroy {
     return {} as Record<string, string>;
   });
 
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
-
   onLoad(event: Event) {
     const { naturalWidth: width, naturalHeight: height } = event.target as HTMLImageElement;
 
@@ -76,7 +71,7 @@ export class DocumentViewerImageComponent implements OnDestroy {
     timer(this.createSnippetTimeout)
       .pipe(
         filter(() => this.isWaitingForCreateSnippet && this.isImageDragging()),
-        takeUntil(this.destroyed$)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
         const helperRect = {

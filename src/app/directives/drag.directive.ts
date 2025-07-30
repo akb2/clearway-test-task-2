@@ -1,12 +1,15 @@
-import { AfterViewInit, Directive, effect, ElementRef, input, model, OnDestroy, output } from "@angular/core";
+import { AfterViewInit, DestroyRef, Directive, effect, ElementRef, inject, input, model, output } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DraggingEvent, DragStartEvent } from "@models/app";
-import { filter, fromEvent, merge, Observable, Subject, takeUntil, tap } from "rxjs";
+import { filter, fromEvent, merge, Observable, tap } from "rxjs";
 
 @Directive({
   selector: "[dragging]",
   standalone: false,
 })
-export class DragDirective implements AfterViewInit, OnDestroy {
+export class DragDirective implements AfterViewInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   readonly disabledDrag = input(false);
   readonly strictTarget = input(false);
   readonly isDragging = model(false);
@@ -16,8 +19,6 @@ export class DragDirective implements AfterViewInit, OnDestroy {
 
   private lastX = 0;
   private lastY = 0;
-
-  private readonly destroyed$ = new Subject<void>();
 
   private getEvent(
     elm: Node,
@@ -46,7 +47,7 @@ export class DragDirective implements AfterViewInit, OnDestroy {
         event.preventDefault();
         callback(event);
       }),
-      takeUntil(this.destroyed$),
+      takeUntilDestroyed(this.destroyRef),
     );
   }
 
@@ -62,13 +63,8 @@ export class DragDirective implements AfterViewInit, OnDestroy {
       this.getEvent(document, "mousemove", this.onDragging.bind(this)),
       this.getEvent(this.elementRef.nativeElement, "mousedown", this.onDragStart.bind(this), this.strictTarget())
     )
-      .pipe(takeUntil(this.destroyed$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
   }
 
   private onDragStart(event: MouseEvent) {

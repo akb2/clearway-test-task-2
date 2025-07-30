@@ -1,11 +1,14 @@
-import { inject, isDevMode } from "@angular/core";
+import { DestroyRef, inject, isDevMode } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { getState, signalStoreFeature, withHooks } from "@ngrx/signals";
 import { EventCreator, Events } from "@ngrx/signals/events";
-import { filter, Subject, takeUntil } from "rxjs";
+import { filter } from "rxjs";
 
-export const debugActions = (actions: EventCreator<string, any>[]) => signalStoreFeature(withHooks((store, events = inject(Events)) => {
-  const destroyed$ = new Subject<void>();
-
+export const debugActions = (actions: EventCreator<string, any>[]) => signalStoreFeature(withHooks((
+  store,
+  events = inject(Events),
+  destroyRef = inject(DestroyRef),
+) => {
   const tagColor = "color: lightgreen; font-weight: bold;";
   const tagErrorColor = "color: red; font-weight: bold;";
   const titleColor = "color: lightgray; font-weight: normal;";
@@ -15,7 +18,7 @@ export const debugActions = (actions: EventCreator<string, any>[]) => signalStor
   const onInit = () => events.on(...actions)
     .pipe(
       filter(() => isDevMode()),
-      takeUntil(destroyed$)
+      takeUntilDestroyed(destroyRef)
     )
     .subscribe({
       next: ({ type, payload }) => {
@@ -44,10 +47,5 @@ export const debugActions = (actions: EventCreator<string, any>[]) => signalStor
       )
     });
 
-  const onDestroy = () => {
-    destroyed$.next();
-    destroyed$.complete();
-  };
-
-  return { onInit, onDestroy };
+  return { onInit };
 }));

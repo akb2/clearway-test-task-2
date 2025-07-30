@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, output } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { IsMacOs } from "@helpers/app";
+import { Clamp } from '@helpers/math';
 import { Direction } from "@models/math";
 import { Dispatcher } from "@ngrx/signals/events";
 import { SetZoomAction } from "@store/document-viewer/document-viewer.actions";
 import { DocumentViewerStore } from "@store/document-viewer/document-viewer.store";
-import { filter, fromEvent, Subject, takeUntil, tap } from "rxjs";
-import { Clamp } from '../../../helpers/math';
+import { filter, fromEvent, tap } from "rxjs";
 
 @Component({
   selector: "app-document-viewer-actions",
@@ -14,10 +15,10 @@ import { Clamp } from '../../../helpers/math';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false
 })
-export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
+export class DocumentViewerActionsComponent implements OnInit {
   private readonly dispatcher = inject(Dispatcher);
   private readonly documentViewerStore = inject(DocumentViewerStore);
-
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly currentPageIndex = this.documentViewerStore.currentPage;
   readonly prevPageAvailable = this.documentViewerStore.prevPageAvailable;
@@ -34,15 +35,8 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
 
   readonly zoomPercentValue = computed(() => Math.round(this.zoom() / this.zoomMin * 100));
 
-  private readonly destroyed$ = new Subject<void>();
-
   ngOnInit(): void {
     this.keyboardZoomListener();
-  }
-
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
   }
 
   onZoomIn() {
@@ -74,7 +68,7 @@ export class DocumentViewerActionsComponent implements OnInit, OnDestroy {
           || simpleKeys.includes(code)
         )),
         tap(event => event.preventDefault()),
-        takeUntil(this.destroyed$)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(({ code }) => {
         if (zoomInKeys.includes(code)) {

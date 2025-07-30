@@ -1,15 +1,18 @@
-import { AfterViewInit, Directive, ElementRef, input, model, OnDestroy, output } from "@angular/core";
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, model, output } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { IsMacOs, IsSafari } from "@helpers/app";
 import { AnyToInt } from "@helpers/converters";
 import { Nullable } from "@models/app";
 import { Direction } from "@models/math";
-import { filter, fromEvent, pairwise, skipWhile, startWith, Subject, switchMap, takeUntil, tap, timer } from "rxjs";
+import { filter, fromEvent, pairwise, skipWhile, startWith, switchMap, tap, timer } from "rxjs";
 
 @Directive({
   selector: "[scrollable]",
   standalone: false,
 })
-export class ScrollableDirective implements AfterViewInit, OnDestroy {
+export class ScrollableDirective implements AfterViewInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   readonly inertion = input(true);
   readonly isScrolling = model(false);
   readonly disabledScroll = input(false);
@@ -21,8 +24,6 @@ export class ScrollableDirective implements AfterViewInit, OnDestroy {
 
   private readonly endTime = 350;
   private readonly inertionDetectTime = 90;
-
-  private readonly destroyed$ = new Subject<void>();
 
   private isInertionEvent(cancelable: boolean, timeStamp: number, lastTime: number): boolean {
     return IsMacOs() && IsSafari()
@@ -53,11 +54,6 @@ export class ScrollableDirective implements AfterViewInit, OnDestroy {
     this.wheelListener();
   }
 
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
-
   private wheelListener() {
     fromEvent<WheelEvent>(this.elementRef.nativeElement, "wheel", { passive: false })
       .pipe(
@@ -67,7 +63,7 @@ export class ScrollableDirective implements AfterViewInit, OnDestroy {
         tap(([, event]) => this.onScrollStart(event!)),
         switchMap(() => timer(this.endTime)),
         filter(() => this.isScrolling()),
-        takeUntil(this.destroyed$)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => this.onScrollEnd());
   }

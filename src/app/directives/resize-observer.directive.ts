@@ -1,19 +1,20 @@
-import { AfterViewInit, Directive, ElementRef, OnDestroy, OnInit, output } from "@angular/core";
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, OnDestroy, OnInit, output } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CompareObjects } from "@helpers/app";
 import { DefaultRectData } from "@helpers/ui";
 import { RectData, ResizeEvent } from "@models/ui";
-import { fromEvent, Subject, takeUntil } from "rxjs";
+import { fromEvent } from "rxjs";
 
 @Directive({
   selector: '[resizeObserver]',
   standalone: false
 })
 export class ResizeObserverDirective implements OnInit, AfterViewInit, OnDestroy {
+  private readonly destroyRef = inject(DestroyRef);
+
   readonly resized = output<ResizeEvent>();
 
   private lastEventData: ResizeEvent = DefaultRectData;
-
-  private readonly destroyed$ = new Subject<void>();
 
   private resizeObserver$ = new ResizeObserver(entries => entries.forEach(this.onResized.bind(this)));
 
@@ -34,7 +35,7 @@ export class ResizeObserverDirective implements OnInit, AfterViewInit, OnDestroy
 
   ngOnInit() {
     fromEvent(window, "resize")
-      .pipe(takeUntil(this.destroyed$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(this.onResized.bind(this));
   }
 
@@ -45,8 +46,6 @@ export class ResizeObserverDirective implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngOnDestroy() {
-    this.destroyed$.next();
-    this.destroyed$.complete();
     this.resizeObserver$.disconnect();
   }
 
