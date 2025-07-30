@@ -31,6 +31,11 @@ export class DocumentViewerImageComponent {
   readonly isCreatingSnippet = signal(false);
   readonly isImageDragging = signal(false);
 
+  private readonly distanceToDragStart = 5;
+
+  private readonly draggingDistanceX = signal(0);
+  private readonly draggingDistanceY = signal(0);
+
   readonly document = this.documentStore.viewingDocument;
 
   private readonly zoomKoeff = this.documentViewerStore.zoomKoeff;
@@ -80,22 +85,44 @@ export class DocumentViewerImageComponent {
         };
 
         this.isWaitingForCreateSnippet = false;
+        this.clearDraggingStates();
 
         this.dispatcher.dispatch(SetCreatingSnippetPositionAction(helperRect));
       });
   }
 
   onDrag({ deltaX, deltaY }: DraggingEvent) {
-    const zoomKoeff = this.zoomKoeff();
+    const draggingDistanceX = this.draggingDistanceX();
+    const draggingDistanceY = this.draggingDistanceY();
 
-    this.changePosition.emit({
-      x: this.imagePositionLeft() * zoomKoeff + deltaX,
-      y: this.imagePositionTop() * zoomKoeff + deltaY,
-    });
-    this.isWaitingForCreateSnippet = false;
+    if (Math.abs(draggingDistanceX) > this.distanceToDragStart || Math.abs(draggingDistanceY) > this.distanceToDragStart) {
+      const zoomKoeff = this.zoomKoeff();
+
+      this.changePosition.emit({
+        x: this.imagePositionLeft() * zoomKoeff + deltaX,
+        y: this.imagePositionTop() * zoomKoeff + deltaY,
+      });
+
+      this.isWaitingForCreateSnippet = false;
+    }
+
+    else if (this.isWaitingForCreateSnippet) {
+      this.draggingDistanceX.set(draggingDistanceX + deltaX);
+      this.draggingDistanceY.set(draggingDistanceY + deltaX);
+    }
+
+    else {
+      this.clearDraggingStates();
+    }
   }
 
   onDragEnd() {
+    this.clearDraggingStates();
     this.isWaitingForCreateSnippet = false;
+  }
+
+  private clearDraggingStates() {
+    this.draggingDistanceX.set(0);
+    this.draggingDistanceY.set(0);
   }
 }
